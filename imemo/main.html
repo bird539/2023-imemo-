@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>imemo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+
 </head>
 <body>
     <!--타이머-->
@@ -23,12 +25,20 @@
     </div>
 
     <script src="/timer.js"></script>
-    <script>/*
-            let satTime  =   [makeNumber(StrSet)];
-            let endTime  =   [makeNumber(StrPast)];
-            let nowTime  =   [makeNumber(startTimer)];
-            //const SetTIME = arrNumber[0] = hour, [1] = min, [2]=s 
-            */
-    </script>
+    <!--
+        <script src="ex.js"></script>
+            let pastT = L_Timers[i].pastTime;
+            let afterT = L_Timers[i].afterTime;
+            let setT = L_Timers[i].setTime;
+            let nowT = moment();
+            
+            let D = moment.duration(afterT.diff(nowT));
+            let H = D.hours();
+            let M = D.minutes();
+            let S = D.seconds();
+
+            let setTime = moment.duration(afterT.diff(pastT)).asSeconds();
+    
+        -->
 </body>
 </html>

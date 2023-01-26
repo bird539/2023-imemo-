@@ -46,6 +46,7 @@ function checkRepeat(event) {
             getData[linkindex] = {
                 setTime: getData[linkindex].setTime,
                 pastTime: getData[linkindex].pastTime,
+                afterTime: getData[linkindex].afterTime,
                 repeatCheck: "true",
             }
             Timers = getData;
@@ -55,6 +56,7 @@ function checkRepeat(event) {
             getData[linkindex] = {
                 setTime: getData[linkindex].setTime,
                 pastTime: getData[linkindex].pastTime,
+                afterTime: getData[linkindex].afterTime,
                 repeatCheck: "false",
             }
             Timers = getData;
@@ -62,7 +64,7 @@ function checkRepeat(event) {
             break;
     }
     saveTimers();
-}
+}       
 
 
 function reStartNow(event) {
@@ -126,14 +128,7 @@ function stopTimerNow(event) {
     const stopTimeBtnID = `stopBtn_${liId}`;
 
     const linkindex = parseInt(liId);
-
-    const date = new Date();
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    const seconds = String(date.getSeconds()).padStart(2, "0");
-    const stopTimeNow = `${hours}:${minutes}:${seconds}`;
-
-
+    const stopTimeNow = moment();
     const getData = JSON.parse(localStorage.getItem(STOPTIMER));
     getData[linkindex] = {
         stopTimerID: stopTimeBtnID,
@@ -142,7 +137,6 @@ function stopTimerNow(event) {
     stopTimers = getData;
     localStorage.setItem(STOPTIMER, JSON.stringify(stopTimers));
     
-
     // btn1 숨기기 (display: none)
     if(stopTimeBtn.style.display !== 'none') {
         stopTimeBtn.style.display = 'none';
@@ -166,25 +160,14 @@ function playTimerNow(event) {
 
     const linkindex = parseInt(liId);
 
-    const date = new Date();
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    const seconds = String(date.getSeconds()).padStart(2, "0");
-    const stopTimeNow = `${hours}:${minutes}:${seconds}`;
-
     const LstopTimers =  JSON.parse(localStorage.getItem(STOPTIMER));
-    const parStopTime_i = `${LstopTimers[linkindex].stopTime}`;
+    let stopT = moment(LstopTimers[linkindex].stopTime);
+    let nowT = moment();
 
-    let makeNumber = function timeNumber(event) { //익명함수 사용
-        let event2 = event.split(":");
-        const makenumber = event2 => event2.map(Number);
-        const arrNumber = makenumber(event2);
-        const SetTIME = arrNumber[0] * 3600 + arrNumber[1] * 60 + arrNumber[2];
-        return SetTIME;
-    }
-    const satTime = makeNumber(parStopTime_i);
-    const nowTime = makeNumber(stopTimeNow);
-    const playTime_after = nowTime - satTime;
+    const playTime_after = moment.duration(nowT.diff(stopT));
+    console.log(`${playTime_after}`);
+    console.log(`${nowT}`)
+    console.log(`${nowT.add(playTime_after)}`)
 
     const getData = JSON.parse(localStorage.getItem(STOPTIMER));
     getData[linkindex] = {
@@ -317,23 +300,15 @@ function handleTimerSubmit(event) { //저장
     const newSecondValue = String(secC).padStart(2, "0");
     const newAllTimerValue = `${newHourValue}:${newMinuteValue}:${newSecondValue}`;
 
-    const date = new Date();
-    let S =date.getSeconds() ;
-    let M = date.getMinutes();
-    let H = date.getHours();
-
-    let secG = (S + secC) % 60;
-    let minG = (M + minC + Math.floor(S / 60)) % 60;
-    let houG = (H + houC + Math.floor((M + minC + Math.floor(S / 60)) / 60)) % 24;
-
-    const seconds = String(secG).padStart(2, "0");
-    const minutes = String(minG).padStart(2, "0");
-    const hours = String(houG).padStart(2, "0");
-    const endTimer = `${hours}:${minutes}:${seconds}`;
+    const pastTime = moment();
+    const afterTime = moment().add(houC, 'hours').add(minC, 'minutes').add(secC, 'seconds');
+    //console.log(pastTime);
+    //console.log(`${afterTime}`);
 
     const newTimerOb = {
         setTime: newAllTimerValue,
-        pastTime: endTimer,
+        pastTime: pastTime,
+        afterTime: afterTime,
         repeatCheck: "false",
     }
 
@@ -383,249 +358,87 @@ if (saveStopTimers !== null) {
     stopTimers = parsedStops;
 }
 
-
 //-------------------------------------------------------------------------------------------------
 function updateTimer() {
     if (Timers !== null) {
         for (let i = 0; i < Timers.length; i++) {
-
-            const getSet = document.getElementById(`timeSet_${i}`);
-            const StrSet = getSet.innerText;
-
-            function makeNumber(event) {
-                let event2 = event.split(":");
-                const makenumber = event2 => event2.map(Number);
-                let arrNumber = makenumber(event2);
-                return arrNumber;
-                //const SetTIME = arrNumber[0] = hour, [1] = min, [2],s 
-                }
-
-            const getPast = document.getElementById(`pastSet_${i}`);
-            const StrPast = getPast.innerText;
-
-            const date = new Date();
-            const hours = date.getHours();
-            const minutes = date.getMinutes();
-            const seconds = date.getSeconds();
-            const startTimer = `${hours}:${minutes}:${seconds}`;
-
-            let satTime  =   makeNumber(StrSet);
-            let endTime  =   makeNumber(StrPast);
-            let nowTime  =   makeNumber(startTimer);
-
             const getChekRepeat = document.getElementById(`repeatCheck_${i}`);
-            
-            const getStopBtn = document.getElementById(`stopBtn_${i}`); ////////////////////////////////////
+            const getStopBtn = document.getElementById(`stopBtn_${i}`); 
             const getPlayBtn = document.getElementById(`playBtn_${i}`);
 
-            const LstopTimers = localStorage.getItem(STOPTIMER);
-            const parseStops = JSON.parse(LstopTimers);
+            let L_Timers = JSON.parse(window.localStorage.getItem('Timers'));
+            let L_stopTimers = JSON.parse(window.localStorage.getItem('stopTimers'));
+            let pastT = moment(L_Timers[i].pastTime);
+            let afterT = moment(L_Timers[i].afterTime);
+            let set_S = L_Timers[i].setTime
+            let nowT = moment();
+            let stopID = L_stopTimers[i].stopTimerID;
+            let stopT = L_stopTimers[i].stopTime;
 
-            const parStoID_i = `${parseStops[i].stopTimerID}`;
-            
-            
-            //console.log(parStoID_i , getStopBtn.id)
-            //console.log(parseStops[i].stopTimerID); ////////////////////////////////////
+            let D = moment.duration(afterT.diff(nowT));
+            let H = D.hours();
+            let M = D.minutes();
+            let S = D.seconds();
+            let declineTIME = `${H}:${M}:${S}`;
+            let update = document.querySelector(`#updatTime_${i}`);
+            let repeatCount = document.querySelector(`#repeatCount_${i}`);
 
-            let PLZero = function (event) {
-                const make = String(event).padStart(2, "0");
-                return make;
-            }
-
-            /*
-            let makeNumber = function timeNumber(event) { //익명함수 사용
-                let event2 = event.split(":");
-                const makenumber = event2 => event2.map(Number);
-                const arrNumber = makenumber(event2);
-                const SetTIME = arrNumber[0] * 3600 + arrNumber[1] * 60 + arrNumber[2];
-                return SetTIME;
-            }
-            */
-
-
-            if ( (satTime[0] > 0 || satTime[1] > 0 || satTime[2] > 0) && getChekRepeat.checked === false && parStoID_i !== getStopBtn.id  && parStoID_i !== getPlayBtn.id) { //감소시간
-
-                const Hours = endTime[0]-nowTime[0];
-                const Minut = endTime[1]-nowTime[1];
-                const Second = endTime[2]-nowTime[2];
-
-                const declineTIME = `${Hours}:${Minut}:${Second}`;
-                const update = document.querySelector(`#updatTime_${i}`);
+            if ( (set_S != '00:00:00') && getChekRepeat.checked === false && stopID !== getStopBtn.id  && stopID !== getPlayBtn.id) { //감소시간
                 update.innerText = declineTIME;
-
-                if(Hours==0 && Minut==0 && Second==0) {
-                    const declineTIME = `END`;
-                    const update = document.querySelector(`#updatTime_${i}`);
-                    update.innerText = declineTIME;
-
+                if(H==0 && M==0 && S <= 0) {
+                    update.innerText = `END`;
                     const playTimeBtn = document.getElementById(`playBtn_${i}`);
                     const stopTimeBtn = document.getElementById(`stopBtn_${i}`);
                     if(stopTimeBtn.style.display !== 'none') {
                         stopTimeBtn.style.display = 'none';
                         playTimeBtn.style.display = 'none';
-                    }
-                    else {
+                    } else {
                             stopTimeBtn.style.display = 'none';
                             playTimeBtn.style.display = 'none';
                     }
-
                 }
 
-            } else if ( (satTime[0] > 0 || satTime[1] > 0 || satTime[2] > 0) &&  getChekRepeat.checked === true && parStoID_i !== getStopBtn.id  && parStoID_i !== getPlayBtn.id) { //반복시간-----------
-                const repeatCounts = document.querySelector(`#repeatCount_${i}`);
-                const decline = (pastTime + satTime) - nowTime;
-                const repeatCount = Math.floor(Math.abs(decline) / satTime + 1);
+            } else if ( set_S != '00:00:00' &&  getChekRepeat.checked === true && stopID !== getStopBtn.id  && stopID !== getPlayBtn.id) { 
+                let SET_R = parseInt(moment.duration(afterT.diff(pastT)).asSeconds());
+                let R = parseInt(moment.duration(nowT.diff(pastT)).asSeconds()/SET_R);//Same1
+                let A_P = afterT.add(SET_R*R, 'seconds');
+                let A_T = moment.duration(A_P.diff(nowT));
+                let declineTIME_R = `${A_T.hours()}:${A_T.minutes()}:${A_T.seconds()}`;
+                update.innerText = declineTIME_R
+                repeatCount.innerText = `${R}`;
 
-                if (decline > 0) {
-                    repeatCounts.innerText = "0";
-                } else if (decline <= 0) {
-                    repeatCounts.innerText = `${repeatCount}`;
+            } else if (set_S === '00:00:00' && stopID !== getStopBtn.id && stopID !== getPlayBtn.id) { 
+                let now_D = moment.duration(nowT.diff(pastT))//Same1
+                let declineTIME_R = `${now_D.hours()}:${now_D.minutes()}:${now_D.seconds()}`;
+                update.innerText = declineTIME_R;
+
+            } else if (stopID === getStopBtn.id) {
+                let S_N = moment.duration(nowT.diff(stopT));
+                let s_D = pastT.add(S_N) ;
+                if (set_S != '00:00:00') {
+                    let s_D = pastT.add(S_N).add(set_S);
                 }
-                //console.log(decline,"본래의 카운트",repeatCount); 
-                if (repeatCount === 1) {
-                    /*
-                    let decT = ; 
-                    let nowDecline =
-                    */
-                    //const nowDecline = Math.floor(((repeatCount * satTime) + pastTime) - nowTime);
+                let S_NN = moment.duration(nowT.diff(s_D));
+                let declineTIME_R = `${S_NN.hours()}:${S_NN.minutes()}:${S_NN.seconds()}`;
+                update.innerText = declineTIME_R;
 
-                    const Hours = PLZero(Math.floor(nowDecline / 3600));
-                    const ChekMinut = Math.floor(nowDecline / 60);
-                    const Minut = PLZero(ChekMinut % 60);
-                    const Second = PLZero(nowDecline % 60);
-                    const declineTIME = `${Hours}:${Minut}:${Second}`;
-                    const update = document.querySelector(`#updatTime_${i}`);
-                    update.innerText = declineTIME;
-
-                    if (Second < 1) {
-                        const repeatCount2 = Math.floor(Math.abs(decline) / satTime + 2);
-                        //console.log("임의의 카운트",repeatCount2); 
-                        const nowDecline = Math.floor(((repeatCount2 * satTime) + pastTime) - nowTime);
-
-                        const Hours = PLZero(Math.floor(nowDecline / 3600));
-                        const ChekMinut = Math.floor(nowDecline / 60);
-                        const Minut = PLZero(ChekMinut % 60);
-                        const Second = PLZero(nowDecline % 60);
-                        const declineTIME = `${Hours}:${Minut}:${Second}`;
-                        const update = document.querySelector(`#updatTime_${i}`);
-                        update.innerText = declineTIME;
-                    }
-
-                } else if (repeatCount >= 2) {
-                    const nowDecline = Math.floor(((repeatCount * satTime) + pastTime + satTime) - nowTime);
-                    let PLZero = function (event) {
-                        const make = String(event).padStart(2, "0");
-                        return make;
-                    }
-                    const Hours = PLZero(Math.floor(nowDecline / 3600));
-                    const ChekMinut = Math.floor(nowDecline / 60);
-                    const Minut = PLZero(ChekMinut % 60);
-                    const Second = PLZero(nowDecline % 60);
-
-                    const declineTIME = `${Hours}:${Minut}:${Second}`;
-                    const update = document.querySelector(`#updatTime_${i}`);
-                    update.innerText = declineTIME;
+            } else if (stopID === getPlayBtn.id) {
+                let S_N = moment.duration(nowT.diff(pastT));
+                let s_DD =  pastT.add(S_N);
+                let s_DDD = pastT.add(stopT); //과거시간+정지기간+(현재~과거)기간 - 현재시간
+                if (set_S != '00:00:00') {
+                    let s_DD = pastT.add(stopT).add(S_N).add(set_S);
                 }
-
-            } else if (satTime === 0 && parStoID_i !== getStopBtn.id && parStoID_i !== getPlayBtn.id) { //증가시간-----------
-                const nowDecline = Math.floor(Math.abs(pastTime - nowTime));
-
-                const Hours = PLZero(Math.floor(nowDecline / 3600));
-                const ChekMinut = Math.floor(nowDecline / 60);
-                const Minut = PLZero(ChekMinut % 60);
-                const Second = PLZero(nowDecline % 60);
-                const declineTIME = `${Hours}:${Minut}:${Second}`;
-                const update = document.querySelector(`#updatTime_${i}`);
-                update.innerText = declineTIME;
-
-
-            } else if (parStoID_i === getStopBtn.id) {
-
-                const stopTime = `${parseStops[i].stopTime}`;
-                const stopTime_T = makeNumber(stopTime);
-                const stop_now = Math.abs(stopTime_T - nowTime);
-
-                const decline = Math.abs((pastTime + satTime + stop_now) - nowTime);
-
-                const Hours = PLZero(Math.floor(decline / 3600));
-                const ChekMinut = Math.floor(decline / 60);
-                const Minut = PLZero(ChekMinut % 60);
-                const Second = PLZero(decline % 60);
-
-                const declineTIME = `${Hours}:${Minut}:${Second}`;
-                const update = document.querySelector(`#updatTime_${i}`);
-                update.innerText = declineTIME;
-
-            }else if (parStoID_i === getPlayBtn.id && getChekRepeat.checked === false) {
-
-                const stopTime = parseStops[i].stopTime;
-
-                const decline = Math.abs((pastTime + satTime + stopTime) - nowTime);
-
-                const Hours = PLZero(Math.floor(decline / 3600));
-                const ChekMinut = Math.floor(decline / 60);
-                const Minut = PLZero(ChekMinut % 60);
-                const Second = PLZero(decline % 60);
-
-                const declineTIME = `${Hours}:${Minut}:${Second}`;
-                const update = document.querySelector(`#updatTime_${i}`);
-                update.innerText = declineTIME;
-
-            } else if (satTime > 0 && parStoID_i === getPlayBtn.id && getChekRepeat.checked === true && parStoID_i !== getStopBtn.id ) { //반복시간-----------
-                const stopTime = parseStops[i].stopTime;
-                const repeatCounts = document.querySelector(`#repeatCount_${i}`);
-                const decline = (pastTime + satTime + stopTime) - nowTime;
-                const repeatCount = Math.floor(Math.abs(decline) / satTime + 1);
-
-                if (decline > 0) {
-                    repeatCounts.innerText = "0";
-                } else if (decline <= 0) {
-                    repeatCounts.innerText = `${repeatCount}`;
-                }
-                //console.log(decline,"본래의 카운트",repeatCount); 
-                if (repeatCount === 1) {
-                    const nowDecline = Math.floor(((repeatCount * satTime) + pastTime + stopTime) - nowTime);
-
-                    const Hours = PLZero(Math.floor(nowDecline / 3600));
-                    const ChekMinut = Math.floor(nowDecline / 60);
-                    const Minut = PLZero(ChekMinut % 60);
-                    const Second = PLZero(nowDecline % 60);
-                    const declineTIME = `${Hours}:${Minut}:${Second}`;
-                    const update = document.querySelector(`#updatTime_${i}`);
-                    update.innerText = declineTIME;
-
-                    if (Second < 1) {
-                        const repeatCount2 = Math.floor(Math.abs(decline) / satTime + 2);
-                        //console.log("임의의 카운트",repeatCount2); 
-                        const nowDecline = Math.floor(((repeatCount2 * satTime) + pastTime + stopTime) - nowTime);
-
-                        const Hours = PLZero(Math.floor(nowDecline / 3600));
-                        const ChekMinut = Math.floor(nowDecline / 60);
-                        const Minut = PLZero(ChekMinut % 60);
-                        const Second = PLZero(nowDecline % 60);
-                        const declineTIME = `${Hours}:${Minut}:${Second}`;
-                        const update = document.querySelector(`#updatTime_${i}`);
-                        update.innerText = declineTIME;
-                    }
-
-                } else if (repeatCount >= 2) {
-                    const nowDecline = Math.floor(((repeatCount * satTime) + pastTime + satTime + stopTime) - nowTime);
-                    let PLZero = function (event) {
-                        const make = String(event).padStart(2, "0");
-                        return make;
-                    }
-                    const Hours = PLZero(Math.floor(nowDecline / 3600));
-                    const ChekMinut = Math.floor(nowDecline / 60);
-                    const Minut = PLZero(ChekMinut % 60);
-                    const Second = PLZero(nowDecline % 60);
-
-                    const declineTIME = `${Hours}:${Minut}:${Second}`;
-                    const update = document.querySelector(`#updatTime_${i}`);
-                    update.innerText = declineTIME;
-                }
-
+                let NN = moment.duration(nowT.diff(s_DDD)); //
+                let declineTIME_R = `${s_DDD.hours()}:${s_DDD.minutes()}:${s_DDD.seconds()}`;
+                //let declineTIME_R = `${s_D.hours()}:${s_D.minutes()}:${s_D.seconds()}`;
+                update.innerText = declineTIME_R;
+                console.log(`${s_DD}`);
+                //console.log(`${NN}`);
+                
             }
         }
+
     } else {
         paintTimerList(newTimerOb);
     }
