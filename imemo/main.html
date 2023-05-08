@@ -3,42 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>imemo</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-
 </head>
 <body>
-    <!--타이머-->
-    <h2>timer</h2>
-    <div class="timer">
-        <form id="timerForm">
-            day
-            <input type="number" id="dayTimer" style="width:30px;">
-            hour
-            <input type="number" id="hourTimer" style="width:40px;">
-            mimute
-            <input type="number" id="minuteTimer" style="width:40px;">
-            second
-            <input type="number" id="secondTimer" style="width:40px;">
-            <input type="submit" value="start" style="width:40px;">
-        </form>
-        <ul id="timer-list"></ul>
+    <div class="main">
     </div>
 
-    <script src="/timer.js"></script>
-    <!--
-        <script src="ex.js"></script>
-            let pastT = L_Timers[i].pastTime;
-            let afterT = L_Timers[i].afterTime;
-            let setT = L_Timers[i].setTime;
-            let nowT = moment();
-            
-            let D = moment.duration(afterT.diff(nowT));
-            let H = D.hours();
-            let M = D.minutes();
-            let S = D.seconds();
+    <script src="/make_window.js"></script>
+    <script src="/window_title_change.js"></script>
 
-            let setTime = moment.duration(afterT.diff(pastT)).asSeconds();
-    
-        -->
 </body>
 </html>

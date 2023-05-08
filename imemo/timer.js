@@ -158,21 +158,25 @@ function playTimerNow(event) {
     const stopTimeBtn = document.getElementById(`stopBtn_${liId}`);
     const playTimeBtnID = `playBtn_${liId}`;
 
+    let L_Timers = JSON.parse(window.localStorage.getItem('Timers'));
+    let pastT = moment(L_Timers[liId].pastTime);
+
     const linkindex = parseInt(liId);
 
     const LstopTimers =  JSON.parse(localStorage.getItem(STOPTIMER));
     let stopT = moment(LstopTimers[linkindex].stopTime);
     let nowT = moment();
 
-    const playTime_after = moment.duration(nowT.diff(stopT));
-    console.log(`${playTime_after}`);
-    console.log(`${nowT}`)
-    console.log(`${nowT.add(playTime_after)}`)
+    const playTime_after =nowT.diff(stopT, 'seconds');
+    const PTN_A = pastT.add(Number(playTime_after), 'seconds');
+    console.log(`플레이시점-정지시점(정지기간) = ${playTime_after}`);
+    console.log(`플레이시점 = ${nowT}`)
+    console.log(`현재시점+정지기간 = ${PTN_A}`)
 
     const getData = JSON.parse(localStorage.getItem(STOPTIMER));
     getData[linkindex] = {
         stopTimerID: playTimeBtnID,
-        stopTime: playTime_after,
+        stopTime: PTN_A,
     }
     stopTimers = getData;
     localStorage.setItem(STOPTIMER, JSON.stringify(stopTimers));
@@ -423,19 +427,14 @@ function updateTimer() {
                 update.innerText = declineTIME_R;
 
             } else if (stopID === getPlayBtn.id) {
-                let S_N = moment.duration(nowT.diff(pastT));
-                let s_DD =  pastT.add(S_N);
-                let s_DDD = pastT.add(stopT); //과거시간+정지기간+(현재~과거)기간 - 현재시간
-                if (set_S != '00:00:00') {
-                    let s_DD = pastT.add(stopT).add(S_N).add(set_S);
-                }
-                let NN = moment.duration(nowT.diff(s_DDD)); //
-                let declineTIME_R = `${s_DDD.hours()}:${s_DDD.minutes()}:${s_DDD.seconds()}`;
-                //let declineTIME_R = `${s_D.hours()}:${s_D.minutes()}:${s_D.seconds()}`;
+
+                let NN = moment.duration(nowT.diff(stopT));  //현재시점 - (과거시점+멈춘기간)시점
+                let declineTIME_R = `${NN.hours()}:${NN.minutes()}:${NN.seconds()}`;
                 update.innerText = declineTIME_R;
-                console.log(`${s_DD}`);
-                //console.log(`${NN}`);
-                
+
+                //console.log(`${S_N.hours()}:${S_N.minutes()}:${S_N.seconds()}`); //(과거~현재)기간 = 계속 증가 0:0:6..7
+                //console.log(`*멈춘기간 = ${stopT}`); 
+                //console.log(`*과거시점 = ${pastT}`); 
             }
         }
 
