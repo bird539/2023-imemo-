@@ -1,29 +1,13 @@
 const main = document.querySelector('.main');
 
-//모듈화 해서 파일끼리 연결하기
-
-
-let n = 0;
-let name1 = "이름";
-
-make_window(n,name1);
-
-//make_tap(win_num,num,name,skill)
-make_tap(0,1,"tapName1","todo");
-make_tap(0,2,"tapName2","calender");
-make_tap(0,0,"tapMenu","menu");
-
-//make_tep_skill(win_num,tap_num,skill_num)
-make_tep_skill(0,0,0);
-
-function make_window(num,name){
+function make_window(num){
     //윈도우 생성
     const newDiv = document.createElement("div");
     newDiv.className = `window_${num}`;
 
     //윈도우 이름 추가
     const window_name = document.createElement("h3");
-    window_name.innerText = `${name}`;
+    window_name.innerText = `win${num}`;
     window_name.className = `${num}_title`;
     newDiv.appendChild(window_name);
 
@@ -47,10 +31,21 @@ function make_window(num,name){
     tap_class.className = `win_tap_${num}`;
     newDiv.appendChild(tap_class);
 
-    //
-
     //윈도우를 메인에 생성
     main.appendChild(newDiv);
+
+    //윈도우 추가 버튼 생성
+    make_menu(num);
+}
+function make_menu(num){
+    const window = document.querySelector(`.win_tap_${num}`);
+    const newDiv = document.createElement("div");
+    newDiv.className = `tep_menu`;
+
+    const tap_button = document.createElement("button");
+    tap_button.innerText = `PLS win`;
+    newDiv.appendChild(tap_button);
+    window.appendChild(newDiv);
 }
 
 function make_tap(win_num,num,name,skill){
@@ -59,7 +54,7 @@ function make_tap(win_num,num,name,skill){
 
     //탭 버튼 클래스 생성
     const newDiv = document.createElement("div");
-    newDiv.className = `${win_num}_tap_${num}_${skill}`;
+    newDiv.className = `win${win_num}_tap${num}_${skill}`;
 
     //탭 버튼 클래스에 탭 버튼 추가
     const tap_button = document.createElement("button");
@@ -76,8 +71,39 @@ function make_tep_skill(win_num,tap_num,skill_num){
 
     //스킬창 클래스 생성
     const newDiv = document.createElement("div");
-    newDiv.className = `${win_num}_tap_${tap_num}_skill_${skill_num}`;
+    newDiv.className = `win${win_num}_tap${tap_num}_skill${skill_num}`;
 
     //스킬창을 윈도우에 생성
     window.appendChild(newDiv);
 }
+
+
+let window_array = [0];
+
+function window_array_store(){
+    localStorage.setItem("win_array",JSON.stringify(window_array));
+}
+
+function pluse_window_event(event){
+    window_array.push(window_array.length);
+    window_array_store();
+    make_window(window_array[window_array.length-1]);
+    location.reload();
+    //make_window();
+}
+
+const in_stor_win_array = localStorage.getItem("win_array");
+if(in_stor_win_array !== null){
+    const parsed_win_array = JSON.parse(in_stor_win_array);
+    window_array = parsed_win_array;
+    parsed_win_array.forEach(make_window);
+} else {
+    //로컬 스토리지 비웠을 때
+    window_array_store();
+    window_array.forEach(make_window);
+}
+
+const pluse_window = document.querySelectorAll(".tep_menu");
+pluse_window.forEach(function (event){
+    event.addEventListener("click",pluse_window_event);
+});
