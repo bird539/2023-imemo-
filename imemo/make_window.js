@@ -35,15 +35,27 @@ function make_window(num){
     main.appendChild(newDiv);
 
     //윈도우 추가 버튼 생성
+    make_tap_pluse(num);
     make_menu(num);
 }
 function make_menu(num){
     const window = document.querySelector(`.win_tap_${num}`);
     const newDiv = document.createElement("div");
-    newDiv.className = `tep_menu`;
+    newDiv.className = `tap_menu`;
 
     const tap_button = document.createElement("button");
     tap_button.innerText = `PLS win`;
+    newDiv.appendChild(tap_button);
+    window.appendChild(newDiv);
+}
+
+function make_tap_pluse(num){
+    const window = document.querySelector(`.win_tap_${num}`);
+    const newDiv = document.createElement("div");
+    newDiv.className = `tap_PLS`;
+
+    const tap_button = document.createElement("button");
+    tap_button.innerText = `tap++`;
     newDiv.appendChild(tap_button);
     window.appendChild(newDiv);
 }
@@ -103,7 +115,7 @@ if(in_stor_win_array !== null){
     window_array.forEach(make_window);
 }
 
-const pluse_window = document.querySelectorAll(".tep_menu");
+const pluse_window = document.querySelectorAll(".tap_menu");
 pluse_window.forEach(function (event){
     event.addEventListener("click",pluse_window_event);
 });
