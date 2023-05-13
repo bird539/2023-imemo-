@@ -54,9 +54,29 @@ function make_tap_pluse(num){
     const newDiv = document.createElement("div");
     newDiv.className = `tap_PLS`;
 
+    //ul로 숨겨진 목록
+    const tapSelectDiv = document.createElement("div");
+    tapSelectDiv.className = `tapPls${num}`;
+    const newUl = document.createElement("ul");
+
+    //li안 선택 스킬 버튼
+    let skill_array = [0,1,2,3,4,5,6,7,8,9];
+    skill_array.forEach(function(n) {
+        const newLi = document.createElement("li");
+        const newLiBtn = document.createElement("button");
+        newLiBtn.innerText = `s${n}`;
+        newLiBtn.className = `skill_pls`
+        newLi.appendChild(newLiBtn);
+        newUl.appendChild(newLi);
+        newUl.style.display = 'none';
+        tapSelectDiv.appendChild(newUl);
+    });
+
     const tap_button = document.createElement("button");
-    tap_button.innerText = `tap++`;
+    tap_button.innerText = `tap++`;    
     newDiv.appendChild(tap_button);
+    newDiv.appendChild(tapSelectDiv);//ul추가
+
     window.appendChild(newDiv);
 }
 
@@ -96,6 +116,7 @@ function window_array_store(){
     localStorage.setItem("win_array",JSON.stringify(window_array));
 }
 
+//윈도우 추가 이벤트
 function pluse_window_event(event){
     window_array.push(window_array.length);
     window_array_store();
@@ -104,6 +125,7 @@ function pluse_window_event(event){
     //make_window();
 }
 
+//새로고침 시 저장물 보존
 const in_stor_win_array = localStorage.getItem("win_array");
 if(in_stor_win_array !== null){
     const parsed_win_array = JSON.parse(in_stor_win_array);
@@ -114,6 +136,28 @@ if(in_stor_win_array !== null){
     window_array_store();
     window_array.forEach(make_window);
 }
+
+//스킬 선택 메뉴 숨기고 보이기
+function hied_show_tapSelect(event){
+    const win_num = event.target.parentElement.parentElement.className;
+    const num = win_num.charAt(win_num.length-1);
+    const tapPls = document.querySelector(`.tapPls${num}`);
+    if(tapPls!=null){
+        if(tapPls.firstChild.style.display == 'none'){
+            tapPls.firstChild.style.display = 'block';
+        }else if(tapPls.firstChild.style.display == 'block'){
+            tapPls.firstChild.style.display = 'none';
+        }
+    }
+
+
+}
+const tapPluse_btn_q = document.querySelectorAll(".tap_PLS button");
+tapPluse_btn_q.forEach(function (event){
+    event.addEventListener("click",hied_show_tapSelect);
+});
+
+
 
 const pluse_window = document.querySelectorAll(".tap_menu");
 pluse_window.forEach(function (event){
