@@ -37,11 +37,18 @@ function make_window(num){
     //윈도우 추가 버튼 생성
     make_tap_pluse(num);
     make_menu(num);
+
+    //tap버튼들 모음 form
+    const w_tap_all = document.createElement("form");
+    w_tap_all.className = `w${num}`;
+    newDiv.appendChild(w_tap_all);
 }
+
 function make_menu(num){
     const window = document.querySelector(`.win_tap_${num}`);
     const newDiv = document.createElement("div");
     newDiv.className = `tap_menu`;
+    newDiv.style.display = "block";
 
     const tap_button = document.createElement("button");
     tap_button.innerText = `PLS win`;
@@ -58,6 +65,7 @@ function make_tap_pluse(num){
     const tapSelectDiv = document.createElement("div");
     tapSelectDiv.className = `tapPls${num}`;
     const newUl = document.createElement("ul");
+    newUl.style.listStyle = "none";
 
     //li안 선택 스킬 버튼
     let skill_array = [0,1,2,3,4,5,6,7,8,9];
@@ -68,6 +76,7 @@ function make_tap_pluse(num){
         newLiBtn.className = `skill_pls`
         newLi.appendChild(newLiBtn);
         newUl.appendChild(newLi);
+        newLi.style.float = "left"
         newUl.style.display = 'none';
         tapSelectDiv.appendChild(newUl);
     });
@@ -149,8 +158,6 @@ function hied_show_tapSelect(event){
             tapPls.firstChild.style.display = 'none';
         }
     }
-
-
 }
 const tapPluse_btn_q = document.querySelectorAll(".tap_PLS button");
 tapPluse_btn_q.forEach(function (event){

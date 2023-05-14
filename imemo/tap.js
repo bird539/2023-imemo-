@@ -16,38 +16,48 @@ pluse_tap.forEach(function (event){
 
 function make_tap_btn_pluse(win_num, btn_num){
     const window = document.querySelector(`.win_tap_${win_num}`);
-    const newDiv = document.createElement("div");
-    newDiv.className = `w${win_num}_t${tap_array.length}_s${btn_num}`;
-    tap_array.push(newDiv.className);
-    const tap_button = document.createElement("button");
-    tap_button.innerText = `tap${btn_num}`;
+    const w_tap_all = document.querySelector(`.w${win_num}`);
+    const class_name = `w${win_num}_t${tap_array.length}_s${btn_num}`
+    
+    tap_array.push(class_name);
+
+    const tap_name = document.createElement("label");
+    tap_name.htmlFor = class_name;
+    tap_name.innerText = `tap${btn_num}`;
+
+    const tap_button = document.createElement("input");
+    tap_button.name = `tap${win_num}`;
+    tap_button.type = 'radio';
+    tap_button.value = class_name;
+    tap_button.id = class_name;
+
     tap_array_Stor();
-    newDiv.appendChild(tap_button);
-    window.appendChild(newDiv);
+    w_tap_all.appendChild(tap_name);
+    w_tap_all.appendChild(tap_button);
+    window.appendChild(w_tap_all);
     
     //window_n 클래스 아래에 제목,form,tap선택 다음에 추가(버튼개수대로)
     const window2 = document.querySelector(`.window_${win_num}`);
     const newDiv2 = document.createElement("div");
     newDiv2.className = `sw${win_num}_t${tap_array.length}_s${btn_num}`;
     window2.appendChild(newDiv2);
-
-    switch(btn_num){
-        case "0":
-            console.log(newDiv2.className);
-            make_workMemo(win_num,newDiv2.className);
-            break;
-    }
 }
 
 //처음 로딩시 만들어주기
 function first_make_tap_btn_pluse(txt){
-    const window = document.querySelector(`.win_tap_${txt.charAt(1)}`);
-    const newDiv = document.createElement("div");
-    newDiv.className = `${txt}`;
-    const tap_button = document.createElement("button");
-    tap_button.innerText = `tap${txt.charAt(txt.length-1)}`;
-    newDiv.appendChild(tap_button);
-    window.appendChild(newDiv);
+    const w_tap_all = document.querySelector(`.w${txt.charAt(1)}`);
+    const tap_name = document.createElement("label");
+    tap_name.htmlFor = `${txt}`;
+    tap_name.innerText = `tap${txt.charAt(txt.length-1)}`;
+
+    const tap_button = document.createElement("input");
+    tap_button.name = `tap${txt.charAt(1)}`;
+    tap_button.type = 'radio';
+    tap_button.value = `${txt}`;
+    tap_button.id = `${txt}`;
+
+    w_tap_all.appendChild(tap_name);
+    w_tap_all.appendChild(tap_button);
 
     const window2 = document.querySelector(`.window_${txt.charAt(1)}`);
     const newDiv2 = document.createElement("div");
@@ -61,39 +71,14 @@ function tap_array_Stor(){
     localStorage.setItem("tap_array",JSON.stringify(tap_array));
 }
 
-
 const in_stor_tap_array = localStorage.getItem("tap_array");
 if(in_stor_tap_array !== null){
     const parsed_tap_array = JSON.parse(in_stor_tap_array);
     for(i=0;i<parsed_tap_array.length;i++){
         tap_array[i] = parsed_tap_array[i]
     }
-    tap_array.forEach(first_make_tap_btn_pluse)
+    tap_array.forEach(first_make_tap_btn_pluse);
 }else{
     tap_array_Stor();
     tap_array.forEach(first_make_tap_btn_pluse);
-}
-
-//할일목록 리스트
-function make_workMemo(n,txt){
-    console.log(document.querySelector(`${txt}`));
-    const window00 = document.querySelector(txt);
-
-    const li = document.createElement("li");
-    li.className = `w${n}_w${n}_memo${n}`;
-    const span = document.createElement("span");
-    span.id = `${n}`;
-    span.innerText = "hello world!"
-    
-    const button = document.createElement("button");
-    button.innerText = "X";
-    //button.addEventListener("click",);
-
-    const checkBtn = document.createElement("input");
-    checkBtn.setAttribute("type","checkbox");
-    //checkBtn.addEvent..
-
-    li.appendChild(span);
-    li.appendChild(checkBtn);
-    window00.appendChild(li);
 }
