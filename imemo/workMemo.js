@@ -9,8 +9,14 @@ function skill_apply(txt){
         const memo_input = document.createElement("input");
         memo_form.className = `m_${div_name}`;
         memo_form.appendChild(memo_input);
+
+        const list_ul = document.createElement("ul");
+        const list_li = document.createElement("li");
+        list_li.innerText = "hello world!";
+        list_ul.appendChild(list_li);
         w_div.style.display = "none";
         w_div.appendChild(memo_form);
+        w_div.appendChild(list_ul);
     }
 }
 
@@ -33,9 +39,13 @@ function show_tap(event){
     const select_value = event.target.value;
     const select_tap = document.querySelector(`.s${select_value}`);
     const tapBtn = document.querySelectorAll(`.w${select_value.charAt(1)} input`);
+
     for(i=0;i< tapBtn.length; i++){
-        const select_tap = document.querySelector(`.s${tapBtn[i].value}`);
-        select_tap.style.display = "none";
+        const select_tap2 = document.querySelector(`.s${tapBtn[i].value}`);
+        //console.log(select_tap2);
+        if(select_tap2!=null){
+            select_tap2.style.display = "none";
+        }
     }
     select_tap.style.display = "block";
 
@@ -50,16 +60,4 @@ if (in_stor_win_array_tapHendle !== null){
     }
     tapBtn_array.forEach(hide_none_or1);
 }
-
-
-/*
-function nn(){
-    console.log("tes");
-}
-
-let tap_PLS_array = document.querySelectorAll(".tap_PLS");
-let li_array = tap_PLS_array[1].childNodes[1].firstChild.childNodes;
-console.log(li_array[0]);
-*/
-
 

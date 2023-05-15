@@ -30,6 +30,8 @@ function make_tap_btn_pluse(win_num, btn_num){
     tap_button.type = 'radio';
     tap_button.value = class_name;
     tap_button.id = class_name;
+    tap_button.checked = "checked"
+
 
     tap_array_Stor();
     w_tap_all.appendChild(tap_name);
@@ -40,7 +42,10 @@ function make_tap_btn_pluse(win_num, btn_num){
     const window2 = document.querySelector(`.window_${win_num}`);
     const newDiv2 = document.createElement("div");
     newDiv2.className = `sw${win_num}_t${tap_array.length}_s${btn_num}`;
-    window2.appendChild(newDiv2);
+
+    //선택에 맞게끔 div안에 스킬창 추가
+    //메모장
+    location.reload();
 }
 
 //처음 로딩시 만들어주기
