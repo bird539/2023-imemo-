@@ -30,8 +30,7 @@ function make_tap_btn_pluse(win_num, btn_num){
     tap_button.type = 'radio';
     tap_button.value = class_name;
     tap_button.id = class_name;
-    tap_button.checked = "checked"
-
+    tap_button.checked = "checked";
 
     tap_array_Stor();
     w_tap_all.appendChild(tap_name);
@@ -61,12 +60,18 @@ function first_make_tap_btn_pluse(txt){
     tap_button.value = `${txt}`;
     tap_button.id = `${txt}`;
 
-    w_tap_all.appendChild(tap_name);
-    w_tap_all.appendChild(tap_button);
-
     const window2 = document.querySelector(`.window_${txt.charAt(1)}`);
     const newDiv2 = document.createElement("div");
     newDiv2.className = `s${txt}`;
+
+    // 라디오 버튼을 미리 클릭시키는 부분 - 임시로 마지막 값만 클릭
+    if(txt.charAt(1)!==0){
+        tap_button.checked = "checked";
+        newDiv2.style.display = "block";
+    }
+    
+    w_tap_all.appendChild(tap_name);
+    w_tap_all.appendChild(tap_button);
     window2.appendChild(newDiv2);
 }
 

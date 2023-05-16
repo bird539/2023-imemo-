@@ -118,9 +118,7 @@ function make_tep_skill(win_num,tap_num,skill_num){
     window.appendChild(newDiv);
 }
 
-
 let window_array = [0];
-
 function window_array_store(){
     localStorage.setItem("win_array",JSON.stringify(window_array));
 }
@@ -163,8 +161,6 @@ const tapPluse_btn_q = document.querySelectorAll(".tap_PLS button");
 tapPluse_btn_q.forEach(function (event){
     event.addEventListener("click",hied_show_tapSelect);
 });
-
-
 
 const pluse_window = document.querySelectorAll(".tap_menu");
 pluse_window.forEach(function (event){
