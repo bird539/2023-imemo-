@@ -1,5 +1,5 @@
 let div_name = [];
-
+let memoText_array =[];
 //처음 로딩시 skill 번호를 확인하고 그에 맞는 스킬을 부여
 let i =0;
 function skill_apply(txt){
@@ -7,6 +7,16 @@ function skill_apply(txt){
     if(div_name.charAt(txt.length)=="0"){
         const w_div = document.querySelector(`.${div_name}`);
 
+        const get_stor_memoText_array_tapHendle = localStorage.getItem(`${div_name}`);
+        const parsed_memoText = JSON.parse(get_stor_memoText_array_tapHendle);
+        if(get_stor_memoText_array_tapHendle !== null){
+            for(i=0;i<parsed_memoText.length;i++){
+                memoText_array[i] = `${parsed_memoText[i]}`;
+            }
+        }
+        
+
+        //console.log(div_name); = sw0_t0_s0
         const memo_form = document.createElement("form");
         const memo_input = document.createElement("input");
         memo_input.className = "workMemo";
@@ -21,16 +31,19 @@ function skill_apply(txt){
         memo_form.appendChild(memo_input_notthing);
 
         const list_ul = document.createElement("ul");
-        for(i=0;i<10;i++){
-            const list_li = document.createElement("li");
-            list_li.innerText = "hello world!";
-            list_ul.appendChild(list_li);
+        if(get_stor_memoText_array_tapHendle !== null){
+            for (i=0;i<memoText_array.length;i++){
+                const li = document.createElement("li");
+                li.innerText = `${memoText_array[i]}`
+                list_ul.prepend(li);
+            }
         }
+        memoText_array = [];
 
         //만약 버튼이 체크 되어 있음 보여지게끔 해줌
+        //-txt주소 페이지 열람 array저장하고 여기에 적용하게끔 나중에 기능 넣을 것
         w_div.style.display = "none";
-        const tap_button = document.querySelector(`input[name="tap${txt.charAt(1)}"]`);
-        if(tap_button.checked == true){
+        if(`${txt}` == "w1_t7_s0"){
             w_div.style.display = "block";
         }
 
@@ -81,19 +94,34 @@ if (in_stor_win_array_tapHendle !== null){
     tapBtn_array.forEach(hide_none_or1);
 }
 //======================================메모 저장
-let memoText_array =['w0_t0_s0'];
-
-function tap_array_Stor(memo_divClassName){
-    localStorage.setItem(`${memo_divClassName}`,JSON.stringify(tap_array));
+function memo_array_Stor(memo_divClassName){
+    localStorage.setItem(`${memo_divClassName}`,JSON.stringify(memoText_array));
 }
 //메모 입력 받고 해당 아래 리스트에 추가.
 function workMemo_inputValu_inList(event){
     event.preventDefault();
     let parent = event.target.parentElement.className;
-    let text = document.querySelector(`.${parent}`).firstChild.firstChild.value;
-    
+
+    const text = document.querySelector(`.${parent}`).firstChild.firstChild;
+    const ul = document.querySelector(`.${parent}`).childNodes[1];
+    const li = document.createElement("li");
+    li.innerText = text.value;
+
+    const get_stor_memoText_array_tapHendle = localStorage.getItem(`${parent}`);
+    const parsed_memoText = JSON.parse(get_stor_memoText_array_tapHendle);
+    if(parsed_memoText !== null){
+        memoText_array = parsed_memoText;
+    }
+
+    memoText_array.push(text.value);
+    memo_array_Stor(parent);
+    memoText_array = [];
+    text.value = "";
+    ul.prepend(li);
 }
+//이벤트 부여
 const workMemo_input = document.querySelectorAll(".workMemo_form");
 workMemo_input.forEach(function (event){
     event.addEventListener("submit",workMemo_inputValu_inList);
 });
+
