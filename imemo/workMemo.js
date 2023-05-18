@@ -11,7 +11,7 @@ function skill_apply(txt){
         const parsed_memoText = JSON.parse(get_stor_memoText_array_tapHendle);
         if(get_stor_memoText_array_tapHendle !== null){
             for(i=0;i<parsed_memoText.length;i++){
-                memoText_array[i] = `${parsed_memoText[i]}`;
+                memoText_array.push(parsed_memoText[i]);
             }
         }
         
@@ -34,7 +34,21 @@ function skill_apply(txt){
         if(get_stor_memoText_array_tapHendle !== null){
             for (i=0;i<memoText_array.length;i++){
                 const li = document.createElement("li");
-                li.innerText = `${memoText_array[i]}`
+                const text_span = document.createElement("span");
+                text_span.innerText = `${memoText_array[i].text}`;
+                text_span.className =  `${i}`;
+                
+                const check_btn = document.createElement("input");
+                check_btn.type = "checkbox";
+                check_btn.className = "memo_checkbox";
+                check_btn.addEventListener("click", checkbox_work); 
+                if(`${memoText_array[i].checked}` == "true"){
+                    check_btn.checked = "true";
+                    text_span.style.textDecoration = "line-through";
+                }
+                li.appendChild(check_btn);
+                li.appendChild(text_span);
+
                 list_ul.prepend(li);
             }
         }
@@ -105,7 +119,10 @@ function workMemo_inputValu_inList(event){
     const text = document.querySelector(`.${parent}`).firstChild.firstChild;
     const ul = document.querySelector(`.${parent}`).childNodes[1];
     const li = document.createElement("li");
-    li.innerText = text.value;
+    const memoSaveValue = {
+        text: text.value,
+        checked: "false",
+    }
 
     const get_stor_memoText_array_tapHendle = localStorage.getItem(`${parent}`);
     const parsed_memoText = JSON.parse(get_stor_memoText_array_tapHendle);
@@ -113,10 +130,25 @@ function workMemo_inputValu_inList(event){
         memoText_array = parsed_memoText;
     }
 
-    memoText_array.push(text.value);
+    const check_btn = document.createElement("input");
+    check_btn.type = "checkbox";
+    check_btn.className = "memo_checkbox";
+    check_btn.addEventListener("click", checkbox_work); 
+    li.appendChild(check_btn);
+
+    const text_span = document.createElement("span");
+    text_span.innerText = text.value;
+    text_span.className =  `0`;
+    if(parsed_memoText !== null){
+        text_span.className =  `${memoText_array.length}`;
+    }
+    li.appendChild(text_span);
+
+    memoText_array.push(memoSaveValue);
     memo_array_Stor(parent);
     memoText_array = [];
     text.value = "";
+
     ul.prepend(li);
 }
 //이벤트 부여
@@ -125,3 +157,41 @@ workMemo_input.forEach(function (event){
     event.addEventListener("submit",workMemo_inputValu_inList);
 });
 
+//체크박스 체크 이벤트
+function checkbox_work(event){
+    let parent = event.target.parentElement.parentElement.parentElement.className;
+    const target_text = event.target.parentElement.childNodes[1];
+
+    const get_stor_memoText_array_tapHendle = localStorage.getItem(`${parent}`);
+    const parsed_memoText = JSON.parse(get_stor_memoText_array_tapHendle);
+
+    let memoSaveValue = {
+        text: target_text.innerText,
+        checked: "true",
+    }
+    switch (event.target.checked){
+        case true:
+            memoSaveValue = {
+                text: target_text.innerText,
+                checked: "true",
+            }
+            target_text.style.textDecoration = "line-through";
+            event.target.checked = true;
+            break;
+        case false:
+            memoSaveValue = {
+                text: target_text.innerText,
+                checked: "false",
+            }
+            target_text.style.textDecoration = "none";
+            event.target.checked = false;
+            break;
+    }
+
+    if(parsed_memoText !== null){
+        memoText_array = parsed_memoText;
+    }
+    memoText_array[Number(target_text.className)] = memoSaveValue;
+    memo_array_Stor(parent);
+    memoText_array = [];
+}
