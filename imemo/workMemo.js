@@ -49,6 +49,31 @@ function skill_apply(txt){
                 li.appendChild(check_btn);
                 li.appendChild(text_span);
 
+                const edit_label = document.createElement("label");
+                const edit_btn = document.createElement("checkbox");
+                const edit_form = document.createElement("form");
+                const edit_input = document.createElement("input");
+                const edit_submit = document.createElement("input");
+                edit_submit.type = "submit";
+                edit_submit.vlaue = "sub";
+                
+                edit_form.className = "workMomo_edit";
+                edit_label.innerText = "edit";
+                edit_btn.style.display = "none";
+                edit_btn.className = `memo_edit_checbox`;
+                edit_label.addEventListener("click",workMemo_checkbox_work);
+                edit_label.appendChild(edit_btn);
+                edit_input.className = `${i}`;
+                edit_input.value = `${memoText_array[i].text}`;
+                edit_input.style.display = "none";
+                edit_form.addEventListener("submit",edit_memo_form);
+                edit_submit.style.display = "none";
+                edit_form.appendChild(edit_input);
+                edit_form.appendChild(edit_submit);
+                edit_form.appendChild(edit_label);
+                li.appendChild(edit_form);
+                
+
                 list_ul.prepend(li);
             }
         }
@@ -144,6 +169,30 @@ function workMemo_inputValu_inList(event){
     }
     li.appendChild(text_span);
 
+    const edit_label = document.createElement("label");
+    const edit_btn = document.createElement("checkbox");
+    const edit_form = document.createElement("form");
+    const edit_input = document.createElement("input");
+    const edit_submit = document.createElement("input");
+    edit_submit.type = "submit";
+    edit_submit.vlaue = "sub";
+    
+    edit_form.className = "workMomo_edit";
+    edit_label.innerText = "edit";
+    edit_btn.style.display = "none";
+    edit_btn.className = `memo_edit_checbox`;
+    edit_label.addEventListener("click",workMemo_checkbox_work);
+    edit_label.appendChild(edit_btn);
+    edit_input.className = `${i}`;
+    edit_input.value = `${text.value}`;
+    edit_input.style.display = "none";
+    edit_form.addEventListener("submit",edit_memo_form);
+    edit_submit.style.display = "none";
+    edit_form.appendChild(edit_input);
+    edit_form.appendChild(edit_submit);
+    edit_form.appendChild(edit_label);
+    li.appendChild(edit_form);
+
     memoText_array.push(memoSaveValue);
     memo_array_Stor(parent);
     memoText_array = [];
@@ -194,4 +243,47 @@ function checkbox_work(event){
     memoText_array[Number(target_text.className)] = memoSaveValue;
     memo_array_Stor(parent);
     memoText_array = [];
+}
+
+function workMemo_checkbox_work(event){
+
+    const input = event.target.parentElement.childNodes[1];
+    const submit = event.target.parentElement.childNodes[0];
+    if (input.style.display == "inline-block"){
+        input.style.display = "none";
+        submit.style.display = "none";
+    } else {
+        submit.style.display = "inline-block";
+        input.style.display = "inline-block";
+    }
+}
+
+function edit_memo_form(event){
+    event.preventDefault();
+    const input_text = event.target.childNodes[0];
+    const parent = event.target.parentElement.parentElement.parentElement.className;
+    const check_btn = event.target.parentElement.childNodes[0].checked;
+
+    
+    const get_stor_memoText_array_tapHendle = localStorage.getItem(`${parent}`);
+    const parsed_memoText = JSON.parse(get_stor_memoText_array_tapHendle);
+
+    let memoSaveValue = {
+        text: input_text.value,
+        checked: check_btn,
+    }
+
+    if(parsed_memoText !== null){
+        memoText_array = parsed_memoText;
+    }
+    memoText_array[Number(input_text.className)] = memoSaveValue;
+    memo_array_Stor(parent);
+    memoText_array = [];
+
+    const html_text = event.target.parentElement.childNodes[1];
+    html_text.innerText = input_text.value;
+
+    const input_sub_btn = event.target.childNodes[1];
+    input_sub_btn.style.display = "none";
+    input_text.style.display = "none";
 }
