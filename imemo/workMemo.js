@@ -1,5 +1,14 @@
 let div_name = [];
 let memoText_array =[];
+
+//열렸던 창인지 확인 위한 자료불러오기
+let M_showTap_array = [];
+const M_tapShow_array = localStorage.getItem("tapShow_array");
+if (M_tapShow_array !== null){
+    const M_parsed_tapShow_array = JSON.parse(M_tapShow_array);
+    M_showTap_array = M_parsed_tapShow_array;
+}
+
 //처음 로딩시 skill 번호를 확인하고 그에 맞는 스킬을 부여
 let i =0;
 function skill_apply(txt){
@@ -81,9 +90,14 @@ function skill_apply(txt){
 
         //만약 버튼이 체크 되어 있음 보여지게끔 해줌
         //-txt주소 페이지 열람 array저장하고 여기에 적용하게끔 나중에 기능 넣을 것
+
         w_div.style.display = "none";
-        if(`${txt}` == "w1_t7_s0"){
-            w_div.style.display = "block";
+        if(M_showTap_array != null){
+            for(i=0;i<M_showTap_array.length;i++){
+                if(`${M_showTap_array[i]}`==txt){
+                    w_div.style.display = "block";
+                }
+            }
         }
 
         w_div.appendChild(memo_form);
@@ -101,37 +115,7 @@ if (in_stor_tap_array_tapHendle !== null){
     div_name.forEach(skill_apply);
 }
 
-//버튼 선택시 스킬창 div가 보일지 안 보일지 선택하는 곳
-function hide_none_or1(txt){
-    const tapBtn = document.querySelectorAll(`.${txt} input`);
-    tapBtn.forEach(function (event){
-        event.addEventListener("click", show_tap);
-    });
-}
-function show_tap(event){
-    const select_value = event.target.value;
-    const select_tap = document.querySelector(`.s${select_value}`);
-    const tapBtn = document.querySelectorAll(`.w${select_value.charAt(1)} input`);
-    for(i=0;i< tapBtn.length; i++){
-        const select_tap2 = document.querySelector(`.s${tapBtn[i].value}`);
-        //console.log(select_tap2);
-        if(select_tap2!=null){
-            select_tap2.style.display = "none";
-        }
-    }
-    select_tap.style.display = "block";
-}
 
-//저장된 곳에서 정보 가져온 정보로 div가 보일지 안 보일지 addEventListner주는 곳
-let tapBtn_array = [];
-const in_stor_win_array_tapHendle = localStorage.getItem("win_array");
-if (in_stor_win_array_tapHendle !== null){
-    const parsed_winNum = JSON.parse(in_stor_win_array_tapHendle);
-    for(i=0;i<parsed_winNum.length;i++){
-        tapBtn_array[i] = `w${parsed_winNum[i]}`;
-    }
-    tapBtn_array.forEach(hide_none_or1);
-}
 //======================================메모 저장
 function memo_array_Stor(memo_divClassName){
     localStorage.setItem(`${memo_divClassName}`,JSON.stringify(memoText_array));
