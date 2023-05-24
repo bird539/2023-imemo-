@@ -98,6 +98,7 @@ function skill_apply(txt){
                 li.appendChild(div_combine);
                 list_ul.prepend(li);
             }
+
         }
         memo_array_Stor(div_name);
         memoText_array = [];
@@ -114,8 +115,23 @@ function skill_apply(txt){
             }
         }
 
+        const del_CheckSelec_btn = document.createElement("button");
+        const del_all_btn = document.createElement("button");
+        del_CheckSelec_btn.className = "del_check_memo";
+        del_all_btn.className = "del_all_memo";
+        del_CheckSelec_btn.innerText = "del checks";
+        del_CheckSelec_btn.addEventListener("click",delete_checks_memo);
+        del_all_btn.innerText = "all del"
+        del_all_btn.addEventListener("click",delete_all_memo);
+
+        const del_list_div = document.createElement("div");
+        del_list_div.appendChild(del_CheckSelec_btn);
+        del_list_div.appendChild(del_all_btn);
+        del_list_div.style.display = "inline-block";
+
         w_div.appendChild(memo_form);
         w_div.appendChild(list_ul);
+        w_div.appendChild(del_list_div);
     }
 }
 function deleteMemo(event){
@@ -138,6 +154,39 @@ function deleteMemo(event){
     memoText_array = [];
     hide_memo_target.style.display = "none";
 
+}
+
+function delete_checks_memo(event){
+    const tap = event.target.parentElement.parentElement;
+    const get_stor_memoText_array_tapHendle = localStorage.getItem(tap.className);
+    const parsed_memoText = JSON.parse(get_stor_memoText_array_tapHendle);
+    let memoSaveValue = {
+        text: "",
+        checked: ""
+    };
+    if(parsed_memoText !== null){
+        memoText_array = parsed_memoText;
+    }
+    const select_memo = document.querySelectorAll(`.${tap.className} li`);
+    const reverse = [...select_memo].reverse();
+    for(i=0; i<memoText_array.length; i++){
+        if(memoText_array[i].checked == "true"){
+            reverse[i].style.display = "none";
+            memoText_array[i] = memoSaveValue;
+        }
+    }
+    memo_array_Stor(tap.className);
+    memoText_array = [];
+}
+
+function delete_all_memo(event){
+    const tap = event.target.parentElement.parentElement;
+    const select_memo = document.querySelectorAll(`.${tap.className} li`);
+    for(i=0; i<select_memo.length; i++){
+        select_memo[i].style.display = "none";
+    }
+    memoText_array = [];
+    memo_array_Stor(tap.className);
 }
 
 //처음 로딩시 skill창을 만들어 주는 곳
@@ -210,6 +259,7 @@ function workMemo_inputValu_inList(event){
     edit_form.appendChild(edit_input);
     edit_form.appendChild(edit_submit);
     edit_form.appendChild(edit_label);
+    edit_form.style.display = "inline-block";
 
     //삭제버튼 구현
     const del_btn = document.createElement("button");
