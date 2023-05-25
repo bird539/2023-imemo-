@@ -90,10 +90,17 @@ function skill_apply(txt){
                 del_btn.className = "memo_delete_btn";
                 del_btn.style.display = "inline-block";
                 del_btn.addEventListener("click",deleteMemo);
+
+                //복사버튼 구현
+                const copy_btn = document.createElement("button");
+                copy_btn.innerText = "copy";
+                copy_btn.style.display = "inline-block";
+                copy_btn.addEventListener("click",copyMemo);
                 
                 const div_combine = document.createElement("div");
                 div_combine.appendChild(edit_form);
                 div_combine.appendChild(del_btn);
+                div_combine.appendChild(copy_btn);
 
                 li.appendChild(div_combine);
                 list_ul.prepend(li);
@@ -124,9 +131,15 @@ function skill_apply(txt){
         del_all_btn.innerText = "all del"
         del_all_btn.addEventListener("click",delete_all_memo);
 
+        //전체복사 
+        const copy_all_memo_btn = document.createElement("button");
+        copy_all_memo_btn.innerText = "copy all";
+        copy_all_memo_btn.addEventListener("click",copyMemo_All);
+
         const del_list_div = document.createElement("div");
         del_list_div.appendChild(del_CheckSelec_btn);
         del_list_div.appendChild(del_all_btn);
+        del_list_div.appendChild(copy_all_memo_btn);
         del_list_div.style.display = "inline-block";
 
         w_div.appendChild(memo_form);
@@ -134,6 +147,27 @@ function skill_apply(txt){
         w_div.appendChild(del_list_div);
     }
 }
+//==============================(위)시작시 추가
+
+//복사버튼
+function copyMemo(event){
+    const del_memo_target = event.target.parentElement.parentElement.childNodes[1];
+    window.navigator.clipboard.writeText(del_memo_target.innerText);
+}
+function copyMemo_All(event){
+    const tap = event.target.parentElement.parentElement;
+    const select_memo = document.querySelectorAll(`.${tap.className} span`);
+    const select_memo_li = document.querySelectorAll(`.${tap.className} li`);
+    let allMemoCopy = "";
+
+    for(i=0;i<select_memo.length;i++){
+        if(select_memo_li[i].style.display != "none"){
+            allMemoCopy = allMemoCopy.concat(select_memo[i].innerText,"\n");
+        }
+    }
+    window.navigator.clipboard.writeText(allMemoCopy);
+}
+
 function deleteMemo(event){
     //삭제시 ""로 저장 및 none으로 숨기고, 후에 새로고침 시 ""는 없앤 배열을 저장하기
     const del_memo_target = event.target.parentElement.parentElement.childNodes[1];
@@ -268,9 +302,16 @@ function workMemo_inputValu_inList(event){
     del_btn.style.display = "inline-block";
     del_btn.addEventListener("click",deleteMemo);
 
+    //복사버튼 구현
+    const copy_btn = document.createElement("button");
+    copy_btn.innerText = "copy";
+    copy_btn.style.display = "inline-block";
+    copy_btn.addEventListener("click",copyMemo);
+
     const div_combine = document.createElement("div");
     div_combine.appendChild(edit_form);
     div_combine.appendChild(del_btn);
+    div_combine.appendChild(copy_btn);
 
     li.appendChild(div_combine);
 
