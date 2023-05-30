@@ -131,6 +131,19 @@ function skill_apply(txt){
         del_all_btn.innerText = "all del"
         del_all_btn.addEventListener("click",delete_all_memo);
 
+        //select option - 순서 정렬 변경 가능
+        const select_option = document.createElement("select");
+        select_option.className = "memo_select_option";
+        select_option.addEventListener("change",selectOption_select);
+
+        let option_list = ["new", "old", "number", "date"];
+        for(i=0;i<option_list.length;i++){
+            const sel_option = document.createElement("option");
+            sel_option.value = `${option_list[i]}`;
+            sel_option.innerText = `${option_list[i]}`;
+            select_option.appendChild(sel_option);
+        }
+
         //전체복사 
         const copy_all_memo_btn = document.createElement("button");
         copy_all_memo_btn.innerText = "copy all";
@@ -143,11 +156,24 @@ function skill_apply(txt){
         del_list_div.style.display = "inline-block";
 
         w_div.appendChild(memo_form);
+        w_div.appendChild(select_option);
         w_div.appendChild(list_ul);
         w_div.appendChild(del_list_div);
     }
 }
 //==============================(위)시작시 추가
+
+//select-option 관련 입력받을시 리스트 순서 변경
+function selectOption_select(event){
+    console.log(event.target.value);
+    //해당 ul list의 appendchild를 
+    //ul의 자식을 제거 후 li를 새로 만들어서 ul에 추가
+    //텍스트에 숫자 포함 여부 확인 후 array에 추가
+    //숫자를 비교하여 ul에 추가
+    //없는 것은 맨 나중에 추가
+
+    
+}
 
 //복사버튼
 function copyMemo(event){
