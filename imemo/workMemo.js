@@ -21,33 +21,22 @@ function skill_apply(txt) {
         if (get_stor_memoText_array_tapHendle !== null) {
             memoText_array = parsed_memoText;
         }
-
         const memo_form = document.createElement("form");
         const memo_input = document.createElement("input");
         memo_input.className = "workMemo";
         memo_form.className = `workMemo_form`;
         memo_form.appendChild(memo_input);
-
         //새로고침 방지 input
         const memo_input_notthing = document.createElement("input");
         memo_input_notthing.type = "submit";
         memo_input_notthing.value = "sub";
         //memo_input_notthing.style.display = "none";
         memo_form.appendChild(memo_input_notthing);
-
         const list_ul = document.createElement("ul");
-        if (get_stor_memoText_array_tapHendle !== null) {
-            for (i = 0; i < memoText_array.length; i++) {
-                const li = makeMemoUl_list(i,memoText_array[i].text,memoText_array[i].checked);
-                list_ul.prepend(li);
-            }
-        }
         memo_array_Stor(div_name);
-        
 
         //만약 버튼이 체크 되어 있음 보여지게끔 해줌
         //-txt주소 페이지 열람 array저장하고 여기에 적용하게끔 나중에 기능 넣을 것
-
         w_div.style.display = "none";
         if (M_showTap_array != null) {
             for (i = 0; i < M_showTap_array.length; i++) {
@@ -68,7 +57,6 @@ function skill_apply(txt) {
         const select_option = document.createElement("select");
         select_option.className = "memo_select_option";
         select_option.addEventListener("change", selectOption_select);
-
         let option_list = ["new", "old", "number", "date"];
         for (i = 0; i < option_list.length; i++) {
             const sel_option = document.createElement("option");
@@ -84,8 +72,8 @@ function skill_apply(txt) {
                 select_option.selectedIndex = jjj;
             }
         }//https://hianna.tistory.com/420 - 빈 값 확인방법
-        
-        
+        selecOption_makeLi(memoText_array,jjj,get_stor_memoText_array_tapHendle,list_ul);
+
         //전체복사 
         const copy_all_memo_btn = document.createElement("button");
         copy_all_memo_btn.innerText = "copy all";
@@ -122,139 +110,18 @@ function selectOption_select(event) {
         checked:memoText_array[0].checked,
         select:0
     }
-    
-    
-    let first_write = [];
-    let second_write = [];
-    let newMemo_array = [];
-    if (select_option == "number") { //넘버로 순서변경
-        memoText_array[0].select = 2;
-        for (j = 0; j < memoText_array.length; j++) {
-            let cutText = memoText_array[j].text;
-            if (cutText.length > 3) {
-                cutText = memoText_array[j].text.substr(0, 3);
-            }
-            const textNum = `${cutText}`.match(/\d+/g);
-
-            if (textNum != null && isNaN(textNum) == false) {
-                let k = {
-                    number: Number(textNum),
-                    index: j
-                }
-                first_write.push(k);
-            } else {
-                second_write.push(j);
-            }
-        }
-        let i = 0;
-        first_write.sort(function (a, b) {
-            if (a.number < b.number) return -1;
-            if (a.number > b.number) return 1;
-            if (a.number == b.number) return 0;
-        });
-        for (i = 0; i < first_write.length; i++) {
-            newMemo_array.push(first_write[i].index);
-        }
-        newMemo_array = newMemo_array.concat(second_write);
-    } else if (select_option == "new") {//오래된거 부터 순서변경
+    let select_num = 0;
+    if(select_option == "new"){
         memoText_array[0].select = 0;
-        for (i = memoText_array.length - 1; i >= 0; i--) {
-            newMemo_array.push(i);
-        }
-    } else if (select_option == "old") { //최신것 부터 순서변경
+    }else if(select_option == "old"){
         memoText_array[0].select = 1;
-        for (i = 0; i < memoText_array.length; i++) {
-            newMemo_array.push(i);
-        }
-    } else if (select_option == "date") { //시간 날짜 부터 순서변경
+    }else if(select_option == "number"){
+        memoText_array[0].select = 2;
+    }else if(select_option == "date"){
         memoText_array[0].select = 3;
-        //텍스트 배열 안 특정 텍스트, 숫자 있는지 확인 - 
-        let second_write2 = [];
-        let second_write22 = [];
-        let second_write3 = [];
-        let else_write = [];
-        for (j = 0; j < memoText_array.length; j++) {
-            let number = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
-            let k_time = ["시", "분", "초"];
-            let k_month = ["년", "달", "월",];
-            let k_day = ["주", "일", "날", "모레"];
-            let k_tiemNum = ["한", "두", "세", "네", "다섯", "여섯", "일곱", "여덜"];
-            let k_next = ["다음"];
-            let k_tomorow = ['내일'];
-            let check_num = 0;
-            let check_ktime = 0;
-            let check_month = 0;
-            let check_day = 0;
-            let check_knum = 0;
-            let check_next = 0;
-            let check_tomorow = 0;
-            for (i = 0; i < number.length; i++) {
-                if (memoText_array[j].text.includes(number[i]) == true) {
-                    check_num += 1;
-                }
-            }
-            for (i = 0; i < k_time.length; i++) {
-                if (memoText_array[j].text.includes(k_time[i]) == true) {
-                    check_ktime += 1;
-                }
-            }
-            for (i = 0; i < k_month.length; i++) {
-                if (memoText_array[j].text.includes(k_month[i]) == true) {
-                    check_month += 1;
-                }
-            }
-            for (i = 0; i < k_tiemNum.length; i++) {
-                if (memoText_array[j].text.includes(k_tiemNum[i]) == true) {
-                    check_knum += 1;
-                }
-            }
-            for (i = 0; i < k_day.length; i++) {
-                if (memoText_array[j].text.includes(k_day[i]) == true) {
-                    check_day += 1;
-                }
-            }
-            if (memoText_array[j].text.includes(k_next[0]) == true) {
-                check_next += 1;
-            }
-            if (memoText_array[j].text.includes(k_tomorow[0]) == true) {
-                check_tomorow += 1;
-            }
-            if ((check_knum >= 1 || 1 && check_num >= 1) && check_ktime >=1 && check_next == 0 && check_month == 0 && check_day == 0&& check_tomorow ==0) {
-                //한 시, 1 시
-                first_write.push(j);
-            } else if (check_tomorow>=1 && (check_month == 0 && check_num == 0 && check_next ==0) ) {
-                //내일
-                second_write22.push(j);
-            } else if ( memoText_array[j].text.includes(k_day[3])==true || k_day >=1 && ((check_ktime >= 1 || check_next >=1 )  >= 1 && (check_month == 0 && check_num == 0) && check_tomorow == 0) ) {
-                //모레 다음 주
-                second_write2.push(j);
-            } else if ( check_tomorow ==0 && (check_knum >= 1 || check_ktime >= 1 || check_num >= 1) && (check_day >= 1 || check_month >= 1)) {
-                //10일 1월 2월 2년 다음 달 한 시
-                second_write3.push(j);
-            } else if(check_day==0) {
-                else_write.push(j);
-            }
-        }/*
-        console.log(first_write);
-        console.log(second_write22);
-        console.log(second_write2);
-        console.log(second_write3);
-        console.log(else_write);*/
-        newMemo_array = newMemo_array.concat(first_write);
-        newMemo_array = newMemo_array.concat(second_write22);
-        newMemo_array = newMemo_array.concat(second_write2);
-        newMemo_array = newMemo_array.concat(second_write3);
-        newMemo_array = newMemo_array.concat(else_write);
     }
-    //순서변경한 array를 ul에 추가
-    let a = 0;
-    if (get_stor_memoText_array_tapHendle !== null) {
-        for (i = 0; i < newMemo_array.length; i++) {
-            a = newMemo_array[i];
-            const li = makeMemoUl_list(a,memoText_array[a].text,memoText_array[a].checked);
-            ul.appendChild(li);
-        }
-    }
+    select_num = memoText_array[0].select;
+    selecOption_makeLi(memoText_array, select_num,get_stor_memoText_array_tapHendle,ul);
     memo_array_Stor(tap.className);
     memoText_array = [];
 }
@@ -516,4 +383,129 @@ function makeMemoUl_list(index,text,checked) {
 
     li.appendChild(div_combine);
     return li;
+}
+
+function selecOption_makeLi(memoText_array, select_option,get_stor_memoText_array_tapHendle,ul){
+    let first_write = [];
+    let second_write = [];
+    let newMemo_array = [];
+    if (select_option == 2) { //넘버로 순서변경
+        for (j = 0; j < memoText_array.length; j++) {
+            let cutText = memoText_array[j].text;
+            if (cutText.length > 3) {
+                cutText = memoText_array[j].text.substr(0, 3);
+            }
+            const textNum = `${cutText}`.match(/\d+/g);
+
+            if (textNum != null && isNaN(textNum) == false) {
+                let k = {
+                    number: Number(textNum),
+                    index: j
+                }
+                first_write.push(k);
+            } else {
+                second_write.push(j);
+            }
+        }
+        let i = 0;
+        first_write.sort(function (a, b) {
+            if (a.number < b.number) return -1;
+            if (a.number > b.number) return 1;
+            if (a.number == b.number) return 0;
+        });
+        for (i = 0; i < first_write.length; i++) {
+            newMemo_array.push(first_write[i].index);
+        }
+        newMemo_array = newMemo_array.concat(second_write);
+    } else if (select_option == 1) {//오래된거 부터 순서변경
+        for (i = memoText_array.length - 1; i >= 0; i--) {
+            newMemo_array.push(i);
+        }
+    } else if (select_option == 0) { //최신것 부터 순서변경
+        for (i = 0; i < memoText_array.length; i++) {
+            newMemo_array.push(i);
+        }
+    } else if (select_option == 3) { //시간 날짜 부터 순서변경
+        //텍스트 배열 안 특정 텍스트, 숫자 있는지 확인 - 
+        let second_write2 = [];
+        let second_write22 = [];
+        let second_write3 = [];
+        let else_write = [];
+        for (j = 0; j < memoText_array.length; j++) {
+            let number = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+            let k_time = ["시", "분", "초"];
+            let k_month = ["년", "달", "월",];
+            let k_day = ["주", "일", "날", "모레"];
+            let k_tiemNum = ["한", "두", "세", "네", "다섯", "여섯", "일곱", "여덜"];
+            let k_next = ["다음"];
+            let k_tomorow = ['내일'];
+            let check_num = 0;
+            let check_ktime = 0;
+            let check_month = 0;
+            let check_day = 0;
+            let check_knum = 0;
+            let check_next = 0;
+            let check_tomorow = 0;
+            for (i = 0; i < number.length; i++) {
+                if (memoText_array[j].text.includes(number[i]) == true) {
+                    check_num += 1;
+                }
+            }
+            for (i = 0; i < k_time.length; i++) {
+                if (memoText_array[j].text.includes(k_time[i]) == true) {
+                    check_ktime += 1;
+                }
+            }
+            for (i = 0; i < k_month.length; i++) {
+                if (memoText_array[j].text.includes(k_month[i]) == true) {
+                    check_month += 1;
+                }
+            }
+            for (i = 0; i < k_tiemNum.length; i++) {
+                if (memoText_array[j].text.includes(k_tiemNum[i]) == true) {
+                    check_knum += 1;
+                }
+            }
+            for (i = 0; i < k_day.length; i++) {
+                if (memoText_array[j].text.includes(k_day[i]) == true) {
+                    check_day += 1;
+                }
+            }
+            if (memoText_array[j].text.includes(k_next[0]) == true) {
+                check_next += 1;
+            }
+            if (memoText_array[j].text.includes(k_tomorow[0]) == true) {
+                check_tomorow += 1;
+            }
+            if ((check_knum >= 1 || 1 && check_num >= 1) && check_ktime >=1 && check_next == 0 && check_month == 0 && check_day == 0&& check_tomorow ==0) {
+                //한 시, 1 시
+                first_write.push(j);
+            } else if (check_tomorow>=1 && (check_month == 0 && check_num == 0 && check_next ==0) ) {
+                //내일
+                second_write22.push(j);
+            } else if ( memoText_array[j].text.includes(k_day[3])==true || k_day >=1 && ((check_ktime >= 1 || check_next >=1 )  >= 1 && (check_month == 0 && check_num == 0) && check_tomorow == 0) ) {
+                //모레 다음 주
+                second_write2.push(j);
+            } else if ( check_tomorow ==0 && (check_knum >= 1 || check_ktime >= 1 || check_num >= 1) && (check_day >= 1 || check_month >= 1)) {
+                //10일 1월 2월 2년 다음 달 한 시
+                second_write3.push(j);
+            } else if(check_day==0) {
+                else_write.push(j);
+            }
+        }
+        newMemo_array = newMemo_array.concat(first_write);
+        newMemo_array = newMemo_array.concat(second_write22);
+        newMemo_array = newMemo_array.concat(second_write2);
+        newMemo_array = newMemo_array.concat(second_write3);
+        newMemo_array = newMemo_array.concat(else_write);
+    }
+    //순서변경한 array를 ul에 추가
+    let a = 0;
+    if (get_stor_memoText_array_tapHendle !== null) {
+        for (i = 0; i < newMemo_array.length; i++) {
+            a = newMemo_array[i];
+            const li = makeMemoUl_list(a,memoText_array[a].text,memoText_array[a].checked);
+            ul.appendChild(li);
+        }
+    }
 }
