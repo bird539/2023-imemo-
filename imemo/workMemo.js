@@ -19,11 +19,7 @@ function skill_apply(txt) {
         const get_stor_memoText_array_tapHendle = localStorage.getItem(`${div_name}`);
         const parsed_memoText = JSON.parse(get_stor_memoText_array_tapHendle);
         if (get_stor_memoText_array_tapHendle !== null) {
-            for (i = 0; i < parsed_memoText.length; i++) {
-                if (parsed_memoText[i].text != '' && parsed_memoText[i] != null) {
-                    memoText_array.push(parsed_memoText[i]);
-                }
-            }
+            memoText_array = parsed_memoText;
         }
 
         const memo_form = document.createElement("form");
@@ -42,73 +38,12 @@ function skill_apply(txt) {
         const list_ul = document.createElement("ul");
         if (get_stor_memoText_array_tapHendle !== null) {
             for (i = 0; i < memoText_array.length; i++) {
-                const li = document.createElement("li");
-                const text_span = document.createElement("span");
-                text_span.innerText = `${memoText_array[i].text}`;
-                text_span.className = `${i}`;
-                text_span.style.display = "inline-block";
-
-                const check_btn = document.createElement("input");
-                check_btn.type = "checkbox";
-                check_btn.className = "memo_checkbox";
-                check_btn.style.display = "inline";
-                check_btn.addEventListener("click", checkbox_work);
-                if (`${memoText_array[i].checked}` == "true") {
-                    check_btn.checked = "true";
-                    text_span.style.textDecoration = "line-through";
-                }
-                li.appendChild(check_btn);
-                li.appendChild(text_span);
-
-                //수정 form과 submit, checkbox 추가
-                const edit_label = document.createElement("label");
-                const edit_btn = document.createElement("checkbox");
-                const edit_form = document.createElement("form");
-                const edit_input = document.createElement("input");
-                const edit_submit = document.createElement("input");
-                edit_submit.type = "submit";
-                edit_submit.vlaue = "sub";
-
-                edit_form.className = "workMomo_edit";
-                edit_label.innerText = "edit";
-                edit_btn.style.display = "none";
-                edit_btn.className = `memo_edit_checbox`;
-                edit_label.addEventListener("click", workMemo_checkbox_work);
-                edit_label.appendChild(edit_btn);
-                edit_input.className = `${i}`;
-                edit_input.value = `${memoText_array[i].text}`;
-                edit_input.style.display = "none";
-                edit_form.addEventListener("submit", edit_memo_form);
-                edit_submit.style.display = "none";
-                edit_form.appendChild(edit_input);
-                edit_form.appendChild(edit_submit);
-                edit_form.appendChild(edit_label);
-                edit_form.style.display = "inline-block";
-                //삭제버튼 구현
-                const del_btn = document.createElement("button");
-                del_btn.innerText = "del";
-                del_btn.className = "memo_delete_btn";
-                del_btn.style.display = "inline-block";
-                del_btn.addEventListener("click", deleteMemo);
-
-                //복사버튼 구현
-                const copy_btn = document.createElement("button");
-                copy_btn.innerText = "copy";
-                copy_btn.style.display = "inline-block";
-                copy_btn.addEventListener("click", copyMemo);
-
-                const div_combine = document.createElement("div");
-                div_combine.appendChild(edit_form);
-                div_combine.appendChild(del_btn);
-                div_combine.appendChild(copy_btn);
-
-                li.appendChild(div_combine);
+                const li = makeMemoUl_list(i,memoText_array[i].text,memoText_array[i].checked);
                 list_ul.prepend(li);
             }
-
         }
         memo_array_Stor(div_name);
-        memoText_array = [];
+        
 
         //만약 버튼이 체크 되어 있음 보여지게끔 해줌
         //-txt주소 페이지 열람 array저장하고 여기에 적용하게끔 나중에 기능 넣을 것
@@ -121,7 +56,6 @@ function skill_apply(txt) {
                 }
             }
         }
-
         const del_CheckSelec_btn = document.createElement("button");
         const del_all_btn = document.createElement("button");
         del_CheckSelec_btn.className = "del_check_memo";
@@ -130,7 +64,6 @@ function skill_apply(txt) {
         del_CheckSelec_btn.addEventListener("click", delete_checks_memo);
         del_all_btn.innerText = "all del"
         del_all_btn.addEventListener("click", delete_all_memo);
-
         //select option - 순서 정렬 변경 가능
         const select_option = document.createElement("select");
         select_option.className = "memo_select_option";
@@ -143,12 +76,20 @@ function skill_apply(txt) {
             sel_option.innerText = `${option_list[i]}`;
             select_option.appendChild(sel_option);
         }
-
+        let jjj=0;
+        if(memoText_array.length >= 1){
+            const haveSelecte = 'select' in memoText_array[0];
+            if(haveSelecte==true){
+                jjj= memoText_array[0].select;
+                select_option.selectedIndex = jjj;
+            }
+        }//https://hianna.tistory.com/420 - 빈 값 확인방법
+        
+        
         //전체복사 
         const copy_all_memo_btn = document.createElement("button");
         copy_all_memo_btn.innerText = "copy all";
         copy_all_memo_btn.addEventListener("click", copyMemo_All);
-
         const del_list_div = document.createElement("div");
         del_list_div.appendChild(del_CheckSelec_btn);
         del_list_div.appendChild(del_all_btn);
@@ -159,10 +100,11 @@ function skill_apply(txt) {
         w_div.appendChild(select_option);
         w_div.appendChild(list_ul);
         w_div.appendChild(del_list_div);
+        
+        memoText_array = [];
     }
 }
 //==============================(위)시작시 추가
-
 //select-option 관련 입력받을시 리스트 순서 변경
 function selectOption_select(event) {
     const select_option = event.target.value;
@@ -175,10 +117,18 @@ function selectOption_select(event) {
     if (parsed_memoText !== null) {
         memoText_array = parsed_memoText;
     }
+    memoText_array[0] = {
+        text:memoText_array[0].text,
+        checked:memoText_array[0].checked,
+        select:0
+    }
+    
+    
     let first_write = [];
     let second_write = [];
     let newMemo_array = [];
     if (select_option == "number") { //넘버로 순서변경
+        memoText_array[0].select = 2;
         for (j = 0; j < memoText_array.length; j++) {
             let cutText = memoText_array[j].text;
             if (cutText.length > 3) {
@@ -207,14 +157,17 @@ function selectOption_select(event) {
         }
         newMemo_array = newMemo_array.concat(second_write);
     } else if (select_option == "new") {//오래된거 부터 순서변경
+        memoText_array[0].select = 0;
         for (i = memoText_array.length - 1; i >= 0; i--) {
             newMemo_array.push(i);
         }
     } else if (select_option == "old") { //최신것 부터 순서변경
+        memoText_array[0].select = 1;
         for (i = 0; i < memoText_array.length; i++) {
             newMemo_array.push(i);
         }
     } else if (select_option == "date") { //시간 날짜 부터 순서변경
+        memoText_array[0].select = 3;
         //텍스트 배열 안 특정 텍스트, 숫자 있는지 확인 - 
         let second_write2 = [];
         let second_write22 = [];
@@ -281,88 +234,28 @@ function selectOption_select(event) {
             } else if(check_day==0) {
                 else_write.push(j);
             }
-        }
+        }/*
         console.log(first_write);
         console.log(second_write22);
         console.log(second_write2);
         console.log(second_write3);
-        console.log(else_write);
-
+        console.log(else_write);*/
         newMemo_array = newMemo_array.concat(first_write);
         newMemo_array = newMemo_array.concat(second_write22);
         newMemo_array = newMemo_array.concat(second_write2);
         newMemo_array = newMemo_array.concat(second_write3);
         newMemo_array = newMemo_array.concat(else_write);
     }
-    //---------------------------------순서변경한 array를 ul에 추가
+    //순서변경한 array를 ul에 추가
     let a = 0;
     if (get_stor_memoText_array_tapHendle !== null) {
         for (i = 0; i < newMemo_array.length; i++) {
             a = newMemo_array[i];
-            const li = document.createElement("li");
-            const text_span = document.createElement("span");
-            text_span.innerText = `${memoText_array[a].text}`;
-            text_span.className = `${a}`;
-            text_span.style.display = "inline-block";
-
-            const check_btn = document.createElement("input");
-            check_btn.type = "checkbox";
-            check_btn.className = "memo_checkbox";
-            check_btn.style.display = "inline";
-            check_btn.addEventListener("click", checkbox_work);
-            if (`${memoText_array[a].checked}` == "true") {
-                check_btn.checked = "true";
-                text_span.style.textDecoration = "line-through";
-            }
-            li.appendChild(check_btn);
-            li.appendChild(text_span);
-
-            //수정 form과 submit, checkbox 추가
-            const edit_label = document.createElement("label");
-            const edit_btn = document.createElement("checkbox");
-            const edit_form = document.createElement("form");
-            const edit_input = document.createElement("input");
-            const edit_submit = document.createElement("input");
-            edit_submit.type = "submit";
-            edit_submit.vlaue = "sub";
-
-            edit_form.className = "workMomo_edit";
-            edit_label.innerText = "edit";
-            edit_btn.style.display = "none";
-            edit_btn.className = `memo_edit_checbox`;
-            edit_label.addEventListener("click", workMemo_checkbox_work);
-            edit_label.appendChild(edit_btn);
-            edit_input.className = `${a}`;
-            edit_input.value = `${memoText_array[a].text}`;
-            edit_input.style.display = "none";
-            edit_form.addEventListener("submit", edit_memo_form);
-            edit_submit.style.display = "none";
-            edit_form.appendChild(edit_input);
-            edit_form.appendChild(edit_submit);
-            edit_form.appendChild(edit_label);
-            edit_form.style.display = "inline-block";
-            //삭제버튼 구현
-            const del_btn = document.createElement("button");
-            del_btn.innerText = "del";
-            del_btn.className = "memo_delete_btn";
-            del_btn.style.display = "inline-block";
-            del_btn.addEventListener("click", deleteMemo);
-
-            //복사버튼 구현
-            const copy_btn = document.createElement("button");
-            copy_btn.innerText = "copy";
-            copy_btn.style.display = "inline-block";
-            copy_btn.addEventListener("click", copyMemo);
-
-            const div_combine = document.createElement("div");
-            div_combine.appendChild(edit_form);
-            div_combine.appendChild(del_btn);
-            div_combine.appendChild(copy_btn);
-
-            li.appendChild(div_combine);
+            const li = makeMemoUl_list(a,memoText_array[a].text,memoText_array[a].checked);
             ul.appendChild(li);
         }
     }
+    memo_array_Stor(tap.className);
     memoText_array = [];
 }
 //========================================================
@@ -405,7 +298,6 @@ function deleteMemo(event) {
     memo_array_Stor(tap.className);
     memoText_array = [];
     hide_memo_target.style.display = "none";
-
 }
 
 function delete_checks_memo(event) {
@@ -445,13 +337,9 @@ function delete_all_memo(event) {
 const in_stor_tap_array_tapHendle = localStorage.getItem("tap_array");
 if (in_stor_tap_array_tapHendle !== null) {
     const parsed_tap_array = JSON.parse(in_stor_tap_array);
-    for (i = 0; i < parsed_tap_array.length; i++) {
-        div_name[i] = parsed_tap_array[i];
-    }
+    div_name = parsed_tap_array;
     div_name.forEach(skill_apply);
 }
-
-
 //======================================메모 저장
 function memo_array_Stor(memo_divClassName) {
     localStorage.setItem(`${memo_divClassName}`, JSON.stringify(memoText_array));
@@ -460,85 +348,23 @@ function memo_array_Stor(memo_divClassName) {
 function workMemo_inputValu_inList(event) {
     event.preventDefault();
     let parent = event.target.parentElement.className;
-
     const text = document.querySelector(`.${parent}`).firstChild.firstChild;
     const ul = document.querySelector(`.${parent}`).childNodes[2];
-    const li = document.createElement("li");
     const memoSaveValue = {
         text: text.value,
         checked: "false",
     }
-
     const get_stor_memoText_array_tapHendle = localStorage.getItem(`${parent}`);
     const parsed_memoText = JSON.parse(get_stor_memoText_array_tapHendle);
     if (parsed_memoText !== null) {
         memoText_array = parsed_memoText;
     }
-
-    const check_btn = document.createElement("input");
-    check_btn.type = "checkbox";
-    check_btn.className = "memo_checkbox";
-    check_btn.addEventListener("click", checkbox_work);
-    li.appendChild(check_btn);
-
-    const text_span = document.createElement("span");
-    text_span.innerText = text.value;
-    text_span.className = `0`;
-    if (parsed_memoText !== null) {
-        text_span.className = `${memoText_array.length}`;
-    }
-    li.appendChild(text_span);
-
-    const edit_label = document.createElement("label");
-    const edit_btn = document.createElement("checkbox");
-    const edit_form = document.createElement("form");
-    const edit_input = document.createElement("input");
-    const edit_submit = document.createElement("input");
-    edit_submit.type = "submit";
-    edit_submit.vlaue = "sub";
-
-    edit_form.className = "workMomo_edit";
-    edit_label.innerText = "edit";
-    edit_btn.style.display = "none";
-    edit_btn.className = `memo_edit_checbox`;
-    edit_label.addEventListener("click", workMemo_checkbox_work);
-    edit_label.appendChild(edit_btn);
-    edit_input.className = `${i}`;
-    edit_input.value = `${text.value}`;
-    edit_input.style.display = "none";
-    edit_form.addEventListener("submit", edit_memo_form);
-    edit_submit.style.display = "none";
-    edit_form.appendChild(edit_input);
-    edit_form.appendChild(edit_submit);
-    edit_form.appendChild(edit_label);
-    edit_form.style.display = "inline-block";
-
-    //삭제버튼 구현
-    const del_btn = document.createElement("button");
-    del_btn.innerText = "del";
-    del_btn.className = "memo_delete_btn";
-    del_btn.style.display = "inline-block";
-    del_btn.addEventListener("click", deleteMemo);
-
-    //복사버튼 구현
-    const copy_btn = document.createElement("button");
-    copy_btn.innerText = "copy";
-    copy_btn.style.display = "inline-block";
-    copy_btn.addEventListener("click", copyMemo);
-
-    const div_combine = document.createElement("div");
-    div_combine.appendChild(edit_form);
-    div_combine.appendChild(del_btn);
-    div_combine.appendChild(copy_btn);
-
-    li.appendChild(div_combine);
-
+    const li = makeMemoUl_list(memoText_array.length,memoSaveValue.text,memoSaveValue.checked);
+    ul.prepend(li);
     memoText_array.push(memoSaveValue);
     memo_array_Stor(parent);
     memoText_array = [];
     text.value = "";
-
-    ul.prepend(li);
 }
 //이벤트 부여
 const workMemo_input = document.querySelectorAll(".workMemo_form");
@@ -576,7 +402,6 @@ function checkbox_work(event) {
             event.target.checked = false;
             break;
     }
-
     if (parsed_memoText !== null) {
         memoText_array = parsed_memoText;
     }
@@ -586,7 +411,6 @@ function checkbox_work(event) {
 }
 
 function workMemo_checkbox_work(event) {
-
     const input = event.target.parentElement.childNodes[1];
     const submit = event.target.parentElement.childNodes[0];
     if (input.style.display == "inline-block") {
@@ -625,4 +449,71 @@ function edit_memo_form(event) {
     const input_sub_btn = event.target.childNodes[1];
     input_sub_btn.style.display = "none";
     input_text.style.display = "none";
+}
+
+//=====================================
+//윈도우에 li만드는 함수
+function makeMemoUl_list(index,text,checked) {
+    const li = document.createElement("li");
+    const text_span = document.createElement("span");
+    text_span.innerText = `${text}`;
+    text_span.className = `${index}`;
+    text_span.style.display = "inline-block";
+
+    const check_btn = document.createElement("input");
+    check_btn.type = "checkbox";
+    check_btn.className = "memo_checkbox";
+    check_btn.style.display = "inline";
+    check_btn.addEventListener("click", checkbox_work);
+    if (`${checked}` == "true") {
+        check_btn.checked = "true";
+        text_span.style.textDecoration = "line-through";
+    }
+    li.appendChild(check_btn);
+    li.appendChild(text_span);
+
+    //수정 form과 submit, checkbox 추가
+    const edit_label = document.createElement("label");
+    const edit_btn = document.createElement("checkbox");
+    const edit_form = document.createElement("form");
+    const edit_input = document.createElement("input");
+    const edit_submit = document.createElement("input");
+    edit_submit.type = "submit";
+    edit_submit.vlaue = "sub";
+
+    edit_form.className = "workMomo_edit";
+    edit_label.innerText = "edit";
+    edit_btn.style.display = "none";
+    edit_btn.className = `memo_edit_checbox`;
+    edit_label.addEventListener("click", workMemo_checkbox_work);
+    edit_label.appendChild(edit_btn);
+    edit_input.className = `${index}`;
+    edit_input.value = `${text}`;
+    edit_input.style.display = "none";
+    edit_form.addEventListener("submit", edit_memo_form);
+    edit_submit.style.display = "none";
+    edit_form.appendChild(edit_input);
+    edit_form.appendChild(edit_submit);
+    edit_form.appendChild(edit_label);
+    edit_form.style.display = "inline-block";
+    //삭제버튼 구현
+    const del_btn = document.createElement("button");
+    del_btn.innerText = "del";
+    del_btn.className = "memo_delete_btn";
+    del_btn.style.display = "inline-block";
+    del_btn.addEventListener("click", deleteMemo);
+
+    //복사버튼 구현
+    const copy_btn = document.createElement("button");
+    copy_btn.innerText = "copy";
+    copy_btn.style.display = "inline-block";
+    copy_btn.addEventListener("click", copyMemo);
+
+    const div_combine = document.createElement("div");
+    div_combine.appendChild(edit_form);
+    div_combine.appendChild(del_btn);
+    div_combine.appendChild(copy_btn);
+
+    li.appendChild(div_combine);
+    return li;
 }
