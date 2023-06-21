@@ -20,7 +20,16 @@ function skill_apply(txt) {
         const parsed_memoText = JSON.parse(get_stor_memoText_array_tapHendle);
         if (get_stor_memoText_array_tapHendle !== null) {
             memoText_array = parsed_memoText;
+            let tem_array = [];//첵딜올 용 - txt, 첵 값이 ""인 경우 배열제외
+            for(i=0;i<memoText_array.length;i++){
+                if(memoText_array[i].txt != "" && memoText_array[i].checked != ""){
+                    tem_array.push(memoText_array[i]);
+                }
+            }
+            memoText_array = tem_array;
         }
+        //memoText_array = parsed_memoText;
+        //console.log(memoText_array);
         const memo_form = document.createElement("form");
         const memo_input = document.createElement("input");
         memo_input.className = "workMemo";
@@ -167,6 +176,7 @@ function deleteMemo(event) {
     hide_memo_target.style.display = "none";
 }
 
+//!!!!!문제점 발견~~~~~첵 딜 올
 function delete_checks_memo(event) {
     const tap = event.target.parentElement.parentElement;
     const get_stor_memoText_array_tapHendle = localStorage.getItem(tap.className);
@@ -179,11 +189,18 @@ function delete_checks_memo(event) {
         memoText_array = parsed_memoText;
     }
     const select_memo = document.querySelectorAll(`.${tap.className} li`);
-    const reverse = [...select_memo].reverse();
-    for (i = 0; i < memoText_array.length; i++) {
+    let tem_num_array = [];
+    for (i = 0; i < memoText_array.length; i++) { 
         if (memoText_array[i].checked == "true") {
-            reverse[i].style.display = "none";
             memoText_array[i] = memoSaveValue;
+            tem_num_array.push(i);
+        }
+    }
+    for(i=0;i<tem_num_array.length;i++){
+        for(j=0;j<select_memo.length;j++){
+            if(select_memo[j].childNodes[1].className == `${tem_num_array[i]}`){
+                select_memo[j].style.display = "none";
+            }
         }
     }
     memo_array_Stor(tap.className);
@@ -382,6 +399,9 @@ function makeMemoUl_list(index,text,checked) {
     div_combine.appendChild(copy_btn);
 
     li.appendChild(div_combine);
+    if(text == "" && checked==""){
+        li.style.display= "none";
+    }
     return li;
 }
 
@@ -417,11 +437,11 @@ function selecOption_makeLi(memoText_array, select_option,get_stor_memoText_arra
             newMemo_array.push(first_write[i].index);
         }
         newMemo_array = newMemo_array.concat(second_write);
-    } else if (select_option == 1) {//오래된거 부터 순서변경
+    } else if (select_option == 0) {//최신것 부터 순서변경
         for (i = memoText_array.length - 1; i >= 0; i--) {
             newMemo_array.push(i);
         }
-    } else if (select_option == 0) { //최신것 부터 순서변경
+    } else if (select_option == 1) { //오래된것 부터 순서변경
         for (i = 0; i < memoText_array.length; i++) {
             newMemo_array.push(i);
         }
