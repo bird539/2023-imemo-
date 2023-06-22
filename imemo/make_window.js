@@ -73,6 +73,17 @@ function make_menu(){
     const ex_delTap_btn = document.createElement("h5");
     ex_delTap_btn.innerText = "탭 삭제하기";
     newDiv.appendChild(ex_delTap_btn);
+    const tap_del_btn = document.createElement("button");
+    tap_del_btn.innerText = "tap del";
+    newDiv.appendChild(tap_del_btn);
+
+    const ex_changeTap_btn = document.createElement("h5");
+    ex_changeTap_btn.innerText = "탭 이름, 순서 변경";
+    newDiv.appendChild(ex_changeTap_btn);
+
+    const ex_delWin_btn = document.createElement("h5");
+    ex_delWin_btn.innerText = "현 윈도우(name) 삭제하기";
+    newDiv.appendChild(ex_delWin_btn);
 
     return newDiv;
 }
@@ -85,7 +96,6 @@ function menu_show(event){
             div_menu.style.display = 'none';
         }
     }
-    console.log(div_menu.className);
 }
 
 function make_tap_pluse(num){
