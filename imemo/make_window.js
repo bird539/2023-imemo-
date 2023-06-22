@@ -36,24 +36,56 @@ function make_window(num){
 
     //윈도우 추가 버튼 생성
     make_tap_pluse(num);
-    make_menu(num);
+
+    const memu_show_btn = document.createElement("button");
+    memu_show_btn.innerText = "menu";
+    memu_show_btn.style.display = "block";
+    memu_show_btn.addEventListener("click",menu_show);
+    newDiv.appendChild(memu_show_btn);
+
+    let newMenu = make_menu(num);
+    newDiv.appendChild(newMenu);
 
     //tap버튼들 모음 form
     const w_tap_all = document.createElement("form");
     w_tap_all.className = `w${num}`;
     newDiv.appendChild(w_tap_all);
 }
-
-function make_menu(num){
-    const window = document.querySelector(`.win_tap_${num}`);
+//MENU
+function make_menu(){
     const newDiv = document.createElement("div");
-    newDiv.className = `tap_menu`;
-    newDiv.style.display = "block";
+    newDiv.className = `win_menu`;
+    newDiv.style.display = "none";
 
-    const tap_button = document.createElement("button");
-    tap_button.innerText = `PLS win`;
-    newDiv.appendChild(tap_button);
-    window.appendChild(newDiv);
+    const title_menu = document.createElement("h4");
+    title_menu.innerText = "MENU";
+    newDiv.appendChild(title_menu);
+
+    const ex_winPLS_btn = document.createElement("h5");
+    ex_winPLS_btn.innerText = "윈도우 추가 하기";
+    newDiv.appendChild(ex_winPLS_btn);
+
+    const winPLS_button = document.createElement("button");
+    winPLS_button.innerText = `PLS win`;
+    winPLS_button.addEventListener("click",pluse_window_event);
+    newDiv.appendChild(winPLS_button);
+
+    const ex_delTap_btn = document.createElement("h5");
+    ex_delTap_btn.innerText = "탭 삭제하기";
+    newDiv.appendChild(ex_delTap_btn);
+
+    return newDiv;
+}
+function menu_show(event){
+    const div_menu = event.target.parentElement.childNodes[4];
+    if(div_menu!=null){
+        if(div_menu.style.display == 'none'){
+            div_menu.style.display = 'block';
+        }else if(div_menu.style.display == 'block'){
+            div_menu.style.display = 'none';
+        }
+    }
+    console.log(div_menu.className);
 }
 
 function make_tap_pluse(num){
@@ -72,19 +104,20 @@ function make_tap_pluse(num){
     skill_array.forEach(function(n) {
         const newLi = document.createElement("li");
         const newLiBtn = document.createElement("button");
-        newLiBtn.innerText = `s${n}`;
-        newLiBtn.className = `skill_pls`
+        newLiBtn.innerText = `${n}`;
+        newLiBtn.className = `skill_pls`;
         newLi.appendChild(newLiBtn);
         newUl.appendChild(newLi);
-        newLi.style.float = "left"
+        newLi.style.float = "left";
         newUl.style.display = 'none';
         tapSelectDiv.appendChild(newUl);
     });
 
     const tap_button = document.createElement("button");
-    tap_button.innerText = `tap++`;    
+    tap_button.innerText = `tap++`;
     newDiv.appendChild(tap_button);
     newDiv.appendChild(tapSelectDiv);//ul추가
+    newDiv.addEventListener("click",hied_show_tapSelect);
 
     window.appendChild(newDiv);
 }
@@ -151,18 +184,9 @@ function hied_show_tapSelect(event){
     const tapPls = document.querySelector(`.tapPls${num}`);
     if(tapPls!=null){
         if(tapPls.firstChild.style.display == 'none'){
-            tapPls.firstChild.style.display = 'block';
-        }else if(tapPls.firstChild.style.display == 'block'){
+            tapPls.firstChild.style.display = 'inline-block';
+        }else if(tapPls.firstChild.style.display == 'inline-block'){
             tapPls.firstChild.style.display = 'none';
         }
     }
 }
-const tapPluse_btn_q = document.querySelectorAll(".tap_PLS button");
-tapPluse_btn_q.forEach(function (event){
-    event.addEventListener("click",hied_show_tapSelect);
-});
-
-const pluse_window = document.querySelectorAll(".tap_menu");
-pluse_window.forEach(function (event){
-    event.addEventListener("click",pluse_window_event);
-});

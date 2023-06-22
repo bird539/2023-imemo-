@@ -54,14 +54,33 @@ function skill_apply(txt) {
                 }
             }
         }
-        const del_CheckSelec_btn = document.createElement("button");
+        const del_checks_btn = document.createElement("button");
+        del_checks_btn.className = "del_check_memo";
+        del_checks_btn.innerText = "del checks";
+        del_checks_btn.addEventListener("click", delete_checks_memo);
+        
         const del_all_btn = document.createElement("button");
-        del_CheckSelec_btn.className = "del_check_memo";
         del_all_btn.className = "del_all_memo";
-        del_CheckSelec_btn.innerText = "del checks";
-        del_CheckSelec_btn.addEventListener("click", delete_checks_memo);
-        del_all_btn.innerText = "all del"
+        del_all_btn.innerText = "yes";
         del_all_btn.addEventListener("click", delete_all_memo);
+
+        const delAll_no = document.createElement("button");
+        delAll_no.innerText = "no";//div다시 가리기
+        delAll_no.addEventListener("click",hied_show_tapSelect2);
+        const delAll_info = document.createElement("span");
+        delAll_info.innerText = "Are you sure you want to delete all notes?";
+        delAll_info.style.display = "block";
+
+        const div_delAll = document.createElement("div");
+        div_delAll.className = `delAll_${div_name}`;
+        const btn_chek_delAll = document.createElement("button");
+        btn_chek_delAll.innerText = "ALL del";
+        btn_chek_delAll.addEventListener("click",hied_show_tapSelect);
+        div_delAll.appendChild(delAll_info);
+        div_delAll.appendChild(del_all_btn);
+        div_delAll.appendChild(delAll_no);
+        div_delAll.style.display = "none";
+        
         //select option - 순서 정렬 변경 가능
         const select_option = document.createElement("select");
         select_option.className = "memo_select_option";
@@ -88,8 +107,11 @@ function skill_apply(txt) {
         copy_all_memo_btn.innerText = "copy all";
         copy_all_memo_btn.addEventListener("click", copyMemo_All);
         const del_list_div = document.createElement("div");
-        del_list_div.appendChild(del_CheckSelec_btn);
-        del_list_div.appendChild(del_all_btn);
+        
+        del_list_div.appendChild(del_checks_btn);
+        del_list_div.appendChild(btn_chek_delAll);
+        del_list_div.appendChild(div_delAll);
+
         del_list_div.appendChild(copy_all_memo_btn);
         del_list_div.style.display = "inline-block";
 
@@ -102,6 +124,32 @@ function skill_apply(txt) {
     }
 }
 //==============================(위)시작시 추가
+//첵딜올 보여주기
+function hied_show_tapSelect(event){
+    const win_num = event.target.parentElement.parentElement.className;
+    const num = `${win_num}`;
+    const delChecks_btn = document.querySelector(`.delAll_${num}`);
+    if(delChecks_btn!=null){
+        if(delChecks_btn.style.display == 'none'){
+            delChecks_btn.style.display = 'block';
+        }else if(delChecks_btn.style.display == 'block'){
+            delChecks_btn.style.display = 'none';
+        }
+    }
+}
+function hied_show_tapSelect2(event){
+    const win_num = event.target.parentElement.parentElement.parentElement.className;
+    const num = `${win_num}`;
+    const delChecks_btn = document.querySelector(`.delAll_${num}`);
+    if(delChecks_btn!=null){
+        if(delChecks_btn.style.display == 'none'){
+            delChecks_btn.style.display = 'block';
+        }else if(delChecks_btn.style.display == 'block'){
+            delChecks_btn.style.display = 'none';
+        }
+    }
+}
+
 //select-option 관련 입력받을시 리스트 순서 변경
 function selectOption_select(event) {
     const select_option = event.target.value;
@@ -176,7 +224,7 @@ function deleteMemo(event) {
     hide_memo_target.style.display = "none";
 }
 
-//!!!!!문제점 발견~~~~~첵 딜 올
+//첵 딜 올
 function delete_checks_memo(event) {
     const tap = event.target.parentElement.parentElement;
     const get_stor_memoText_array_tapHendle = localStorage.getItem(tap.className);
@@ -208,7 +256,7 @@ function delete_checks_memo(event) {
 }
 
 function delete_all_memo(event) {
-    const tap = event.target.parentElement.parentElement;
+    const tap = event.target.parentElement.parentElement.parentElement;
     const select_memo = document.querySelectorAll(`.${tap.className} li`);
     for (i = 0; i < select_memo.length; i++) {
         select_memo[i].style.display = "none";

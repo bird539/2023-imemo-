@@ -1,8 +1,11 @@
 body {
     background-color: black;
 }
-h3, span, label {
+h3, h5, h4, span, label {
     color: bisque;
+}
+h3, h5, h4 {
+    line-height: 0.1;
 }
 input, button, select{
     background-color: black;
