@@ -52,7 +52,7 @@ function make_window(num){
     newDiv.appendChild(w_tap_all);
 }
 //MENU
-function make_menu(){
+function make_menu(num){
     const newDiv = document.createElement("div");
     newDiv.className = `win_menu`;
     newDiv.style.display = "none";
@@ -73,9 +73,48 @@ function make_menu(){
     const ex_delTap_btn = document.createElement("h5");
     ex_delTap_btn.innerText = "탭 삭제하기";
     newDiv.appendChild(ex_delTap_btn);
-    const tap_del_btn = document.createElement("button");
-    tap_del_btn.innerText = "tap del";
-    newDiv.appendChild(tap_del_btn);
+
+    
+    const form_tapSelect = document.createElement("form");
+    form_tapSelect.className = `del_tapSelect_win${num}`;
+    
+    const in_stor_tap_array = localStorage.getItem("tap_array");
+    let tap_array = [];
+    if(in_stor_tap_array !== null){
+        const parsed_tap_array = JSON.parse(in_stor_tap_array);
+        tap_array = parsed_tap_array;
+        const select_tap = document.createElement("select");
+        select_tap.className = `tapSelectDel_w${num}`;
+        for(i=0;i<tap_array.length;i++){
+            if(`${tap_array[i].charAt(1)}`==`${num}`){
+                const tap_option = document.createElement("option");
+                tap_option.innerText = tap_array[i];
+                select_tap.appendChild(tap_option);
+                /*
+                                const tap_name = document.createElement("label");
+                tap_name.htmlFor = `${tap_array[i]}`;
+                tap_name.innerText = `tap${tap_array[i].charAt(tap_array[i].length-1)}`;
+    
+                const tap_button = document.createElement("input");
+                tap_button.name = `tap${tap_array[i].charAt(1)}`;
+                tap_button.type = 'radio';
+                tap_button.value = `${tap_array[i]}`;
+                tap_button.name = `w${num}_delTapSel`;
+                form_tapSelect.appendChild(tap_name);
+                form_tapSelect.appendChild(tap_button);
+                 */
+            }
+        }
+        form_tapSelect.appendChild(select_tap);
+        const tap_del_btn = document.createElement("input");
+        tap_del_btn.type = "submit";
+        tap_del_btn.value = "tap del";
+        tap_del_btn.addEventListener("click",selectTapDel);
+        form_tapSelect.appendChild(tap_del_btn);    
+    }
+
+    
+    newDiv.appendChild(form_tapSelect);
 
     const ex_changeTap_btn = document.createElement("h5");
     ex_changeTap_btn.innerText = "탭 이름, 순서 변경";
@@ -87,6 +126,13 @@ function make_menu(){
 
     return newDiv;
 }
+//메뉴 속 버튼들 함수
+function selectTapDel(event){
+    event.preventDefault();
+    const tapName = event.target.previousSibling.value;
+}
+//
+
 function menu_show(event){
     const div_menu = event.target.parentElement.childNodes[4];
     if(div_menu!=null){

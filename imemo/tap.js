@@ -36,7 +36,6 @@ pluse_tap.forEach(function (event){
 
 const in_stor_win_array_tapHendle2 = localStorage.getItem("win_array");
 const parsed_winNum2 = JSON.parse(in_stor_win_array_tapHendle2);
-showTap_array.length2 = parsed_winNum2.length;
 
 function make_tap_btn_pluse(win_num, btn_num){
     const window = document.querySelector(`.win_tap_${win_num}`);
@@ -88,7 +87,7 @@ function first_make_tap_btn_pluse(txt){
     const newDiv2 = document.createElement("div");
     newDiv2.className = `s${txt}`;
 
-    // 라디오 버튼을 미리 클릭시키는 부분 - 임시로 마지막 값만 클릭
+    // 라디오 버튼을 미리 클릭시키는 부분
 
     for(i=0;i<showTap_array.length;i++){
         if(txt == showTap_array[i]){
