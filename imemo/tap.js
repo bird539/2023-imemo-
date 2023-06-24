@@ -22,7 +22,7 @@ function pluse_tap_btn(event){
     event.preventDefault();
     const btn_parent = event.target.parentElement.parentElement.parentElement.className;
     const win_num = btn_parent.charAt(btn_parent.length - 1);
-
+    
     const btn_text = event.target.innerText;
     const btn_num = btn_text.charAt(btn_text.length - 1);
 
@@ -40,9 +40,22 @@ const parsed_winNum2 = JSON.parse(in_stor_win_array_tapHendle2);
 function make_tap_btn_pluse(win_num, btn_num){
     const window = document.querySelector(`.win_tap_${win_num}`);
     const w_tap_all = document.querySelector(`.w${win_num}`);
-    const class_name = `w${win_num}_t${tap_array.length}_s${btn_num}`
     
-    tap_array.push(class_name);
+    let class_name = "";
+    let name = "";
+    let condition = 0;
+    let k = 0;
+    while(condition < 1){
+        class_name = `w${win_num}_t${tap_array.length+k}_s${btn_num}`;
+        name = `sw${win_num}_t${tap_array.length+k}_s${btn_num}`;
+        for(i=0;i<tap_array.length;i++){
+            if(tap_array[i] == class_name){
+                k+=1;
+                condition = -1;
+            }
+        }
+        condition +=1;
+    }
 
     const tap_name = document.createElement("label");
     tap_name.htmlFor = class_name;
@@ -55,7 +68,7 @@ function make_tap_btn_pluse(win_num, btn_num){
     tap_button.id = class_name;
     tap_button.checked = "checked";
 
-    tap_array_Stor();
+    
     w_tap_all.appendChild(tap_name);
     w_tap_all.appendChild(tap_button);
     window.appendChild(w_tap_all);
@@ -63,7 +76,11 @@ function make_tap_btn_pluse(win_num, btn_num){
     //window_n 클래스 아래에 제목,form,tap선택 다음에 추가(버튼개수대로)
     //const window2 = document.querySelector(`.window_${win_num}`);
     const newDiv2 = document.createElement("div");
-    newDiv2.className = `sw${win_num}_t${tap_array.length}_s${btn_num}`;
+    newDiv2.className = name;
+    
+    tap_array.push(class_name);
+    tap_array_Stor();
+    newDiv2.className = name;
     window.appendChild(newDiv2);
     //선택에 맞게끔 div안에 스킬창 추가
     //메모장
@@ -96,13 +113,14 @@ function first_make_tap_btn_pluse(txt){
         }
     }
 
-    
-    w_tap_all.appendChild(tap_name);
-    w_tap_all.appendChild(tap_button);
-    window2.appendChild(newDiv2);
+    if(w_tap_all!=null){
+        w_tap_all.appendChild(tap_name);
+        w_tap_all.appendChild(tap_button);
+        window2.appendChild(newDiv2);
+    }
 }
 
-let tap_array =['w0_t0_s0'];
+let tap_array =[];
 
 function tap_array_Stor(){
     localStorage.setItem("tap_array",JSON.stringify(tap_array));
@@ -116,6 +134,7 @@ if(in_stor_tap_array !== null){
     }
     tap_array.forEach(first_make_tap_btn_pluse);
 }else{
+    tap_array =['w0_t0_s0'];
     tap_array_Stor();
     tap_array.forEach(first_make_tap_btn_pluse);
 }

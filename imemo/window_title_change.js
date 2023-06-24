@@ -1,8 +1,7 @@
 //title을 저장할 array
-let title_array = [];
+let title_array = [0,1,2,3,4,5,6,7,8,9];
 const in_stor_win_array2 = localStorage.getItem("win_array");
 const parsed_win_array2 = JSON.parse(in_stor_win_array2);
-title_array = [...parsed_win_array2];
 
 //title_array를 localStorage에 넣기-array 형태로 넣기위해 JSON사용
 function title_iput_Stor(){
@@ -41,14 +40,15 @@ function title_change(event){
 //들어왔을 때 stor에서 받아서 수정
 let num1 = 0;
 function change_window(name){
-
     if(name == null){
         name = "win_name"
     }
     const title = document.getElementsByClassName(`${num1}_title`)[0];
     const input = document.getElementsByClassName(`${num1}_rewrite_input`)[0];
-    title.innerHTML = name;
-    input.type = "hidden";
+    if(title != null){
+        title.innerHTML = name;
+        input.type = "hidden";
+    }
     num1++;
 }
 

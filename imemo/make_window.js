@@ -51,7 +51,7 @@ function make_window(num){
     w_tap_all.className = `w${num}`;
     newDiv.appendChild(w_tap_all);
 }
-//MENU
+//MENU----------------
 function make_menu(num){
     const newDiv = document.createElement("div");
     newDiv.className = `win_menu`;
@@ -62,13 +62,17 @@ function make_menu(num){
     newDiv.appendChild(title_menu);
 
     const ex_winPLS_btn = document.createElement("h5");
-    ex_winPLS_btn.innerText = "윈도우 추가 하기";
+    ex_winPLS_btn.innerText = "윈도우 추가 하기 (0~9까지가능(최대 개수 10개))";
     newDiv.appendChild(ex_winPLS_btn);
 
     const winPLS_button = document.createElement("button");
     winPLS_button.innerText = `PLS win`;
     winPLS_button.addEventListener("click",pluse_window_event);
     newDiv.appendChild(winPLS_button);
+
+    const ex_changeTap_btn = document.createElement("h5");
+    ex_changeTap_btn.innerText = "탭 이름, 순서 변경";
+    newDiv.appendChild(ex_changeTap_btn);
 
     const ex_delTap_btn = document.createElement("h5");
     ex_delTap_btn.innerText = "탭 삭제하기";
@@ -90,19 +94,6 @@ function make_menu(num){
                 const tap_option = document.createElement("option");
                 tap_option.innerText = tap_array[i];
                 select_tap.appendChild(tap_option);
-                /*
-                                const tap_name = document.createElement("label");
-                tap_name.htmlFor = `${tap_array[i]}`;
-                tap_name.innerText = `tap${tap_array[i].charAt(tap_array[i].length-1)}`;
-    
-                const tap_button = document.createElement("input");
-                tap_button.name = `tap${tap_array[i].charAt(1)}`;
-                tap_button.type = 'radio';
-                tap_button.value = `${tap_array[i]}`;
-                tap_button.name = `w${num}_delTapSel`;
-                form_tapSelect.appendChild(tap_name);
-                form_tapSelect.appendChild(tap_button);
-                 */
             }
         }
         form_tapSelect.appendChild(select_tap);
@@ -112,26 +103,140 @@ function make_menu(num){
         tap_del_btn.addEventListener("click",selectTapDel);
         form_tapSelect.appendChild(tap_del_btn);    
     }
-
-    
     newDiv.appendChild(form_tapSelect);
 
-    const ex_changeTap_btn = document.createElement("h5");
-    ex_changeTap_btn.innerText = "탭 이름, 순서 변경";
-    newDiv.appendChild(ex_changeTap_btn);
-
     const ex_delWin_btn = document.createElement("h5");
-    ex_delWin_btn.innerText = "현 윈도우(name) 삭제하기";
+    //const win_title = win.childNodes[0].innerText;
+    ex_delWin_btn.innerText = `현재 윈도우(${num}번) 삭제하기`;
     newDiv.appendChild(ex_delWin_btn);
+    const show_winDel_btn = document.createElement("button");
+    show_winDel_btn.innerText = "del now window";
+    show_winDel_btn.addEventListener("click",hied_show);
+    newDiv.appendChild(show_winDel_btn);
+
+    const div_warning_winDel = document.createElement("div");
+    div_warning_winDel.style.display = "none";
+
+    const span_waining_windel = document.createElement("span");
+    span_waining_windel.innerText = `정말로 현재 윈도우(${num}번)을 삭제하시겠습니까?\n해당 윈도우 속 탭 저장물도 모두 함께 삭제됩니다.`;
+    div_warning_winDel.appendChild(span_waining_windel);
+
+    const btn_yes_winDel = document.createElement("button");
+    btn_yes_winDel.innerText = "YES";
+    btn_yes_winDel.addEventListener("click",nowWinDel);
+    div_warning_winDel.appendChild(btn_yes_winDel);
+
+    const btn_no_winDel = document.createElement("button");
+    btn_no_winDel.innerText = "NO";
+    div_warning_winDel.appendChild(btn_no_winDel);
+
+    newDiv.appendChild(div_warning_winDel);
+
+    newDiv.style.border = "1px solid white";
 
     return newDiv;
 }
-//메뉴 속 버튼들 함수
+//----------------MENU
+//메뉴 속 버튼들 함수----------------
 function selectTapDel(event){
-    event.preventDefault();
+    //event.preventDefault();
     const tapName = event.target.previousSibling.value;
+
+    const in_stor_tap_array = localStorage.getItem("tap_array");
+    let tap_array = [];
+    let tap_array_new = [];
+    if(in_stor_tap_array !== null){
+        const parsed_tap_array = JSON.parse(in_stor_tap_array);
+        tap_array = parsed_tap_array;
+        for(i=0;i<tap_array.length;i++){
+            if(tap_array[i]==tapName){
+                window.localStorage.removeItem(tapName);
+            }else if(tap_array[i]!=tapName){
+                tap_array_new.push(tap_array[i]);
+            }
+        }
+        localStorage.setItem(`tap_array`,JSON.stringify(tap_array_new));
+    }
 }
-//
+
+function nowWinDel(event){
+    const win = event.target.parentElement.parentElement.parentElement.className;
+    const winNum = Number(win.charAt(win.length-1));
+    const in_stor_win_array = localStorage.getItem("win_array");
+    const in_stor_tap_array = localStorage.getItem("tap_array");
+    const in_stor_tapShow_array = localStorage.getItem("tapShow_array");
+    const in_stor_title_array = localStorage.getItem("window_title");
+
+    let del_showTap = [];
+    if(in_stor_tap_array !== null){
+        const parsed_tap_array = JSON.parse(in_stor_tap_array);
+        let tap_array = parsed_tap_array;
+        let new_tap_array = [];
+        for(i=0;i<tap_array.length;i++){
+            const tapNum = Number(tap_array[i].charAt(1));
+            console.log(tapNum,winNum);
+            if(tapNum!=winNum){
+                new_tap_array.push(tap_array[i]);
+            }else if(tapNum==winNum){
+                del_showTap.push(tap_array[i]);
+                window.localStorage.removeItem(`s${tap_array[i]}`);
+            }
+        }
+        localStorage.setItem(`tap_array`,JSON.stringify(new_tap_array));
+    }
+    if(in_stor_tapShow_array !== null){
+        const parsed_tap_array = JSON.parse(in_stor_tapShow_array);
+        let tapShow_array = parsed_tap_array;
+        let newShowTap_array = [];
+        for(i=0;i<tapShow_array.length;i++){
+            for(j=0;j<del_showTap.length;j++){
+                if(tapShow_array[i] == del_showTap[j]){
+                    tapShow_array[i] = -1;
+                }
+            }
+        }
+        for(i=0;i<tapShow_array.length;i++){
+            if(tapShow_array[i]!=-1){
+                newShowTap_array.push(tapShow_array[i]);
+            }
+        }
+        localStorage.setItem(`tapShow_array`,JSON.stringify(newShowTap_array));
+    }
+    
+    if(in_stor_win_array !== null){
+        const parsed_win_array = JSON.parse(in_stor_win_array);
+        let window_array = parsed_win_array;
+
+        const parsed_win_title = JSON.parse(in_stor_title_array);
+        let win_title_array = parsed_win_title;
+        //let new_win_title_array = [];
+
+        let new_win_array = [];
+        for(i=0;i<window_array.length;i++){
+            console.log("win[i]:",window_array[i],"winN:",winNum)
+            if(window_array[i]!=winNum){
+                new_win_array.push(window_array[i]);
+            }else{
+                win_title_array[i] = i;
+            }
+        }
+        localStorage.setItem(`win_array`,JSON.stringify(new_win_array));
+        localStorage.setItem(`window_title`,JSON.stringify(win_title_array));
+    }
+    location.reload();
+}
+
+function hied_show(event){
+    const show_hide_target = event.target.nextSibling;
+    if(show_hide_target!=null){
+        if(show_hide_target.style.display == 'none'){
+            show_hide_target.style.display = 'block';
+        }else if(show_hide_target.style.display == 'block'){
+            show_hide_target.style.display = 'none';
+        }
+    }
+}
+//----------------메뉴 속 버튼들 함수
 
 function menu_show(event){
     const div_menu = event.target.parentElement.childNodes[4];
@@ -212,15 +317,6 @@ function window_array_store(){
     localStorage.setItem("win_array",JSON.stringify(window_array));
 }
 
-//윈도우 추가 이벤트
-function pluse_window_event(event){
-    window_array.push(window_array.length);
-    window_array_store();
-    make_window(window_array[window_array.length-1]);
-    location.reload();
-    //make_window();
-}
-
 //새로고침 시 저장물 보존
 const in_stor_win_array = localStorage.getItem("win_array");
 if(in_stor_win_array !== null){
@@ -231,6 +327,28 @@ if(in_stor_win_array !== null){
     //로컬 스토리지 비웠을 때
     window_array_store();
     window_array.forEach(make_window);
+}
+
+//윈도우 추가 이벤트
+function pluse_window_event(event){
+    let limit_num = [0,1,2,3,4,5,6,7,8,9];
+    let new_can_winNum = [];
+    for(i=0;i<window_array.length;i++){
+        for(j=0;j<limit_num.length;j++){
+            if(window_array[i]==limit_num[j]){
+                limit_num[j] = -1;
+            }
+        }
+    }
+    for(i=0;i<limit_num.length;i++){
+        if(limit_num[i] != -1){
+            window_array.push(limit_num[i]);
+            break;
+        }
+    }
+    window_array_store();
+    make_window(window_array[new_can_winNum[0]]);
+    location.reload();
 }
 
 //스킬 선택 메뉴 숨기고 보이기
