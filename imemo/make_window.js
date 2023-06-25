@@ -73,6 +73,8 @@ function make_menu(num){
     const ex_changeTap_btn = document.createElement("h5");
     ex_changeTap_btn.innerText = "탭 이름, 순서 변경";
     newDiv.appendChild(ex_changeTap_btn);
+    const form_changeTap = plusTapBTN_canChange(num);
+    newDiv.appendChild(form_changeTap);
 
     const ex_delTap_btn = document.createElement("h5");
     ex_delTap_btn.innerText = "탭 삭제하기";
@@ -138,6 +140,178 @@ function make_menu(num){
 }
 //----------------MENU
 //메뉴 속 버튼들 함수----------------
+function tapIndexChange(event){
+    const whatBtn = event.target.innerText;
+    const input_real = event.target.parentElement.childNodes[3].value;
+    let btnValue = 0;
+    if(whatBtn == '<'){
+        btnValue = -1;
+    }else if(whatBtn == '>'){
+        btnValue = 1;
+    }
+
+    const in_stor_tap_array = localStorage.getItem("tap_array");
+    const in_stor_tapName_array = localStorage.getItem("tap_name_array");
+    let tapName_array = [];
+    let tap_array = [];
+    if(in_stor_tap_array!=null){
+        tap_array = JSON.parse(in_stor_tap_array);
+    }
+    if(in_stor_tapName_array == null){
+        tapName_array = Array(tap_array.length);
+    }else{
+        const parsed_tapName_array = JSON.parse(in_stor_tapName_array);
+        tapName_array = parsed_tapName_array;
+    }
+    for(i=0;i<tap_array.length;i++){
+        if(tap_array[i] == input_real && (i != 0 && i != tap_array.length-1)){
+            let tem = tap_array[i+btnValue];
+            tap_array[i+btnValue]=tap_array[i];
+            tap_array[i] = tem;
+        }else if(tap_array[i] == input_real && (i == 0 || i == tap_array.length-1)){
+            let tt = 0;
+            if(i == 0){
+                tt = tap_array.length-1;
+            }else if(i != 0){
+                tt = 0;
+            }
+            console.log(tt, i);
+            let tem = tap_array[tt];
+            tap_array[tt]=tap_array[i];
+            tap_array[i] = tem;
+        }
+    }
+    console.log(btnValue);
+    console.log(tap_array);
+    localStorage.setItem(`tap_array`,JSON.stringify(tap_array));
+    localStorage.setItem(`tap_name_array`,JSON.stringify(tapName_array));
+    
+}
+
+function plusTapBTN_canChange(num){
+    let thisWinTap_array = [];
+    const in_stor_tap_array = localStorage.getItem("tap_array");
+    const form = document.createElement("form");
+    form.className = `changeTap_form${num}`;
+    form.addEventListener("submit",tapNameChange);
+
+    const tapGoBefore = document.createElement("button");
+    tapGoBefore.innerText = " < ";
+    tapGoBefore.addEventListener("click",tapIndexChange);
+    const tapNameInput = document.createElement("input");
+    const tapNameSubmit = document.createElement("input");
+    tapNameSubmit.type = "submit";
+    tapNameSubmit.value = "sub";//tapNameChange
+    //tapNameSubmit.addEventListener("click",tapNameChange);
+    const tapName_real = document.createElement("input");
+    tapName_real.style.display = "none";
+    const tapGoNext = document.createElement("button");
+    tapGoNext.innerText = " > ";
+    tapGoNext.addEventListener("click",tapIndexChange);
+    form.appendChild(tapGoBefore);
+    form.appendChild(tapNameInput);
+    form.appendChild(tapNameSubmit);
+    form.appendChild(tapName_real);
+    form.appendChild(tapGoNext);
+    
+    const btn_div = document.createElement("div");
+
+    if(in_stor_tap_array !== null){
+    const parsed_tap_array = JSON.parse(in_stor_tap_array);
+    tap_array = parsed_tap_array;
+        for(i=0;i<tap_array.length;i++){
+            if(tap_array[i].charAt(1)==num){
+                thisWinTap_array.push(tap_array[i]);
+            }
+        }
+    }
+    const in_stor_tapName_array = localStorage.getItem("tap_name_array");
+    let tapName_array = [];
+    if(in_stor_tapName_array != null){
+        const parsed_tapName_array = JSON.parse(in_stor_tapName_array);
+        tapName_array = parsed_tapName_array;
+    }
+    if(thisWinTap_array != null){
+        for(i=0;i<thisWinTap_array.length;i++){
+            const name =  `changeTap_radio_${num}`;
+            const label = document.createElement("label");
+            label.innerHTML = `tap${thisWinTap_array[i].charAt(thisWinTap_array[i].length-1)}`; 
+            if(tapName_array[i] != null){
+                label.innerHTML = tapName_array[i];
+            }
+            const radio = document.createElement("input");
+            radio.type = "radio";
+            radio.name = name;
+            radio.value = thisWinTap_array[i];
+            radio.addEventListener("click",radioTapSelect);
+
+            label.appendChild(radio);
+            btn_div.appendChild(label);
+        }
+    }
+    form.appendChild(btn_div);
+    return form;
+}
+
+
+function radioTapSelect(event){
+    const tapName = event.target.parentElement.innerText;
+    const inputBox = event.target.parentElement.parentElement.parentElement.childNodes[1];
+    inputBox.value = `${tapName}`;
+    const input_real = event.target.parentElement.parentElement.parentElement.childNodes[3];
+    const value = event.target.value;
+    input_real.value = `${value}`;
+
+    const div = event.target.parentElement.parentElement.childNodes;
+    for(i=0;i<div.length;i++){
+        if(div[i].childNodes[1].value == value){
+            div[i].childNodes[1].checked=true;
+        }else{
+            div[i].childNodes[1].checked = false;
+        }
+    }
+}
+
+function tapNameChange(event){
+    event.preventDefault();
+    const in_stor_tap_array = localStorage.getItem("tap_array");
+    const in_stor_tapName_array = localStorage.getItem("tap_name_array");
+    let tapName_array = [];
+    let parsed_tap_array = [];
+    if(in_stor_tap_array!=null){
+        parsed_tap_array = JSON.parse(in_stor_tap_array);
+    }
+    if(in_stor_tapName_array == null){
+        tapName_array = Array(parsed_tap_array.length);
+    }else{
+        const parsed_tapName_array = JSON.parse(in_stor_tapName_array);
+        tapName_array = parsed_tapName_array;
+    }
+    const name = event.target.childNodes[1].value;
+    const input_real = event.target.childNodes[3].value;
+    for(i=0;i<parsed_tap_array.length;i++){
+        if(parsed_tap_array[i] == input_real){
+            tapName_array[i] = name;
+            const tapBtn = document.getElementById(input_real);
+            tapBtn.previousElementSibling.innerText = name;
+        }
+    }
+    const div = event.target.childNodes[5].childNodes;
+    for(i=0;i<div.length;i++){
+        if(div[i].childNodes[1].checked==true){
+            div[i].innerText = name;
+            const radio = document.createElement("input");
+            radio.type = "radio";
+            radio.name = name;
+            radio.value = input_real;
+            radio.checked = true;
+            radio.addEventListener("click",radioTapSelect);
+            div[i].appendChild(radio);
+        }
+    }
+    localStorage.setItem(`tap_name_array`,JSON.stringify(tapName_array));
+}
+
 function selectTapDel(event){
     //event.preventDefault();
     const tapName = event.target.previousSibling.value;
@@ -174,7 +348,6 @@ function nowWinDel(event){
         let new_tap_array = [];
         for(i=0;i<tap_array.length;i++){
             const tapNum = Number(tap_array[i].charAt(1));
-            console.log(tapNum,winNum);
             if(tapNum!=winNum){
                 new_tap_array.push(tap_array[i]);
             }else if(tapNum==winNum){
@@ -261,7 +434,7 @@ function make_tap_pluse(num){
     newUl.style.listStyle = "none";
 
     //li안 선택 스킬 버튼
-    let skill_array = [0,1,2,3,4,5,6,7,8,9];
+    let skill_array = ["메모0",1,2,3,4,5,6,7,8,9];
     skill_array.forEach(function(n) {
         const newLi = document.createElement("li");
         const newLiBtn = document.createElement("button");

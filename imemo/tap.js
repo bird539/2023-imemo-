@@ -87,12 +87,28 @@ function make_tap_btn_pluse(win_num, btn_num){
     location.reload();
 }
 
+    const in_stor_tapName_array = localStorage.getItem("tap_name_array");
+    let tapName_array = [];
+    if(in_stor_tapName_array != null){
+        const parsed_tapName_array = JSON.parse(in_stor_tapName_array);
+        tapName_array = parsed_tapName_array;
+    }
+    let ii = 0;
 //처음 로딩시 만들어주기
 function first_make_tap_btn_pluse(txt){
     const w_tap_all = document.querySelector(`.w${txt.charAt(1)}`);
     const tap_name = document.createElement("label");
     tap_name.htmlFor = `${txt}`;
-    tap_name.innerText = `tap${txt.charAt(txt.length-1)}`;
+    let numTxt = `${txt.charAt(txt.length-1)}`;
+    let bName = `tap${numTxt}`;
+    if(numTxt == '0'){
+        bName = `메모${numTxt}`;
+    }
+    tap_name.innerText = bName;
+    if(tapName_array[ii] != null){
+        tap_name.innerText = tapName_array[ii];
+    }
+    ii++;
 
     const tap_button = document.createElement("input");
     tap_button.name = `tap${txt.charAt(1)}`;
