@@ -163,28 +163,81 @@ function tapIndexChange(event){
         const parsed_tapName_array = JSON.parse(in_stor_tapName_array);
         tapName_array = parsed_tapName_array;
     }
+    
+    let num = input_real.charAt(1);
+    let win_tap_array = [];
     for(i=0;i<tap_array.length;i++){
-        if(tap_array[i] == input_real && (i != 0 && i != tap_array.length-1)){
-            let tem = tap_array[i+btnValue];
-            tap_array[i+btnValue]=tap_array[i];
-            tap_array[i] = tem;
-        }else if(tap_array[i] == input_real && (i == 0 || i == tap_array.length-1)){
+        if(tap_array[i].charAt(1)==num){
+            win_tap_array.push(tap_array[i]);
+        }
+    }
+    let change;
+    for(i=0;i<win_tap_array.length;i++){
+        if(win_tap_array[i] == input_real && (i != 0 && i != win_tap_array.length-1)){
+            change = win_tap_array[i+btnValue];
+        }else if(win_tap_array[i] == input_real && (i == 0 || i == win_tap_array.length-1)){
             let tt = 0;
             if(i == 0){
-                tt = tap_array.length-1;
+                tt = win_tap_array.length-1;
             }else if(i != 0){
                 tt = 0;
             }
-            console.log(tt, i);
-            let tem = tap_array[tt];
-            tap_array[tt]=tap_array[i];
-            tap_array[i] = tem;
+            change = win_tap_array[tt];
+            break;
         }
     }
-    console.log(btnValue);
-    console.log(tap_array);
+    let change_num;
+    let select_num;
+    for(i=0;i<tap_array.length;i++){
+        if(tap_array[i] == input_real && (i != 0 && i != tap_array.length-1)){
+            change_num = i+btnValue;
+            select_num = i;
+        }else if(tap_array[i] == input_real && (i == 0 || i == tap_array.length-1)){
+            let tt = 0;
+            if(i == 0){//btnValue = <:-1 |  >:+1
+                if(btnValue == -1){
+                    tt = tap_array.length-1;
+                }else if(btnValue == 1){
+                    tt = 1;
+                }
+            }else if(i != 0){
+                if(btnValue == -1){
+                    tt = tap_array.length-2;
+                }else if(btnValue == 1){
+                    tt = 0;
+                }
+            }
+            change_num = tt;
+            select_num = i;
+        }
+    }
+    let tem2 = tap_array[change_num];
+    tap_array[change_num] = tap_array[select_num];
+    tap_array[select_num] = tem2;
+    
+    tem2 = tapName_array[change_num];
+    sel2 = tapName_array[select_num];
+    tapName_array[change_num] = sel2;
+    tapName_array[select_num] = tem2;
+
     localStorage.setItem(`tap_array`,JSON.stringify(tap_array));
     localStorage.setItem(`tap_name_array`,JSON.stringify(tapName_array));
+
+    const tapBtn = document.getElementById(input_real);
+    
+    const div = event.target.childNodes[5].childNodes;
+    for(i=0;i<div.length;i++){
+        if(div[i].childNodes[1].checked==true){
+            div[i].innerText = name;
+            const radio = document.createElement("input");
+            radio.type = "radio";
+            radio.name = name;
+            radio.value = input_real;
+            radio.checked = true;
+            radio.addEventListener("click",radioTapSelect);
+            div[i].appendChild(radio);
+        }
+    }
     
 }
 
