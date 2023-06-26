@@ -76,37 +76,6 @@ function make_menu(num){
     const form_changeTap = plusTapBTN_canChange(num);
     newDiv.appendChild(form_changeTap);
 
-    const ex_delTap_btn = document.createElement("h5");
-    ex_delTap_btn.innerText = "탭 삭제하기";
-    newDiv.appendChild(ex_delTap_btn);
-
-    
-    const form_tapSelect = document.createElement("form");
-    form_tapSelect.className = `del_tapSelect_win${num}`;
-    
-    const in_stor_tap_array = localStorage.getItem("tap_array");
-    let tap_array = [];
-    if(in_stor_tap_array !== null){
-        const parsed_tap_array = JSON.parse(in_stor_tap_array);
-        tap_array = parsed_tap_array;
-        const select_tap = document.createElement("select");
-        select_tap.className = `tapSelectDel_w${num}`;
-        for(i=0;i<tap_array.length;i++){
-            if(`${tap_array[i].charAt(1)}`==`${num}`){
-                const tap_option = document.createElement("option");
-                tap_option.innerText = tap_array[i];
-                select_tap.appendChild(tap_option);
-            }
-        }
-        form_tapSelect.appendChild(select_tap);
-        const tap_del_btn = document.createElement("input");
-        tap_del_btn.type = "submit";
-        tap_del_btn.value = "tap del";
-        tap_del_btn.addEventListener("click",selectTapDel);
-        form_tapSelect.appendChild(tap_del_btn);    
-    }
-    newDiv.appendChild(form_tapSelect);
-
     const ex_delWin_btn = document.createElement("h5");
     //const win_title = win.childNodes[0].innerText;
     ex_delWin_btn.innerText = `현재 윈도우(${num}번) 삭제하기`;
@@ -130,6 +99,7 @@ function make_menu(num){
 
     const btn_no_winDel = document.createElement("button");
     btn_no_winDel.innerText = "NO";
+    btn_no_winDel.addEventListener("click",hied_show_winDelNo);
     div_warning_winDel.appendChild(btn_no_winDel);
 
     newDiv.appendChild(div_warning_winDel);
@@ -171,21 +141,7 @@ function tapIndexChange(event){
             win_tap_array.push(tap_array[i]);
         }
     }
-    let change;
-    for(i=0;i<win_tap_array.length;i++){
-        if(win_tap_array[i] == input_real && (i != 0 && i != win_tap_array.length-1)){
-            change = win_tap_array[i+btnValue];
-        }else if(win_tap_array[i] == input_real && (i == 0 || i == win_tap_array.length-1)){
-            let tt = 0;
-            if(i == 0){
-                tt = win_tap_array.length-1;
-            }else if(i != 0){
-                tt = 0;
-            }
-            change = win_tap_array[tt];
-            break;
-        }
-    }
+
     let change_num;
     let select_num;
     for(i=0;i<tap_array.length;i++){
@@ -214,52 +170,112 @@ function tapIndexChange(event){
     let tem2 = tap_array[change_num];
     tap_array[change_num] = tap_array[select_num];
     tap_array[select_num] = tem2;
-    
     tem2 = tapName_array[change_num];
     sel2 = tapName_array[select_num];
     tapName_array[change_num] = sel2;
     tapName_array[select_num] = tem2;
-
     localStorage.setItem(`tap_array`,JSON.stringify(tap_array));
     localStorage.setItem(`tap_name_array`,JSON.stringify(tapName_array));
 
-    const tapBtn = document.getElementById(input_real);
-    
-    const div = event.target.childNodes[5].childNodes;
+    const div = event.target.parentElement.childNodes[5].childNodes;
+    let select = [];
+    let target = [];
+    let select_index;
+    let target_index;
     for(i=0;i<div.length;i++){
-        if(div[i].childNodes[1].checked==true){
-            div[i].innerText = name;
-            const radio = document.createElement("input");
-            radio.type = "radio";
-            radio.name = name;
-            radio.value = input_real;
-            radio.checked = true;
-            radio.addEventListener("click",radioTapSelect);
-            div[i].appendChild(radio);
+        if(div[i].childNodes[1].value==tap_array[select_num]){
+            select.push(div[i].innerText);
+            select.push(div[i].childNodes[1].name);
+            select.push(div[i].childNodes[1].value);
+            select_index = i;
         }
     }
-    
+    for(i=0;i<div.length;i++){
+        if(div[i].childNodes[1].value==tap_array[change_num]){
+            target.push(div[i].innerText);
+            target.push(div[i].childNodes[1].name);
+            target.push(div[i].childNodes[1].value);
+            target_index = i;
+        }
+    }
+    div[select_index].innerText = target[0];
+    const select_r = document.createElement("input");
+    select_r.type = "radio";
+    select_r.name =  target[1];
+    select_r.value =  target[2];
+    select_r.addEventListener("click",radioTapSelect);
+    div[select_index].appendChild(select_r);
+    div[select_index].childNodes[1].checked = true;
+
+    div[target_index].innerText = select[0];
+    const target_r = document.createElement("input");
+    target_r.type = "radio";
+    target_r.name = select[1];
+    target_r.value = select[2];
+    target_r.addEventListener("click",radioTapSelect);
+    div[target_index].appendChild(target_r);
+    div[target_index].childNodes[1].checked = false;
+
+    const realTapForm = document.querySelector(`.w${input_real.charAt(1)}`);
+    const realTapChild = realTapForm.childNodes;
+    realTapChild[select_index*2].innerText = target[0];
+    realTapChild[select_index*2].htmlFor = target[2];
+    realTapChild[select_index*2+1].name = `tap${input_real.charAt(1)}`;
+    realTapChild[select_index*2+1].value = target[2];
+    realTapChild[select_index*2+1].id = target[2];
+    realTapChild[select_index*2+1].addEventListener("click", show_tap);
+    realTapChild[select_index*2+1].checked = true;
+
+    realTapChild[target_index*2].innerText = select[0];
+    realTapChild[target_index*2].htmlFor = select[2];
+    realTapChild[target_index*2+1].name = `tap${input_real.charAt(1)}`;
+    realTapChild[target_index*2+1].value = select[2];
+    realTapChild[target_index*2+1].id = select[2];
+    realTapChild[target_index*2+1].addEventListener("click", show_tap);
+    realTapChild[target_index*2+1].checked = false;
+}
+//버튼 선택시 스킬창 div가 보일지 안 보일지 선택하는 곳
+function show_tap(event){
+    const select_value = event.target.value;
+    const select_tap = document.querySelector(`.s${select_value}`);
+    const tapBtn = document.querySelectorAll(`.w${select_value.charAt(1)} input`);
+    for(i=0;i< tapBtn.length; i++){
+        const select_tap2 = document.querySelector(`.s${tapBtn[i].value}`);
+        //console.log(select_tap2);
+        if(select_tap2!=null){
+            select_tap2.style.display = "none";
+        }
+    }
+    select_tap.style.display = "block";
+
+    //해당 윈도우[i]에 이 탭 번호를 집어 넣어야 함
+    let lastTapOpen = `${select_value}`;
+
+    showTap_array[Number(select_value.charAt(1))] = lastTapOpen;
+    tapShow_array_Stor();
 }
 
 function plusTapBTN_canChange(num){
     let thisWinTap_array = [];
     const in_stor_tap_array = localStorage.getItem("tap_array");
-    const form = document.createElement("form");
+    const form = document.createElement("div");
     form.className = `changeTap_form${num}`;
-    form.addEventListener("submit",tapNameChange);
+    //form.setAttribute("onsubmit","return false");
+    //form.addEventListener("submit",tapNameChange);
 
     const tapGoBefore = document.createElement("button");
     tapGoBefore.innerText = " < ";
     tapGoBefore.addEventListener("click",tapIndexChange);
+
     const tapNameInput = document.createElement("input");
-    const tapNameSubmit = document.createElement("input");
-    tapNameSubmit.type = "submit";
-    tapNameSubmit.value = "sub";//tapNameChange
-    //tapNameSubmit.addEventListener("click",tapNameChange);
+    const tapNameSubmit = document.createElement("button");
+    tapNameSubmit.innerText = "sub";//tapNameChange
+    tapNameSubmit.addEventListener("click",tapNameChange);
     const tapName_real = document.createElement("input");
     tapName_real.style.display = "none";
     const tapGoNext = document.createElement("button");
     tapGoNext.innerText = " > ";
+
     tapGoNext.addEventListener("click",tapIndexChange);
     form.appendChild(tapGoBefore);
     form.appendChild(tapNameInput);
@@ -297,12 +313,18 @@ function plusTapBTN_canChange(num){
             radio.name = name;
             radio.value = thisWinTap_array[i];
             radio.addEventListener("click",radioTapSelect);
-
             label.appendChild(radio);
             btn_div.appendChild(label);
         }
     }
     form.appendChild(btn_div);
+    const ex_delTapBtn = document.createElement("span"); 
+    ex_delTapBtn.innerText = "\n선택된 탭 삭제하기";
+    const delTapBtn = document.createElement("button");
+    delTapBtn.innerText = "del tap";
+    delTapBtn.addEventListener("click", selectTapDel);
+    form.appendChild(ex_delTapBtn);
+    form.appendChild(delTapBtn);
     return form;
 }
 
@@ -340,8 +362,8 @@ function tapNameChange(event){
         const parsed_tapName_array = JSON.parse(in_stor_tapName_array);
         tapName_array = parsed_tapName_array;
     }
-    const name = event.target.childNodes[1].value;
-    const input_real = event.target.childNodes[3].value;
+    const name = event.target.parentElement.childNodes[1].value;
+    const input_real = event.target.parentElement.childNodes[3].value;
     for(i=0;i<parsed_tap_array.length;i++){
         if(parsed_tap_array[i] == input_real){
             tapName_array[i] = name;
@@ -349,7 +371,7 @@ function tapNameChange(event){
             tapBtn.previousElementSibling.innerText = name;
         }
     }
-    const div = event.target.childNodes[5].childNodes;
+    const div = event.target.parentElement.childNodes[5].childNodes;
     for(i=0;i<div.length;i++){
         if(div[i].childNodes[1].checked==true){
             div[i].innerText = name;
@@ -362,13 +384,12 @@ function tapNameChange(event){
             div[i].appendChild(radio);
         }
     }
+    console.log("이름 변경 이벤트");
     localStorage.setItem(`tap_name_array`,JSON.stringify(tapName_array));
 }
 
 function selectTapDel(event){
-    //event.preventDefault();
-    const tapName = event.target.previousSibling.value;
-
+    const tapName = event.target.parentElement.childNodes[3].value;
     const in_stor_tap_array = localStorage.getItem("tap_array");
     let tap_array = [];
     let tap_array_new = [];
@@ -384,6 +405,7 @@ function selectTapDel(event){
         }
         localStorage.setItem(`tap_array`,JSON.stringify(tap_array_new));
     }
+    location.reload();
 }
 
 function nowWinDel(event){
@@ -454,6 +476,16 @@ function nowWinDel(event){
 
 function hied_show(event){
     const show_hide_target = event.target.nextSibling;
+    if(show_hide_target!=null){
+        if(show_hide_target.style.display == 'none'){
+            show_hide_target.style.display = 'block';
+        }else if(show_hide_target.style.display == 'block'){
+            show_hide_target.style.display = 'none';
+        }
+    }
+}
+function hied_show_winDelNo(event){
+    const show_hide_target = event.target.parentElement;
     if(show_hide_target!=null){
         if(show_hide_target.style.display == 'none'){
             show_hide_target.style.display = 'block';
