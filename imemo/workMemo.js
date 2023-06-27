@@ -13,7 +13,7 @@ if (M_tapShow_array !== null) {
 let i = 0;
 function skill_apply(txt) {
     const div_name = `s${txt}`;
-    if (div_name.charAt(txt.length) == "0") {
+    if (div_name.charAt(div_name.length-1) == "0") {
         const w_div = document.querySelector(`.${div_name}`);
 
         const get_stor_memoText_array_tapHendle = localStorage.getItem(`${div_name}`);
