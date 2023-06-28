@@ -1,7 +1,7 @@
 body {
     background-color: black;
 }
-h3, h5, h4, span, label {
+h3, h5, h4, span, label, a, div {
     color: bisque;
 }
 h3, h5, h4 {

@@ -270,7 +270,12 @@ const in_stor_tap_array_tapHendle = localStorage.getItem("tap_array");
 if (in_stor_tap_array_tapHendle !== null) {
     const parsed_tap_array = JSON.parse(in_stor_tap_array);
     div_name = parsed_tap_array;
-    div_name.forEach(skill_apply);
+    if(div_name !=null){
+        div_name.forEach(skill_apply);
+    }else{
+        skill_apply("w0_t0_s0");
+    }
+
 }
 //======================================메모 저장
 function memo_array_Stor(memo_divClassName) {
