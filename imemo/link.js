@@ -89,14 +89,27 @@ function skill_apply_link(txt){
                 li_name_link.href =lint_url;
                 li_name_link.style.display = "block";
 
-                const tag_link = document.createElement("div");
+                let tag_array = linkText_array[0].tag;
+                const link_tag_select1 = document.createElement("select");
+                for(j=0;j<tag_array.length;j++){
+                    const link_option1 = document.createElement("option");
+                    link_option1.value = `${tag_array[j]}`;
+                    link_option1.innerText = `#${tag_array[j]}`;
+                    if(tag_array[j] == "none"){
+                        link_option1.innerText = `    `;
+                    }
+                    link_tag_select1.appendChild(link_option1);
+                }
+                link_tag_select1.selectedIndex = linkText_array[i].obj[3];
+
+                //const tag_link = document.createElement("div");
                 let tagText = linkText_array[0].tag[linkText_array[i].obj[3]];
-                tag_link.innerText = `#${tagText} `;
-                if(tagText == "none"){
-                    tag_link.style.display = "none";
-                }else{
-                    tag_link.style.display = "inline";
-                }                
+                //tag_link.innerText = `#${tagText} `;
+                //if(tagText == "none"){
+                //    tag_link.style.display = "none";
+                //}else{
+                //    tag_link.style.display = "inline";
+                //}                
                 const copy_link = document.createElement("button");
                 copy_link.innerText = "copy";
                 copy_link.addEventListener("click",copyMemLink);
@@ -132,7 +145,7 @@ function skill_apply_link(txt){
                 edit_form_link.addEventListener("submit",linkEdit);
             
                 link_ul.appendChild(li_name_link);
-                link_ul.appendChild(tag_link);
+                link_ul.appendChild(link_tag_select1);
                 link_ul.appendChild(copy_link);
                 link_ul.appendChild(del_btn_link);
                 link_ul.appendChild(edit_btn_link);
