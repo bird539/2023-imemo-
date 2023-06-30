@@ -82,7 +82,7 @@ function skill_apply_link(txt){
         const link_ul = document.createElement("ul");
         if(parsed_linkStor != null){
             let tag_array = linkText_array[0].tag;
-            makeLinkUl(linkText_array,link_ul,div_linkName,tag_array);
+            makeLinkUl(linkText_array,link_ul,div_linkName,tag_array,0,0);
         }
         w_divLink.appendChild(link_ul);
 
@@ -99,8 +99,9 @@ function skill_apply_link(txt){
 }
 //-----------------------처음 링크메모 만들기
 
-function makeLinkUl(linkText_array,link_ul,div_linkName,tag_array){
+function makeLinkUl(linkText_array,link_ul,div_linkName,tag_array,check,index){
     for(i=0;i<linkText_array.length;i++){
+        if(linkText_array[i].obj != null){
         const li_name_link = document.createElement("a");
         let link_name = linkText_array[i].obj[0];
         li_name_link.innerText =link_name;
@@ -145,6 +146,9 @@ function makeLinkUl(linkText_array,link_ul,div_linkName,tag_array){
         const edit_hiden_link = document.createElement("input");
         edit_hiden_link.type = "hiden"
         edit_hiden_link.value = i;
+        if(check == -1){
+            edit_hiden_link.value = index;
+        }
         edit_hiden_link.style.display = "none";
         const edit_submit_link = document.createElement("input");
         edit_submit_link.type = "submit";
@@ -163,6 +167,7 @@ function makeLinkUl(linkText_array,link_ul,div_linkName,tag_array){
         link_ul.appendChild(del_btn_link);
         link_ul.appendChild(edit_btn_link);
         link_ul.appendChild(edit_form_link);
+        }
     }
 }
 function selectTagLineUpLink(event){
@@ -186,7 +191,7 @@ function selectTagLineUpLink(event){
     if(tagOptionValue == 0){
         selectTagLink = linkText_array;
     }
-    makeLinkUl(selectTagLink,ul,divNameLink,linkText_array[0].tag);
+    makeLinkUl(selectTagLink,ul,divNameLink,linkText_array[0].tag,0,0);
 }
 
 function tagSelectLink(event){
@@ -201,6 +206,7 @@ function tagSelectLink(event){
         linkText_array = parsed_linkStor;
     }
     linkText_array[indexLink].obj[3] = tagOptionValue;
+
     const tagOptionSelect = event.target;
     tagOptionSelect.selectedIndex = tagOptionValue;
 
@@ -239,6 +245,9 @@ function linkTagPluseInput(event){
     const divName_link = event.target.parentElement.className;
     const link_tag = event.target.childNodes[0].value;
     linkTagPluse(divName_link, link_tag, 0);
+    const tagValue = document.querySelector(`.${divName_link}`).childNodes[0].childNodes[0]; 
+    console.log(tagValue);
+    tagValue.value = null;
 }
 function linkTagPluse(divName_link, link_tag, check){
     let linkText_array = [];
@@ -371,8 +380,16 @@ function lingMemo_pluse(event){
     const get_link_stor = localStorage.getItem(divLinkName);
     const parsed_linkStor = JSON.parse(get_link_stor);
     let linkArray = [parsed_linkStor[parsed_linkStor.length-1]];
-    makeLinkUl(linkArray,link_ul,divLinkName,parsed_linkStor[0].tag);
+    makeLinkUl(linkArray,link_ul,divLinkName,parsed_linkStor[0].tag,-1,parsed_linkStor.length-1);
     linkTagPluse(divName_link, link_name, -2);
+    
+    const nameValue = document.querySelector(`.${divLinkName}`).firstChild.firstChild;
+    const tagValue = document.querySelector(`.${divLinkName}`).childNodes[1].childNodes[0]; 
+    const urlValue = document.querySelector(`.${divLinkName}`).childNodes[1].childNodes[1]; 
+
+    nameValue.value = null;
+    tagValue.value =  null;
+    urlValue.value = null;
 }
 
 function hied_show_linkEdit(event){
