@@ -91,9 +91,10 @@ function skill_apply_link(txt){
 
                 let tag_array = linkText_array[0].tag;
                 const link_tag_select1 = document.createElement("select");
+                link_tag_select1.className = `tagLink${div_linkName}`;
                 for(j=0;j<tag_array.length;j++){
                     const link_option1 = document.createElement("option");
-                    link_option1.value = `${tag_array[j]}`;
+                    link_option1.value = j;
                     link_option1.innerText = `#${tag_array[j]}`;
                     if(tag_array[j] == "none"){
                         link_option1.innerText = `    `;
@@ -101,6 +102,7 @@ function skill_apply_link(txt){
                     link_tag_select1.appendChild(link_option1);
                 }
                 link_tag_select1.selectedIndex = linkText_array[i].obj[3];
+                link_tag_select1.addEventListener("change", tagSelectLink);
 
                 //const tag_link = document.createElement("div");
                 let tagText = linkText_array[0].tag[linkText_array[i].obj[3]];
@@ -166,6 +168,24 @@ function skill_apply_link(txt){
     }
 }
 //-----------------------처음 링크메모 만들기
+function tagSelectLink(event){
+    const tagOptionValue = event.target.value;
+    const divNameLink = event.target.parentElement.parentElement.className;
+    const indexLink = event.target.nextSibling.nextSibling.nextSibling.nextSibling.childNodes[3].value;
+
+    let linkText_array;
+    const get_link_stor = localStorage.getItem(divNameLink);
+    const parsed_linkStor = JSON.parse(get_link_stor);
+    if (parsed_linkStor!=null&& parsed_linkStor.length != 0) {
+        linkText_array = parsed_linkStor;
+    }
+    linkText_array[indexLink].obj[3] = tagOptionValue;
+    const tagOptionSelect = event.target;
+    tagOptionSelect.selectedIndex = tagOptionValue;
+
+    localStorage.setItem(`${divNameLink}`, JSON.stringify(linkText_array));
+}
+
 function linkEdit(event){
     event.preventDefault();
     const name_link = event.target.childNodes[0].value;
@@ -187,10 +207,11 @@ function linkEdit(event){
     }
     const name_form = event.target;
     name_form.style.display = "none";
-    console.log(name_Link.innerText);
-
 }
 
+function isStringValue(val){
+    return !!val?.trim();
+}
 function linkTagPluseInput(event){
     event.preventDefault();
     const divName_link = event.target.parentElement.className;
@@ -208,31 +229,46 @@ function linkTagPluseInput(event){
         tag_array = ["none"];
     }
     let tag_index = -1;
-    if(link_tag != ""){
-        for(i=0;i<link_tag.length;i++){
+
+    if(isStringValue(link_tag)==false){
+        tag_index = 0;
+    }
+    if(isStringValue(link_tag)==true){
+        for(i=0;i<tag_array.length;i++){
             if(tag_array[i]==link_tag){
                 tag_index = i;
             }
         }
     }
+    let tagSelecPLS_check = 0;
     if(tag_index == -1){
         tag_array.push(link_tag);
         tag_index = tag_array.length-1;
+        tagSelecPLS_check = -1;
     }
-
     let linkObj = {
         obj : link_obj,
         tag : tag_array
     }
     linkText_array[0] = linkObj;
     localStorage.setItem(`${divName_link}`, JSON.stringify(linkText_array));
-    //saveLink(divName_link,link_name,link_url,link_tag,index_link);
     const selec_link = event.target.childNodes[1];
 
     const link_option1 = document.createElement("option");    
     link_option1.value = `${link_tag}`;
     link_option1.innerText = `${link_tag}`;
     selec_link.appendChild(link_option1);
+
+    const div_linkName = event.target.parentElement.className;
+    let tagSelect_inLi = document.querySelectorAll(`.tagLink${div_linkName}`);
+    if(tagSelecPLS_check == -1){
+        for(i=0;i<tagSelect_inLi.length;i++){
+            const link_optionB = document.createElement("option");
+            link_optionB.value = `${tag_index}`;
+            link_optionB.innerText = `#${link_tag}`;
+            tagSelect_inLi[i].appendChild(link_optionB);
+        }
+    }
 }
 
 function saveLink(divName_link,link_name,link_url,link_tag,index_link){
