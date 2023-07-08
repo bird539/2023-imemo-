@@ -5,7 +5,7 @@ if(L_tapShow_array != null){
     L_showTap_array = L_parsed_tapShow_array;
 }
 
-
+let tagPluseCheck_i = 0;
 function skill_apply_link(txt){
     const div_linkName = `s${txt}`;
     if(div_linkName.charAt(div_linkName.length-1) == `1`){
@@ -58,6 +58,8 @@ function skill_apply_link(txt){
         link_tag_form.appendChild(link_tag_select1);
         w_divLink.appendChild(link_tag_form);
 
+        link_tag_select_basic.addEventListener("change",selectLineUpLink);
+
         const link_form = document.createElement("form");
         const link_name_input = document.createElement("input");
         const link_url_input = document.createElement("input");
@@ -82,7 +84,7 @@ function skill_apply_link(txt){
         const link_ul = document.createElement("ul");
         if(parsed_linkStor != null){
             let tag_array = linkText_array[0].tag;
-            makeLinkUl(linkText_array,link_ul,div_linkName,tag_array,0,0);
+            makeLinkUl(linkText_array,link_ul,div_linkName,tag_array,0,0,"new");
         }
         w_divLink.appendChild(link_ul);
 
@@ -98,8 +100,61 @@ function skill_apply_link(txt){
     }
 }
 //-----------------------처음 링크메모 만들기
+function visitLink(event){
+    event.preventDefault();
+    
+    const linkTargetForm = event.target.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;
+    const targetIndex = linkTargetForm.childNodes[3].value;
+    const divNameLink = event.target.parentElement.parentElement.className;
+    console.log(targetIndex);
+    console.log(divNameLink);
 
-function makeLinkUl(linkText_array,link_ul,div_linkName,tag_array,check,index){
+    let linkText_array;
+    const get_link_stor = localStorage.getItem(divNameLink);
+    const parsed_linkStor = JSON.parse(get_link_stor);
+    if (parsed_linkStor!=null&& parsed_linkStor.length != 0) {
+        linkText_array = parsed_linkStor;
+    }
+    //[targetIndex] =;[-1,-1,0,-1,1,3,2];
+    //[-1,-1,0];
+    //[-1,0,1];
+    let visitArg = linkText_array[0].visit;
+    let visitArg2 = [...visitArg];
+    let check = false; //false면 추가, true면 교환
+    let indexArg = [];
+    console.log(visitArg);
+
+    for(i=1;i<=visitArg.length;i++){
+        if(visitArg[i] != 0){
+            indexArg.push(i);
+            if(visitArg[i] == visitArg[targetIndex]){
+                check = true;
+            }
+        } 
+    }
+    indexArg.sort();
+    if(check == false){
+        indexArg.push(indexArg[indexArg.length-1]+1);
+    }
+
+    for(i=0;i<=visitArg.length;i++){
+        for(j=0;j<indexArg.length;j++){
+            if(visitArg[i] == indexArg[i]){
+                
+            }
+        }
+    }
+
+
+    visitArg2[targetIndex] = 1;
+    console.log(visitArg2);
+    linkText_array[0].visit = visitArg2;
+
+    localStorage.setItem(`${divNameLink}`, JSON.stringify(linkText_array));
+
+}
+
+function makeLinkUl(linkText_array,link_ul,div_linkName,tag_array,check,index,selectOption){
     for(i=0;i<linkText_array.length;i++){
         if(linkText_array[i].obj != null){
         const li_name_link = document.createElement("a");
@@ -108,6 +163,7 @@ function makeLinkUl(linkText_array,link_ul,div_linkName,tag_array,check,index){
         let lint_url = linkText_array[i].obj[1];
         li_name_link.href =lint_url;
         li_name_link.style.display = "block";
+        li_name_link.addEventListener("click", visitLink);
 
         const link_tag_select1 = document.createElement("select");
         link_tag_select1.className = `tagLink${div_linkName}`;
@@ -116,7 +172,7 @@ function makeLinkUl(linkText_array,link_ul,div_linkName,tag_array,check,index){
             link_option1.value = j;
             link_option1.innerText = `#${tag_array[j]}`;
             if(tag_array[j] == "none"){
-                link_option1.innerText = `    `;
+                link_option1.innerText = `     `;
             }
             link_tag_select1.appendChild(link_option1);
         }
@@ -160,13 +216,21 @@ function makeLinkUl(linkText_array,link_ul,div_linkName,tag_array,check,index){
         edit_form_link.appendChild(edit_submit_link);
         edit_form_link.style.display = "none";
         edit_form_link.addEventListener("submit",linkEdit);
-    
-        link_ul.appendChild(li_name_link);
-        link_ul.appendChild(link_tag_select1);
-        link_ul.appendChild(copy_link);
-        link_ul.appendChild(del_btn_link);
-        link_ul.appendChild(edit_btn_link);
-        link_ul.appendChild(edit_form_link);
+        if(selectOption === "old"){
+            link_ul.appendChild(li_name_link);
+            link_ul.appendChild(link_tag_select1);
+            link_ul.appendChild(copy_link);
+            link_ul.appendChild(del_btn_link);
+            link_ul.appendChild(edit_btn_link);
+            link_ul.appendChild(edit_form_link);
+        }else if(selectOption === "new"){
+            link_ul.prepend(edit_form_link);
+            link_ul.prepend(edit_btn_link);
+            link_ul.prepend(del_btn_link);
+            link_ul.prepend(copy_link);
+            link_ul.prepend(link_tag_select1);
+            link_ul.prepend(li_name_link);
+        }
         }
     }
 }
@@ -174,6 +238,7 @@ function selectTagLineUpLink(event){
     const tagOptionValue = event.target.value;
     const divNameLink = event.target.parentElement.className;
     const ul = event.target.nextSibling;
+    const basicOptionValue = event.target.previousSibling.value;
     ul.replaceChildren();
 
     let linkText_array;
@@ -184,14 +249,43 @@ function selectTagLineUpLink(event){
     }
     let selectTagLink = [];
     for(i=0;i<linkText_array.length;i++){
-        if(linkText_array[i].obj[3] == tagOptionValue){
-            selectTagLink.push(linkText_array[i]);
+        if(linkText_array[i].obj != null){
+            if(linkText_array[i].obj[3] == tagOptionValue){
+                selectTagLink.push(linkText_array[i]);
+            }
         }
     }
     if(tagOptionValue == 0){
         selectTagLink = linkText_array;
     }
-    makeLinkUl(selectTagLink,ul,divNameLink,linkText_array[0].tag,0,0);
+    makeLinkUl(selectTagLink,ul,divNameLink,linkText_array[0].tag,0,0,basicOptionValue);
+}
+
+function selectLineUpLink(event){
+    const basicOptionValue = event.target.value;
+    const divNameLink = event.target.parentElement.className;
+    const ul = event.target.nextSibling.nextSibling;
+    const tagOptionValue = event.target.nextSibling.value;
+    ul.replaceChildren();
+
+    let linkText_array;
+    const get_link_stor = localStorage.getItem(divNameLink);
+    const parsed_linkStor = JSON.parse(get_link_stor);
+    if (parsed_linkStor!=null&& parsed_linkStor.length != 0) {
+        linkText_array = parsed_linkStor;
+    }
+    let selectTagLink = [];
+    for(i=0;i<linkText_array.length;i++){
+        if(linkText_array[i].obj != null){
+            if(linkText_array[i].obj[3] == tagOptionValue){
+                selectTagLink.push(linkText_array[i]);
+            }
+        }
+    }
+    if(tagOptionValue == 0){
+        selectTagLink = linkText_array;
+    }
+    makeLinkUl(selectTagLink,ul,divNameLink,linkText_array[0].tag,0,0,basicOptionValue);
 }
 
 function tagSelectLink(event){
@@ -246,19 +340,20 @@ function linkTagPluseInput(event){
     const link_tag = event.target.childNodes[0].value;
     linkTagPluse(divName_link, link_tag, 0);
     const tagValue = document.querySelector(`.${divName_link}`).childNodes[0].childNodes[0]; 
-    console.log(tagValue);
     tagValue.value = null;
 }
 function linkTagPluse(divName_link, link_tag, check){
     let linkText_array = [];
     let tag_array = [];
     let link_obj;
+    let visit_array;
     const get_link_stor = localStorage.getItem(divName_link);
     const parsed_linkStor = JSON.parse(get_link_stor);
     if (parsed_linkStor!=null&& parsed_linkStor.length != 0) {
         linkText_array = parsed_linkStor;
         tag_array = linkText_array[0].tag;
         link_obj = linkText_array[0].obj;
+        visit_array = linkText_array[0].visit;
     }else {
         tag_array = ["none"];
     }
@@ -269,8 +364,9 @@ function linkTagPluse(divName_link, link_tag, check){
     }
     if(isStringValue(link_tag)==true){
         for(i=0;i<tag_array.length;i++){
-            if(tag_array[i]==link_tag){
+            if(tag_array[i]===link_tag){
                 tag_index = i;
+                break;
             }
         }
     }
@@ -282,7 +378,8 @@ function linkTagPluse(divName_link, link_tag, check){
     }
     let linkObj = {
         obj : link_obj,
-        tag : tag_array
+        tag : tag_array,
+        visit : visit_array
     }
     linkText_array[0] = linkObj;
     localStorage.setItem(`${divName_link}`, JSON.stringify(linkText_array));
@@ -299,7 +396,7 @@ function linkTagPluse(divName_link, link_tag, check){
         tagSelecPLS_check = -1;
     }
     if(tagSelecPLS_check == -1){
-        for(i=0;i<tagSelect_inLi.length;i++){
+        for(i=0;i<tagSelect_inLi.length-1;i++){
             const link_optionB = document.createElement("option");
             link_optionB.value = `${tag_index}`;
             link_optionB.innerText = `#${link_tag}`;
@@ -308,37 +405,48 @@ function linkTagPluse(divName_link, link_tag, check){
     }
 }
 
+function checkTagIndex(link_tag, tag_array){ //-1이면 newTag 아니면 기존 태그
+    let tag_index = -1;
+    if(isStringValue(link_tag) == true){
+        for(i=0;i<tag_array.length;i++){
+            if(tag_array[i]===link_tag){
+                tag_index = i;
+            }
+        }
+    }
+    return tag_index;
+}
+
 function saveLink(divName_link,link_name,link_url,link_tag,index_link){
     let linkText_array = [];
     let tag_array = [];
+    let visit_array = [];
     const get_link_stor = localStorage.getItem(divName_link);
     const parsed_linkStor = JSON.parse(get_link_stor);
     if (parsed_linkStor!=null&& parsed_linkStor.length != 0) {
         linkText_array = parsed_linkStor;
         tag_array = linkText_array[0].tag;
+        visit_array = linkText_array[0].visit;
     }else {
         tag_array = ["none"];
     }
-    let tag_index = -1;
-    if(link_tag != ""){
-        for(i=0;i<link_tag.length;i++){
-            if(tag_array[i]==link_tag){
-                tag_index = i;
-            }
-        }
-    }
+    let tag_index = checkTagIndex(link_tag, tag_array);
+
     if(tag_index == -1){
         tag_array.push(link_tag);
         tag_index = tag_array.length-1;
+        tagPluseCheck_i = -2;
     }
+    visit_array.push(0);
     let link_obj = [link_name,link_url,0,tag_index];
     let linkObj = {
-        obj : link_obj,
+        obj : link_obj
     }
     if (parsed_linkStor == null){
         linkObj = {
             obj : link_obj,
-            tag : tag_array
+            tag : tag_array,
+            visit : visit_array
         }
     }
     if(index_link == -1){
@@ -346,7 +454,8 @@ function saveLink(divName_link,link_name,link_url,link_tag,index_link){
     }else if(index_link == 0){
         linkObj = {
             obj : link_obj,
-            tag : tag_array
+            tag : tag_array,
+            visit : visit_array
         }
         linkText_array[index_link] = linkObj;
     }else{
@@ -366,7 +475,7 @@ function lingMemo_pluse(event){
     if(link_tag_input != ""){
         link_tag = link_tag_input;
     }
-    
+
     const link_url = event.target.childNodes[1].value;
     const link_ul = event.target.parentElement.childNodes[4];
     if(isStringValue(link_name)==false){
@@ -380,13 +489,14 @@ function lingMemo_pluse(event){
     const get_link_stor = localStorage.getItem(divLinkName);
     const parsed_linkStor = JSON.parse(get_link_stor);
     let linkArray = [parsed_linkStor[parsed_linkStor.length-1]];
-    makeLinkUl(linkArray,link_ul,divLinkName,parsed_linkStor[0].tag,-1,parsed_linkStor.length-1);
-    linkTagPluse(divName_link, link_name, -2);
+    makeLinkUl(linkArray,link_ul,divLinkName,parsed_linkStor[0].tag,-1,parsed_linkStor.length-1,"new");
+    linkTagPluse(divName_link, link_tag, tagPluseCheck_i);
     
     const nameValue = document.querySelector(`.${divLinkName}`).firstChild.firstChild;
     const tagValue = document.querySelector(`.${divLinkName}`).childNodes[1].childNodes[0]; 
     const urlValue = document.querySelector(`.${divLinkName}`).childNodes[1].childNodes[1]; 
 
+    tagPluseCheck_i = 0;
     nameValue.value = null;
     tagValue.value =  null;
     urlValue.value = null;
@@ -403,7 +513,7 @@ function hied_show_linkEdit(event){
     }
 }
 function copyMemLink(event) {
-    const ling_target = event.target.previousSibling.href;
+    const ling_target = event.target.previousSibling.previousSibling.href;
     window.navigator.clipboard.writeText(ling_target);
 }
 
