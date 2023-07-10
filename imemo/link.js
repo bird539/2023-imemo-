@@ -102,12 +102,9 @@ function skill_apply_link(txt){
 //-----------------------처음 링크메모 만들기
 function visitLink(event){
     event.preventDefault();
-    
     const linkTargetForm = event.target.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;
     const targetIndex = linkTargetForm.childNodes[3].value;
     const divNameLink = event.target.parentElement.parentElement.className;
-    console.log(targetIndex);
-    console.log(divNameLink);
 
     let linkText_array;
     const get_link_stor = localStorage.getItem(divNameLink);
@@ -115,41 +112,63 @@ function visitLink(event){
     if (parsed_linkStor!=null&& parsed_linkStor.length != 0) {
         linkText_array = parsed_linkStor;
     }
-    //[targetIndex] =;[-1,-1,0,-1,1,3,2];
-    //[-1,-1,0];
-    //[-1,0,1];
     let visitArg = linkText_array[0].visit;
     let visitArg2 = [...visitArg];
-    let check = false; //false면 추가, true면 교환
     let indexArg = [];
-    console.log(visitArg);
-
-    for(i=1;i<=visitArg.length;i++){
-        if(visitArg[i] != 0){
-            indexArg.push(i);
-            if(visitArg[i] == visitArg[targetIndex]){
-                check = true;
-            }
-        } 
-    }
-    indexArg.sort();
-    if(check == false){
-        indexArg.push(indexArg[indexArg.length-1]+1);
-    }
-
+    console.log(`---------------------------`);
+    console.log(`target:${visitArg2[targetIndex]}, i:${targetIndex}`);
+    console.log(`or:${visitArg}`);
+    let check = 0;
+    let check2 = 0; 
     for(i=0;i<=visitArg.length;i++){
-        for(j=0;j<indexArg.length;j++){
-            if(visitArg[i] == indexArg[i]){
-                
+        if(visitArg[i] > 0){
+            indexArg.push(visitArg[i]);
+        }else if( visitArg[i] == 0){
+            check2+=1;
+            if(visitArg[i] == visitArg[targetIndex]){
+                check+=1;
             }
         }
     }
 
+    indexArg.sort();
+    if(visitArg.length == check2){
+        indexArg.push(1);
+    }else if(check > 0){
+        indexArg.push(indexArg[indexArg.length-1]+1);
+    }
+    
+    if(check >0){//새로 추가시 전부변경
+        if(visitArg[targetIndex] != 1){
+            for(i=0;i<visitArg.length;i++){
+                for(j=0;j<indexArg.length;j++){
+                    if(indexArg[i]==visitArg[j]){
+                        if(indexArg[i+1] > 0){
+                            visitArg2[j] = indexArg[i+1];
+                        }
+                        if(indexArg[i] == indexArg.length){
+                            visitArg2[j] = indexArg[i-1];
+                        }
+                    }
+                }
+            }
+            visitArg2[targetIndex] = 1;
+        }
+    }else if((check == 0) && (visitArg.length != check2)){
+        let tem = visitArg[targetIndex];//변경할 열까지만 변경
+        for(i=0;i<tem;i++){
+            for(j=0;j<indexArg.length;j++){
+                if(indexArg[i]==visitArg[j]){
+                    if(indexArg[i+1] > 0){
+                        visitArg2[j] = indexArg[i+1];
+                    }
+                }
+            }
+        }
+        visitArg2[targetIndex] = 1;
+    }
 
-    visitArg2[targetIndex] = 1;
-    console.log(visitArg2);
     linkText_array[0].visit = visitArg2;
-
     localStorage.setItem(`${divNameLink}`, JSON.stringify(linkText_array));
 
 }
