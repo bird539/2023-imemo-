@@ -101,7 +101,6 @@ function skill_apply_link(txt){
 }
 //-----------------------처음 링크메모 만들기
 function visitLink(event){
-    event.preventDefault();
     const linkTargetForm = event.target.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;
     const targetIndex = linkTargetForm.childNodes[3].value;
     const divNameLink = event.target.parentElement.parentElement.className;
@@ -115,9 +114,6 @@ function visitLink(event){
     let visitArg = linkText_array[0].visit;
     let visitArg2 = [...visitArg];
     let indexArg = [];
-    console.log(`---------------------------`);
-    console.log(`target:${visitArg2[targetIndex]}, i:${targetIndex}`);
-    console.log(`or:${visitArg}`);
     let check = 0;
     let check2 = 0; 
     for(i=0;i<=visitArg.length;i++){
@@ -170,7 +166,6 @@ function visitLink(event){
 
     linkText_array[0].visit = visitArg2;
     localStorage.setItem(`${divNameLink}`, JSON.stringify(linkText_array));
-
 }
 
 function makeLinkUl(linkText_array,link_ul,div_linkName,tag_array,check,index,selectOption){
@@ -224,6 +219,9 @@ function makeLinkUl(linkText_array,link_ul,div_linkName,tag_array,check,index,se
         if(check == -1){
             edit_hiden_link.value = index;
         }
+        if(selectOption === "visit" && linkText_array[0] != undefined){
+            edit_btn_link.value = linkText_array[0].index[i];
+        }
         edit_hiden_link.style.display = "none";
         const edit_submit_link = document.createElement("input");
         edit_submit_link.type = "submit";
@@ -235,7 +233,7 @@ function makeLinkUl(linkText_array,link_ul,div_linkName,tag_array,check,index,se
         edit_form_link.appendChild(edit_submit_link);
         edit_form_link.style.display = "none";
         edit_form_link.addEventListener("submit",linkEdit);
-        if(selectOption === "old"){
+        if(selectOption === "old" || selectOption === "visit"){
             link_ul.appendChild(li_name_link);
             link_ul.appendChild(link_tag_select1);
             link_ul.appendChild(copy_link);
@@ -266,17 +264,9 @@ function selectTagLineUpLink(event){
     if (parsed_linkStor!=null&& parsed_linkStor.length != 0) {
         linkText_array = parsed_linkStor;
     }
-    let selectTagLink = [];
-    for(i=0;i<linkText_array.length;i++){
-        if(linkText_array[i].obj != null){
-            if(linkText_array[i].obj[3] == tagOptionValue){
-                selectTagLink.push(linkText_array[i]);
-            }
-        }
-    }
-    if(tagOptionValue == 0){
-        selectTagLink = linkText_array;
-    }
+
+    let selectTagLink = selectArray(linkText_array,tagOptionValue,basicOptionValue);
+
     makeLinkUl(selectTagLink,ul,divNameLink,linkText_array[0].tag,0,0,basicOptionValue);
 }
 
@@ -293,18 +283,70 @@ function selectLineUpLink(event){
     if (parsed_linkStor!=null&& parsed_linkStor.length != 0) {
         linkText_array = parsed_linkStor;
     }
+    let selectTagLink = selectArray(linkText_array,tagOptionValue,basicOptionValue);
+
+    makeLinkUl(selectTagLink,ul,divNameLink,linkText_array[0].tag,0,0,basicOptionValue);
+}
+function selectArray(linkText_array,tagOptionValue,basicOptionValue){
+    let visit = linkText_array[0].visit;
     let selectTagLink = [];
+    let originIndex = [];
+    let visitIndex = [];
+    let originIndexM = [];
     for(i=0;i<linkText_array.length;i++){
         if(linkText_array[i].obj != null){
+            originIndexM.push(i);
             if(linkText_array[i].obj[3] == tagOptionValue){
                 selectTagLink.push(linkText_array[i]);
+                originIndex.push(i);
+                visitIndex.push(visit[i]);
             }
         }
     }
     if(tagOptionValue == 0){
         selectTagLink = linkText_array;
+        originIndex = originIndexM;
+        visitIndex = visit;
     }
-    makeLinkUl(selectTagLink,ul,divNameLink,linkText_array[0].tag,0,0,basicOptionValue);
+    
+    if(basicOptionValue === "visit"){
+        let selectTagLink2 = [...selectTagLink];
+        let originIndex2 = [...originIndex]
+        let noSwap;
+        for( i=0; i<visitIndex.length; i++){
+            if(visitIndex[i] === 0){
+                selectTagLink2.splice(i, 1);
+                originIndex2.splice(i, 1);
+                visitIndex.splice(i, 1);
+                i--;
+            }
+        }
+        for( j=visitIndex.length; j>0; j--){
+            noSwap = true;
+            for(i =0; i < j-1; i++){
+                if(visitIndex[i] > visitIndex[i+1] ){
+                    let tem = visitIndex[i];
+                    let tem1 = selectTagLink2[i];
+                    let tem2 = originIndex2[i];
+                    visitIndex[i] = visitIndex[i+1];
+                    selectTagLink2[i] = selectTagLink2[i+1];
+                    originIndex2[i] = originIndex2[i+1];
+                    visitIndex[i+1] = tem;
+                    selectTagLink2[i+1] = tem1;
+                    originIndex2[i+1] = tem2;
+                    noSwap = false;
+                }
+            }
+            if(noSwap)break;
+        }
+        let b = selectTagLink2[0].obj;
+        selectTagLink2[0] = {
+            obj : b,
+            index : originIndex2
+        }
+        selectTagLink = selectTagLink2; 
+    }
+    return selectTagLink;
 }
 
 function tagSelectLink(event){
@@ -326,22 +368,23 @@ function tagSelectLink(event){
     localStorage.setItem(`${divNameLink}`, JSON.stringify(linkText_array));
 }
 
-function linkEdit(event){
+function linkEdit(event){//수정 필요
     event.preventDefault();
     const name_link = event.target.childNodes[0].value;
     const tag_link = event.target.childNodes[1].value;
     const url_link = event.target.childNodes[2].value;
     const index_link = Number(event.target.childNodes[3].value);
     const divName_link = event.target.parentElement.parentElement.className;
-    saveLink(divName_link,name_link,url_link,tag_link,index_link);
+    linkTagPluse(divName_link, tag_link, 0);
+    //saveLink(divName_link,name_link,url_link,tag_link,index_link);
 
     const name_Link = event.target.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling;
     name_Link.innerText = name_link;
     name_Link.href = url_link;
     const tag_Link = event.target.previousSibling.previousSibling.previousSibling.previousSibling;
-    tag_Link.innerText = `#${tag_link} `;
+    linkTagPluse(divName_link, tag_link, -2);
     if(tag_link == "" || tag_link == "none"){
-        tag_Link.style.display = "none";
+        tag_Link.style.display = "inline";
     }else{
         tag_Link.style.display = "inline";
     }
@@ -415,7 +458,7 @@ function linkTagPluse(divName_link, link_tag, check){
         tagSelecPLS_check = -1;
     }
     if(tagSelecPLS_check == -1){
-        for(i=0;i<tagSelect_inLi.length-1;i++){
+        for(i=0;i<tagSelect_inLi.length;i++){
             const link_optionB = document.createElement("option");
             link_optionB.value = `${tag_index}`;
             link_optionB.innerText = `#${link_tag}`;
