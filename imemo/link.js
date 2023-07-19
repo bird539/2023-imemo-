@@ -31,17 +31,24 @@ function skill_apply_link(txt){
         const link_tag_pluse = document.createElement("input");
         const link_tag_select1 = document.createElement("select");
         const link_tag_select2 = document.createElement("select");
-        //link_tag_select.addEventListener("change", event);
+        const link_tag_select3 = document.createElement("select");
+        link_tag_select1.className =  `tagLink${div_linkName}`;
+        link_tag_select2.className =  `tagLink${div_linkName}`;
+        link_tag_select3.className =  `tagLink${div_linkName}`;
 
         for(i=0;i<tag_array.length;i++){
             const link_option1 = document.createElement("option");
             const link_option2 = document.createElement("option");
+            const link_option3 = document.createElement("option");
             link_option1.value = `${tag_array[i]}`;
             link_option2.value = i;
+            link_option3.value = i;
             link_option1.innerText = `${tag_array[i]}`;
             link_option2.innerText = `${tag_array[i]}`;
+            link_option3.innerText = `${tag_array[i]}`;
             link_tag_select1.appendChild(link_option1);
             link_tag_select2.appendChild(link_option2);
+            link_tag_select3.appendChild(link_option3);
         }
         link_tag_select2.addEventListener("change",selectTagLineUpLink);
         
@@ -87,6 +94,27 @@ function skill_apply_link(txt){
             makeLinkUl(linkText_array,link_ul,div_linkName,tag_array,0,0,"new");
         }
         w_divLink.appendChild(link_ul);
+
+        const delSelect = document.createElement("select");
+        let delOptionValue = ["delete only tag","Delete tags and their links","edit tag"];
+        for(i=0;i<delOptionValue.length;i++){
+            const delOption = document.createElement("option");
+            delOption.value = i;
+            delOption.innerText = `${delOptionValue[i]}`;
+            delSelect.appendChild(delOption);
+        }
+        delSelect.addEventListener("change", editTagSelect1);
+        const editTagInput = document.createElement("input");
+        editTagInput.style.display = "none";
+        const delTagBtn = document.createElement("button");
+        delTagBtn.innerText = "del";
+        delTagBtn.addEventListener("click",delTagBtnEvent);
+        link_tag_select3.addEventListener("change", editTagSelect2);
+
+        w_divLink.appendChild(delSelect);
+        w_divLink.appendChild(link_tag_select3);
+        w_divLink.appendChild(editTagInput);
+        w_divLink.appendChild(delTagBtn);
 
         //열었던 창인지 확인 후 블록
         w_divLink.style.display = "none";
@@ -193,7 +221,6 @@ function makeLinkUl(linkText_array,link_ul,div_linkName,tag_array,check,index,se
         link_tag_select1.selectedIndex = linkText_array[i].obj[3];
         link_tag_select1.addEventListener("change", tagSelectLink);
 
-        let tagText = tag_array[linkText_array[i].obj[3]];           
         const copy_link = document.createElement("button");
         copy_link.innerText = "copy";
         copy_link.addEventListener("click",copyMemLink);
@@ -203,14 +230,12 @@ function makeLinkUl(linkText_array,link_ul,div_linkName,tag_array,check,index,se
     
         const del_btn_link = document.createElement("button");
         del_btn_link.innerText = "del";
+        del_btn_link.addEventListener("click", delBtnEvent);
     
         const edit_form_link = document.createElement("form");
         const edit_name_link = document.createElement("input");
         edit_name_link.value = link_name;
-        const link_tag_input = document.createElement("input");
-        if(tagText != "none"){
-            link_tag_input.value = tagText;
-        }
+
         const edit_url_link = document.createElement("input");
         edit_url_link.value = lint_url;
         const edit_hiden_link = document.createElement("input");
@@ -227,7 +252,6 @@ function makeLinkUl(linkText_array,link_ul,div_linkName,tag_array,check,index,se
         edit_submit_link.type = "submit";
         edit_submit_link.value = "sub";
         edit_form_link.appendChild(edit_name_link);
-        edit_form_link.appendChild(link_tag_input);
         edit_form_link.appendChild(edit_url_link);
         edit_form_link.appendChild(edit_hiden_link);
         edit_form_link.appendChild(edit_submit_link);
@@ -339,10 +363,17 @@ function selectArray(linkText_array,tagOptionValue,basicOptionValue){
             }
             if(noSwap)break;
         }
-        let b = selectTagLink2[0].obj;
-        selectTagLink2[0] = {
-            obj : b,
-            index : originIndex2
+        if(selectTagLink2[0] != null && selectTagLink2[0].obj != null){
+            console.log("dd")
+            let b = selectTagLink2[0].obj;
+            selectTagLink2[0] = {
+                obj : b,
+                index : originIndex2
+            }
+        }else{
+            selectTagLink2[0] = {
+                index : originIndex2
+            }
         }
         selectTagLink = selectTagLink2; 
     }
@@ -368,27 +399,47 @@ function tagSelectLink(event){
     localStorage.setItem(`${divNameLink}`, JSON.stringify(linkText_array));
 }
 
-function linkEdit(event){//수정 필요
+function linkEdit(event){
     event.preventDefault();
     const name_link = event.target.childNodes[0].value;
-    const tag_link = event.target.childNodes[1].value;
-    const url_link = event.target.childNodes[2].value;
-    const index_link = Number(event.target.childNodes[3].value);
-    const divName_link = event.target.parentElement.parentElement.className;
-    linkTagPluse(divName_link, tag_link, 0);
-    //saveLink(divName_link,name_link,url_link,tag_link,index_link);
+    const url_link = event.target.childNodes[1].value;
+    const index_link = Number(event.target.childNodes[2].value);
+    const divLinkName = event.target.parentElement.parentElement.className;
 
-    const name_Link = event.target.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling;
-    name_Link.innerText = name_link;
-    name_Link.href = url_link;
-    const tag_Link = event.target.previousSibling.previousSibling.previousSibling.previousSibling;
-    linkTagPluse(divName_link, tag_link, -2);
-    if(tag_link == "" || tag_link == "none"){
-        tag_Link.style.display = "inline";
-    }else{
-        tag_Link.style.display = "inline";
-    }
     const name_form = event.target;
+
+    const get_link_stor = localStorage.getItem(divLinkName);
+    const parsed_linkStor = JSON.parse(get_link_stor);
+    let linkArray;
+    let tagArray;
+    let visitArray;
+    let newObj;
+    if(parsed_linkStor != null){
+        linkArray = parsed_linkStor;
+        tagArray = linkArray[0].tag;
+        visitArray = linkArray[0].visit;
+
+        newObj = linkArray[index_link].obj;
+        newObj[0] = name_link;
+        newObj[1] = url_link;
+
+        linkArray[index_link] = {
+            obj : newObj
+        }
+        if(index_link == 0){
+            linkArray[index_link] = {
+                obj : newObj,
+                tag : tagArray,
+                visit : visitArray
+            }
+        }
+        localStorage.setItem(`${divLinkName}`, JSON.stringify(linkArray));
+        const targetName = event.target.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling;
+        targetName.innerText = name_link;
+        targetName.href = url_link;
+    }else{
+        return;
+    }
     name_form.style.display = "none";
 }
 
@@ -445,25 +496,18 @@ function linkTagPluse(divName_link, link_tag, check){
     }
     linkText_array[0] = linkObj;
     localStorage.setItem(`${divName_link}`, JSON.stringify(linkText_array));
-    const selec_link = event.target.childNodes[1];
 
-    const link_option1 = document.createElement("option");    
-    link_option1.value = `${link_tag}`;
-    link_option1.innerText = `${link_tag}`;
-    selec_link.appendChild(link_option1);
-
-    const div_linkName = event.target.parentElement.className;
-    let tagSelect_inLi = document.querySelectorAll(`.tagLink${div_linkName}`);
+    let tagSelect_inLi = document.querySelectorAll(`.tagLink${divName_link}`);
     if(check == -2){
         tagSelecPLS_check = -1;
     }
     if(tagSelecPLS_check == -1){
-        for(i=0;i<tagSelect_inLi.length;i++){
-            const link_optionB = document.createElement("option");
-            link_optionB.value = `${tag_index}`;
-            link_optionB.innerText = `#${link_tag}`;
-            tagSelect_inLi[i].appendChild(link_optionB);
-        }
+            for(i=0;i<tagSelect_inLi.length;i++){
+                const link_optionB = document.createElement("option");
+                link_optionB.value = `${tag_index}`;
+                link_optionB.innerText = `#${link_tag}`;
+                tagSelect_inLi[i].appendChild(link_optionB);
+            }
     }
 }
 
@@ -577,6 +621,152 @@ function hied_show_linkEdit(event){
 function copyMemLink(event) {
     const ling_target = event.target.previousSibling.previousSibling.href;
     window.navigator.clipboard.writeText(ling_target);
+}
+
+//del 버튼  - 각각
+function delBtnEvent(event){
+    const divLinkName = event.target.parentElement.parentElement.className;
+    const targetIndex = event.target.nextSibling.nextSibling.childNodes[3].value;
+    const ul = event.target.parentElement;
+    const selectOption = event.target.parentElement.parentElement.childNodes[2].value;
+    
+    const get_link_stor = localStorage.getItem(divLinkName);
+    const parsed_linkStor = JSON.parse(get_link_stor);
+    let linkArray = parsed_linkStor;
+    let tagArray = linkArray[0].tag;
+    if(targetIndex == 0){
+        let obj = {
+            tag : linkArray[0].tag,
+            visit : linkArray[0].visit
+        }
+        linkArray[0] = obj;
+    }else{
+        linkArray.splice(targetIndex,1);
+    }
+    
+    ul.replaceChildren(); //자식노드 삭제
+    localStorage.setItem(`${divLinkName}`, JSON.stringify(linkArray));
+
+    makeLinkUl(linkArray,ul,divLinkName,tagArray,0,0,selectOption);
+}
+
+function delTagBtnEvent(event){
+    const divLinkName = event.target.parentElement.className;
+    const get_link_stor = localStorage.getItem(divLinkName);
+    const targetTagValue = event.target.previousSibling.previousSibling.value;
+    const targetTag = Number(targetTagValue);
+    const onlyOrAll = event.target.previousSibling.previousSibling.previousSibling.value;
+    const selectOption = event.target.parentElement.childNodes[2].value;
+    const ul = event.target.previousSibling.previousSibling.previousSibling.previousSibling;
+
+    const parsed_linkStor = JSON.parse(get_link_stor);
+    let linkArray;
+    let tagArray;
+    let visitArray;
+    if(targetTag == 0){
+        return;
+    }
+    
+    if(parsed_linkStor != null){
+        linkArray = parsed_linkStor;
+        tagArray = linkArray[0].tag;
+        visitArray = linkArray[0].visit;
+    }
+    let newLinkArray = [];
+    if(onlyOrAll == 1){
+        for(i=0;i<linkArray.length;i++){
+            if(linkArray[i].obj != null && linkArray[i].obj[3] != `${targetTag}`){
+                newLinkArray.push(linkArray[i]);
+            }
+        }
+        tagArray.splice(targetTag, 1);
+        let newObj = newLinkArray[0].obj; 
+        newLinkArray[0] = {
+            obj:newObj,
+            tag:tagArray,
+            visit:visitArray
+        }
+    }else if(onlyOrAll == 0){
+        for(i=0;i<linkArray.length;i++){
+            if(linkArray[i].obj != null && linkArray[i].obj[3] == `${targetTag}`){
+                linkArray[i].obj[3] = 0;
+            }
+        }
+        tagArray.splice(targetTag, 1);
+        if(linkArray[0].obj != null){
+            let newObj = linkArray[0].obj; 
+            linkArray[0] = {
+                obj:newObj,
+                tag:tagArray,
+                visit:visitArray
+            }
+        }else{
+            linkArray[0] = {
+                tag:tagArray,
+                visit:visitArray
+            }
+        }
+        newLinkArray = linkArray;
+    }else if(onlyOrAll == 2){
+        const editTagTxt = event.target.previousSibling.value;
+        tagArray[targetTag] = editTagTxt;
+        newLinkArray = linkArray;
+        let newObj = newLinkArray[0].obj; 
+        newLinkArray[0] = {
+            obj:newObj,
+            tag:tagArray,
+            visit:visitArray
+        }
+    }
+
+    ul.replaceChildren(); //자식노드 삭제
+    localStorage.setItem(`${divLinkName}`, JSON.stringify(newLinkArray));
+    let tagSelect_inLi = document.querySelectorAll(`.tagLink${divLinkName}`);
+
+    for(i=0;i<tagSelect_inLi.length;i++){
+        tagSelect_inLi[i].replaceChildren();
+        for(j=0;j<tagArray.length;j++){
+            const link_option1 = document.createElement("option");
+            link_option1.value = j;
+            link_option1.innerText = `#${tagArray[j]}`;
+            if(tagArray[j] == "none"){
+                link_option1.innerText = `     `;
+            }
+            if(i == 0 || i==1 || i == tagSelect_inLi.length-1){
+                link_option1.innerText = `none`;
+            }
+            tagSelect_inLi[i].appendChild(link_option1);
+        }
+    }
+
+    makeLinkUl(newLinkArray,ul,divLinkName,tagArray,0,0,selectOption);
+    if(onlyOrAll == 2){
+        const editTagTxt = event.target.previousSibling;
+        const Btn = event.target;
+        editTagTxt.style.display = "none";
+        Btn.innerText = "del";
+    }
+}
+
+function editTagSelect1(event){
+    const selectOption = event.target.value;
+    const tagInput = event.target.nextSibling.nextSibling;
+    const Btn = event.target.nextSibling.nextSibling.nextSibling;
+    if(selectOption == 2){
+        tagInput.style.display = "inline";
+        Btn.innerText = "sub";
+    }else{
+        tagInput.style.display = "none";
+        Btn.innerText = "del";
+    }
+}
+function editTagSelect2(event){
+    const selectTag = event.target.childNodes[event.target.value].innerText;
+    const tagInput = event.target.nextSibling;
+    tagInput.value = selectTag;
+    if(event.target.value == 0){
+        tagInput.value = "*this tag can't edit";
+    }
 }
 
 
