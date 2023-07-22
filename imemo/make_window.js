@@ -394,6 +394,7 @@ function tapNameChange(event){
 }
 
 function selectTapDel(event){
+    //event.preventDefault();
     const tapName = event.target.parentElement.childNodes[3].value;
     const in_stor_tap_array = localStorage.getItem("tap_array");
     let tap_array = [];
@@ -403,7 +404,8 @@ function selectTapDel(event){
         tap_array = parsed_tap_array;
         for(i=0;i<tap_array.length;i++){
             if(tap_array[i]==tapName){
-                window.localStorage.removeItem(tapName);
+                console.log(tapName);
+                window.localStorage.removeItem(`s${tapName}`);
             }else if(tap_array[i]!=tapName){
                 tap_array_new.push(tap_array[i]);
             }
