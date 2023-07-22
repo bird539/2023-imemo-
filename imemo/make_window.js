@@ -304,7 +304,12 @@ function plusTapBTN_canChange(num){
         for(i=0;i<thisWinTap_array.length;i++){
             const name =  `changeTap_radio_${num}`;
             const label = document.createElement("label");
-            label.innerHTML = `tap${thisWinTap_array[i].charAt(thisWinTap_array[i].length-1)}`; 
+
+            let numTxt = `${thisWinTap_array[i].charAt(thisWinTap_array[i].length-1)}`;
+            let NameSkil = ["메모", "링크", "tap","tap","tap","tap","tap","tap","tap","tap"];
+            let bName = `${NameSkil[numTxt]}${numTxt}`;
+
+            label.innerHTML = `${bName}`; 
             if(tapName_array[i] != null){
                 label.innerHTML = tapName_array[i];
             }
@@ -519,7 +524,7 @@ function make_tap_pluse(num){
     newUl.style.listStyle = "none";
 
     //li안 선택 스킬 버튼
-    let skill_array = ["메모0",1,2,3,4,5,6,7,8,9];
+    let skill_array = ["메모0","링크1",2,3,4,5,6,7,8,9];
     skill_array.forEach(function(n) {
         const newLi = document.createElement("li");
         const newLiBtn = document.createElement("button");

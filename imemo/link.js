@@ -85,13 +85,42 @@ function skill_apply_link(txt){
 
         w_divLink.appendChild(link_form);
 
+        if(linkText_array[0] != null && linkText_array[0].select != null){
+            let i; let j;
+            if(linkText_array[0].select[0]=="new"){
+                i = 0;
+            }else if(linkText_array[0].select[0]=="old"){
+                i = 1;
+            }else if(linkText_array[0].select[0]=="visit"){
+                i = 2;
+            }else{
+                i=0;
+            }
+            if(linkText_array[0].select[1] != null){
+                j = Number(linkText_array[0].select[1]);
+            }else{
+                j=0;
+            }
+            link_tag_select_basic.selectedIndex = i;
+            link_tag_select2.selectedIndex = j;
+        }
+
         w_divLink.appendChild(link_tag_select_basic);
         w_divLink.appendChild(link_tag_select2);
 
         const link_ul = document.createElement("ul");
         if(parsed_linkStor != null){
             let tag_array = linkText_array[0].tag;
-            makeLinkUl(linkText_array,link_ul,div_linkName,tag_array,0,0,"new");
+            let basicOptionValue = "new";
+            let selectTagLink = linkText_array;
+            //makeLinkUl(linkText_array,link_ul,div_linkName,tag_array,0,0,"new");
+
+            if(linkText_array[0].select != null){
+                let tagOptionValue = linkText_array[0].select[1];
+                basicOptionValue = linkText_array[0].select[0];
+                selectTagLink = selectArray(linkText_array,tagOptionValue,basicOptionValue);
+            }
+            makeLinkUl(selectTagLink,link_ul,div_linkName,tag_array,0,0,basicOptionValue);
         }
         w_divLink.appendChild(link_ul);
 
@@ -130,7 +159,7 @@ function skill_apply_link(txt){
 //-----------------------처음 링크메모 만들기
 function visitLink(event){
     const linkTargetForm = event.target.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;
-    const targetIndex = linkTargetForm.childNodes[3].value;
+    const targetIndex = linkTargetForm.childNodes[2].value;
     const divNameLink = event.target.parentElement.parentElement.className;
 
     let linkText_array;
@@ -287,6 +316,15 @@ function selectTagLineUpLink(event){
     const parsed_linkStor = JSON.parse(get_link_stor);
     if (parsed_linkStor!=null&& parsed_linkStor.length != 0) {
         linkText_array = parsed_linkStor;
+
+        let selectArray = [basicOptionValue, tagOptionValue];
+        linkText_array[0] = {
+            obj : linkText_array[0].obj,
+            tag : linkText_array[0].tag,
+            visit : linkText_array[0].visit,
+            select : selectArray
+        }
+        localStorage.setItem(`${divNameLink}`, JSON.stringify(linkText_array));
     }
 
     let selectTagLink = selectArray(linkText_array,tagOptionValue,basicOptionValue);
@@ -301,11 +339,22 @@ function selectLineUpLink(event){
     const tagOptionValue = event.target.nextSibling.value;
     ul.replaceChildren();
 
+
+    
     let linkText_array;
     const get_link_stor = localStorage.getItem(divNameLink);
     const parsed_linkStor = JSON.parse(get_link_stor);
     if (parsed_linkStor!=null&& parsed_linkStor.length != 0) {
         linkText_array = parsed_linkStor;
+
+        let selectArray = [basicOptionValue, tagOptionValue];
+        linkText_array[0] = {
+            obj : linkText_array[0].obj,
+            tag : linkText_array[0].tag,
+            visit : linkText_array[0].visit,
+            select : selectArray
+        }
+        localStorage.setItem(`${divNameLink}`, JSON.stringify(linkText_array));
     }
     let selectTagLink = selectArray(linkText_array,tagOptionValue,basicOptionValue);
 
@@ -364,7 +413,6 @@ function selectArray(linkText_array,tagOptionValue,basicOptionValue){
             if(noSwap)break;
         }
         if(selectTagLink2[0] != null && selectTagLink2[0].obj != null){
-            console.log("dd")
             let b = selectTagLink2[0].obj;
             selectTagLink2[0] = {
                 obj : b,
@@ -383,20 +431,20 @@ function selectArray(linkText_array,tagOptionValue,basicOptionValue){
 function tagSelectLink(event){
     const tagOptionValue = event.target.value;
     const divNameLink = event.target.parentElement.parentElement.className;
-    const indexLink = event.target.nextSibling.nextSibling.nextSibling.nextSibling.childNodes[3].value;
-
+    const indexLink = event.target.nextSibling.nextSibling.nextSibling.nextSibling.childNodes[2].value;
     let linkText_array;
     const get_link_stor = localStorage.getItem(divNameLink);
     const parsed_linkStor = JSON.parse(get_link_stor);
     if (parsed_linkStor!=null&& parsed_linkStor.length != 0) {
         linkText_array = parsed_linkStor;
+        linkText_array[indexLink].obj[3] = tagOptionValue;
+
+        const tagOptionSelect = event.target;
+        tagOptionSelect.selectedIndex = tagOptionValue;
+    
+        localStorage.setItem(`${divNameLink}`, JSON.stringify(linkText_array));
     }
-    linkText_array[indexLink].obj[3] = tagOptionValue;
 
-    const tagOptionSelect = event.target;
-    tagOptionSelect.selectedIndex = tagOptionValue;
-
-    localStorage.setItem(`${divNameLink}`, JSON.stringify(linkText_array));
 }
 
 function linkEdit(event){
@@ -430,7 +478,8 @@ function linkEdit(event){
             linkArray[index_link] = {
                 obj : newObj,
                 tag : tagArray,
-                visit : visitArray
+                visit : visitArray,
+                select : linkArray[0].select
             }
         }
         localStorage.setItem(`${divLinkName}`, JSON.stringify(linkArray));
@@ -492,7 +541,8 @@ function linkTagPluse(divName_link, link_tag, check){
     let linkObj = {
         obj : link_obj,
         tag : tag_array,
-        visit : visit_array
+        visit : visit_array,
+        select : linkText_array[0].select
     }
     linkText_array[0] = linkObj;
     localStorage.setItem(`${divName_link}`, JSON.stringify(linkText_array));
@@ -552,7 +602,8 @@ function saveLink(divName_link,link_name,link_url,link_tag,index_link){
         linkObj = {
             obj : link_obj,
             tag : tag_array,
-            visit : visit_array
+            visit : visit_array,
+            select : ["new", 0]
         }
     }
     if(index_link == -1){
@@ -561,7 +612,8 @@ function saveLink(divName_link,link_name,link_url,link_tag,index_link){
         linkObj = {
             obj : link_obj,
             tag : tag_array,
-            visit : visit_array
+            visit : visit_array,
+            select : linkText_array[0].select
         }
         linkText_array[index_link] = linkObj;
     }else{
@@ -626,7 +678,7 @@ function copyMemLink(event) {
 //del 버튼  - 각각
 function delBtnEvent(event){
     const divLinkName = event.target.parentElement.parentElement.className;
-    const targetIndex = event.target.nextSibling.nextSibling.childNodes[3].value;
+    const targetIndex = event.target.nextSibling.nextSibling.childNodes[2].value;
     const ul = event.target.parentElement;
     const selectOption = event.target.parentElement.parentElement.childNodes[2].value;
     
@@ -637,13 +689,14 @@ function delBtnEvent(event){
     if(targetIndex == 0){
         let obj = {
             tag : linkArray[0].tag,
-            visit : linkArray[0].visit
+            visit : linkArray[0].visit,
+            select : linkArray[0].select
         }
         linkArray[0] = obj;
     }else{
         linkArray.splice(targetIndex,1);
     }
-    
+
     ul.replaceChildren(); //자식노드 삭제
     localStorage.setItem(`${divLinkName}`, JSON.stringify(linkArray));
 
@@ -684,7 +737,8 @@ function delTagBtnEvent(event){
         newLinkArray[0] = {
             obj:newObj,
             tag:tagArray,
-            visit:visitArray
+            visit:visitArray,
+            select : linkArray[0].select
         }
     }else if(onlyOrAll == 0){
         for(i=0;i<linkArray.length;i++){
@@ -698,12 +752,14 @@ function delTagBtnEvent(event){
             linkArray[0] = {
                 obj:newObj,
                 tag:tagArray,
-                visit:visitArray
+                visit:visitArray,
+                select : linkArray[0].select
             }
         }else{
             linkArray[0] = {
                 tag:tagArray,
-                visit:visitArray
+                visit:visitArray,
+                select : linkArray[0].select
             }
         }
         newLinkArray = linkArray;
@@ -715,7 +771,8 @@ function delTagBtnEvent(event){
         newLinkArray[0] = {
             obj:newObj,
             tag:tagArray,
-            visit:visitArray
+            visit:visitArray,
+            select : linkArray[0].select
         }
     }
 
