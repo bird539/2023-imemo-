@@ -8,7 +8,6 @@ if(W_tapShow_array != null){
 function skill_apply_word(txt){
     const div_wordName = `s${txt}`;
     if(div_wordName.charAt(div_wordName.length-1) == `3`){
-        console.log("hello")
         const w_divWord = document.querySelector(`.${div_wordName}`);
         const ex = document.createElement("button");
         ex.innerText = "this is words"
