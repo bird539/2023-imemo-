@@ -195,91 +195,72 @@ function newInputCalcul(event){
 
     const tableCalcul = event.target.nextSibling;
 
-    let indexAndSave = saveCalcul(divName,textInput.value, numInput.value, 0);
-    makeTrTd(indexAndSave,false,textInput.value,numInput.value,tableCalcul);
 
-    devideTextAndNum(textInput.value,numInput.value,0);
 
+    let textCheck = devideTextAndNumAndCalcul(textInput.value);
+    let valueCheck = devideTextAndNumAndCalcul(numInput.value);
+
+    for(i=0;i<3;i++){
+        if(textCheck[i]==''){
+            textCheck[i] = null;
+        }
+        if(valueCheck[i]==''){
+            valueCheck[i] = null;
+        }
+    }
+    let finalText;
+    let finalCalcul;
+    let finalValue;
+
+    if(valueCheck[0]!=null){
+        finalText=valueCheck[0];
+    }
+    if(textCheck[0]!=null){
+        finalText=textCheck[0];
+    }
+    if(textCheck[1]!=null){
+        finalCalcul=textCheck[1];
+    }
+    if(valueCheck[1]!=null){
+        finalCalcul=valueCheck[1];
+    }
+    if(valueCheck[2]==null && textCheck[2] !=null){
+        finalValue=textCheck[2];
+    }else{
+        finalValue=valueCheck[2];
+    }
+    if(finalCalcul!=null && finalText !=null){
+        finalText = `${finalText}\n${finalCalcul}`;
+    }
+    console.log(textCheck);
+    console.log(valueCheck);
+    console.log(valueCheck[2] ==null);
+    console.log(finalText, );
+    //let textTitle = `${}`
+
+    let indexAndSave = saveCalcul(divName,finalText, finalValue, 0);
+    makeTrTd(indexAndSave,false,finalText,finalValue,tableCalcul);
     textInput.value = null;
     numInput.value = null;
 }
 
-function devideTextAndNum(text, num){
+function devideTextAndNumAndCalcul(text){
     let result  = text.split(/[^0-9\/\*\**\%\^\+\-\(\)\.]/g);
     let ss = "";
     result = ss.concat(result);
     result = result.split(/[\ ]/g);
     result = ss.concat(result);
     result = result.replace(/[,]/g,"");
-    iresult = Array.from(result);
-    console.log(result);
-    console.log(iresult);
-    console.log("-=================")
-    
-    let modify = result.split(/[\d\.]/g);
-    let number = result.split(/[\/\*\**\%\^\+\-\(\)]/g);
-    let imodify = [];
-    let inumber = [];
-    console.log(modify);
-    for(i=0;i<modify.length;i++){
-        if(modify[i]!=''&&modify[i]!=null){
-            imodify.push(modify[i])
-        }
-        if(number[i]!='' &&number[i]!=null){
-            inumber.push(number[i])
-        }
-    }
-    modify = imodify;
-    console.log(modify);
-    number = inumber;
-    let calcul = [];
-    for(i=0;i<number.length;i++){
-        calcul.push(Number(number[i]));
-        if(modify[i]!=null){
-            let MsplitStr = Array.from(modify[i]);
-            for(j=0;j<MsplitStr.length;j++){
-                calcul.push(MsplitStr[j]);
-            }
-        }
-    }
-    parenthesesCalcul(calcul);
-}
-//()가로 안 식 먼저 계산
-//1.0index에 가까운 n번째 (기호를 만나면 -index에 가까운 n번째 기호를 찾아서 판단
-//2. 가장 안 쪽 기호를 찾아서 먼저 계산
-//3. 가로 계산 후 밖으로 나오면서 앞에 숫자가 있으면 '(안 숫자)'를 '*','안 숫자'로 변경. 가로는 제거
-function parenthesesCalcul(array){
-    let inDoor = [];// (:2번째 (:1번째 계산   
-    let outDoor = [];//       ):1번째 계산 ):2번째
-    for(i=0;i<array.length;i++){
-        for(j=0;j<array[i].length;j++){
-            if(array[i][j] == '('){
-                inDoor.push([i,j]);
-            }
-        }
-    }
-    for(i=0;i<array.length;i++){
-        for(j=0;j<array[i].length;j++){
-            if(array[i][j] == ')'){
-                outDoor.push([i,j]);
-            }
-        }
-    }
-    for(i=1;i>=-(inDoor.length);i--){
-        //array[inDoor[i][0]]~array[outDoor[-i][0]]
-        //while(outDoor[])
-    }
-    console.log(array);
-    //console.log(inDoor);
-    //console.log(outDoor);
-}
-//(:1-가장첫번째  (:2-두번째  (:3   ):1   ):2-마지막두번째  ):3-가장마지막
+    let sum = new Function(`return ${result}`)();
 
+    let textTitle  = text.split(/[0-9\/\*\**\%\^\+\-\(\)\.\t]/g);
+    let s2 = "";
+    textTitle = s2.concat(textTitle);
+    textTitle = textTitle.replace(/[,]/g,"");
 
-//계산식 계산 구현 - 
-//해당 기호를 만나면
-//1. n-1번째, n번째(기호), n+1번째를 가져와서 계산
-//2. n-1번째, n+1번째 값을 가지고 n번째 기호에 맞게 끔 계산
+    let retrunValue = [textTitle,result,sum];
+    return retrunValue;
+}
 
 
 //----------------------------------------
