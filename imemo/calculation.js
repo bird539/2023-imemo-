@@ -79,7 +79,6 @@ function skill_apply_calcul(txt){
         otherBtnSpan.appendChild(selectOption);
         otherBtnSpan.style.display = "block";
 
-
         w_divCalcul.appendChild(inputForm);
         w_divCalcul.appendChild(tableCalcul);
         w_divCalcul.appendChild(selectSumSpan);
@@ -154,6 +153,11 @@ function makeTrTd(index,checkedvalue,text,num,tableCalcul){
             tdCal.style.borderBottom = "1px solid #ffffff";
             tdCal.style.borderCollapse = "collapse";
             tdCal.style.padding = "5px";
+            
+            const textEditInput = document.createElement("input");
+            textEditInput.value = `${text}`;;
+            textEditInput.style.display="none";
+            tdCal.appendChild(textEditInput);
             trCal.appendChild(tdCal);
         }else if(j==2){
             const tdCal = document.createElement("td");
