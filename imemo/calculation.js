@@ -36,7 +36,7 @@ function skill_apply_calcul(txt){
 
         tableCalcul.style.borderTop = "1px solid #ffffff";
         tableCalcul.style.borderCollapse = "collapse";
-        tableCalcul.style.width = "370px"
+        tableCalcul.style.width = "370px";
         
         const sumSpan = document.createElement("span");
         const allCheckSpan = document.createElement("span");
@@ -126,6 +126,11 @@ function saveCalcul(divName,text, num,newOrDel){
         calculArray = newCalculArray;
         localStorage.setItem(divName, JSON.stringify(calculArray));
         return calculArray;
+    }else if(newOrDel == 3){
+        let change = calculArray[num];
+        change = text;
+        calculArray[num] = change;
+        localStorage.setItem(divName, JSON.stringify(calculArray));
     }
 }
 
@@ -162,14 +167,22 @@ function makeTrTd(index,checkedvalue,text,num,tableCalcul){
             tdCal.style.borderCollapse = "collapse";
             tdCal.style.padding = "5px";
             
+            const textEditForm = document.createElement("form");
+            const textEditSub = document.createElement("button");
+            textEditSub.innerText = "sub";
+            textEditSub.type = "submit";
             const textEditInput = document.createElement("input");
             textEditInput.value = `${text}`;
             if(j==2){
                 textEditInput.value = `${num}`;
             }
-            textEditInput.style.display="none";
+            textEditForm.addEventListener("submit",editFormSubmit);
+            textEditForm.appendChild(textEditInput);
+            textEditForm.appendChild(textEditSub);
+            textEditForm.style.display="none";
+            
             tdCal.appendChild(tdTxtSpan);
-            tdCal.appendChild(textEditInput);
+            tdCal.appendChild(textEditForm);
             trCal.appendChild(tdCal);
         }
     }
@@ -204,10 +217,16 @@ function newInputCalcul(event){
 
     const tableCalcul = event.target.nextSibling;
 
-
-
-    let textCheck = devideTextAndNumAndCalcul(textInput.value);
-    let valueCheck = devideTextAndNumAndCalcul(numInput.value);
+    let final = seperateCalculUi(textInput.value, numInput.value);
+    let indexAndSave = saveCalcul(divName,final[0], final[1], 0);
+    makeTrTd(indexAndSave,false,final[0],final[1],tableCalcul);
+    textInput.value = null;
+    numInput.value = null;
+}
+function seperateCalculUi(textInput, numInput,edit){
+    let textCheck = devideTextAndNumAndCalcul(textInput);
+    let valueCheck = devideTextAndNumAndCalcul(numInput);
+    //["string","1+2",3];
 
     for(i=0;i<3;i++){
         if(textCheck[i]==''){
@@ -243,12 +262,30 @@ function newInputCalcul(event){
     }else if(finalCalcul!=null && finalText ==null){
         finalText = `${finalCalcul}`;
     }
-    //let textTitle = `${}`
-
-    let indexAndSave = saveCalcul(divName,finalText, finalValue, 0);
-    makeTrTd(indexAndSave,false,finalText,finalValue,tableCalcul);
-    textInput.value = null;
-    numInput.value = null;
+    if(edit==0){
+        if(textCheck[0]!=null && textCheck[1] !=null){
+            finalText = `${textCheck[0]}\n${textCheck[1]}`;
+            finalValue = textCheck[2];
+        }else if(textCheck[1] ==null){
+            finalText = `${textCheck[0]}`;
+        }else if(textCheck[0]==null && textCheck[1] !=null){
+            finalText = `${textCheck[1]}`;
+            finalValue = textCheck[2];
+        }
+    }if(edit==1){
+        if(textCheck[0]!=null && textCheck[1] !=null){
+            finalText = `${textCheck[0]}\n${textCheck[1]}`;
+            finalValue = valueCheck[2];
+        }else if(textCheck[1] ==null){
+            finalText = `${textCheck[0]}`;
+            finalValue = valueCheck[2];
+        }else if(textCheck[0]==null && textCheck[1] !=null){
+            finalText = `${textCheck[1]}`;
+            finalValue = valueCheck[2];
+        }
+    }
+    let final = [finalText, finalValue];
+    return final;
 }
 
 function devideTextAndNumAndCalcul(text){
@@ -260,7 +297,7 @@ function devideTextAndNumAndCalcul(text){
     result = result.replace(/[,]/g,"");
     let sum = new Function(`return ${result}`)();
 
-    let textTitle  = text.split(/[0-9\/\*\**\%\^\+\-\(\)\.\t]/g);
+    let textTitle  = text.split(/[0-9\/\*\**\%\^\+\-\(\)\.\t\n]/g);
     let s2 = "";
     textTitle = s2.concat(textTitle);
     textTitle = textTitle.replace(/[,]/g,"");
@@ -270,16 +307,60 @@ function devideTextAndNumAndCalcul(text){
 }
 
 function editTextOrValue(event){
-    const target = event.target.childNodes[0];
-    const showInput = event.target.childNodes[1];
+    const target = event.target;
+    if(target.tagName == "SPAN"){
+        const targetIn = event.target;
+        const showInput = event.target.nextSibling;
 
-    if(target.style.display != "none"){
-        target.style.display = "none";
-        showInput.style.display = "inline-block";
-    }else{
-        target.style.display = "inline-block";
-        showInput.style.display = "none";
+        if(targetIn.style.display != "none"){
+            targetIn.style.display = "none";
+            showInput.style.display = "inline-block";
+        }else{
+            targetIn.style.display = "inline-block";
+            showInput.style.display = "none";
+        }
+    }else if(target.tagName == "TD"){
+        const targetIn = event.target.childNodes[0];
+        const showInput = event.target.childNodes[1];
+
+        if(targetIn.style.display != "none"){
+            targetIn.style.display = "none";
+            showInput.style.display = "inline-block";
+        }else{
+            targetIn.style.display = "inline-block";
+            showInput.style.display = "none";
+        }
     }
+}
+function editFormSubmit(event){
+    event.preventDefault();
+    const targetFormValue = event.target.childNodes[0].value;
+    const targetForm = event.target;
+    const targetText = event.target.previousSibling;
+    const targetCheck = event.target.parentElement.parentElement.childNodes[0].childNodes[0];
+    const divName = event.target.parentElement.parentElement.parentElement.parentElement.className;
+    let editArray = [];
+    if(targetText.className == "value"){
+        const text = event.target.parentElement.parentElement.childNodes[1].childNodes[0];
+        let final = seperateCalculUi(text.innerText,targetFormValue,1);
+        editArray = [targetCheck.checked, final[0], final[1]];
+        targetText.innerText = final[1];
+        text.innerText = `${final[0]}`;
+    }else if(targetText.className == "text"){
+        const value = event.target.parentElement.parentElement.childNodes[2].childNodes[0];
+        let final = seperateCalculUi(targetFormValue,value.innerText,0);
+        editArray = [targetCheck.checked, final[0], final[1]];
+        targetText.innerText = final[0];
+        if(final[1]!=null){
+            value.innerText = `${final[1]}`;
+        }
+    }
+    
+    saveCalcul(divName,editArray, targetCheck.value,3);
+
+    targetForm.style.display = "none";
+    targetText.style.display = "inline-block";
+    
 }
 
 
