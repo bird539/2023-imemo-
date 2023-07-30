@@ -147,24 +147,29 @@ function makeTrTd(index,checkedvalue,text,num,tableCalcul){
             tdCal.style.width = "20px";
             trCal.appendChild(tdCal);
             
-        }else if(j==1){
+        }else if(j>0){
             const tdCal = document.createElement("td");
-            tdCal.innerText = `${text}`;
+            const tdTxtSpan = document.createElement("span");
+            tdTxtSpan.innerText = `${text}`;
+            tdTxtSpan.className = "text";
+            if(j==2){
+                tdTxtSpan.innerText = `${num}`;
+                tdTxtSpan.className = "value";
+            }
+            trCal.addEventListener("dblclick",editTextOrValue);
+
             tdCal.style.borderBottom = "1px solid #ffffff";
             tdCal.style.borderCollapse = "collapse";
             tdCal.style.padding = "5px";
             
             const textEditInput = document.createElement("input");
-            textEditInput.value = `${text}`;;
+            textEditInput.value = `${text}`;
+            if(j==2){
+                textEditInput.value = `${num}`;
+            }
             textEditInput.style.display="none";
+            tdCal.appendChild(tdTxtSpan);
             tdCal.appendChild(textEditInput);
-            trCal.appendChild(tdCal);
-        }else if(j==2){
-            const tdCal = document.createElement("td");
-            tdCal.innerText = `${num}`;
-            tdCal.style.borderBottom = "1px solid #ffffff";
-            tdCal.style.borderCollapse = "collapse";
-            tdCal.style.padding = "5px";
             trCal.appendChild(tdCal);
         }
     }
@@ -235,11 +240,9 @@ function newInputCalcul(event){
     }
     if(finalCalcul!=null && finalText !=null){
         finalText = `${finalText}\n${finalCalcul}`;
+    }else if(finalCalcul!=null && finalText ==null){
+        finalText = `${finalCalcul}`;
     }
-    console.log(textCheck);
-    console.log(valueCheck);
-    console.log(valueCheck[2] ==null);
-    console.log(finalText, );
     //let textTitle = `${}`
 
     let indexAndSave = saveCalcul(divName,finalText, finalValue, 0);
@@ -264,6 +267,19 @@ function devideTextAndNumAndCalcul(text){
 
     let retrunValue = [textTitle,result,sum];
     return retrunValue;
+}
+
+function editTextOrValue(event){
+    const target = event.target.childNodes[0];
+    const showInput = event.target.childNodes[1];
+
+    if(target.style.display != "none"){
+        target.style.display = "none";
+        showInput.style.display = "inline-block";
+    }else{
+        target.style.display = "inline-block";
+        showInput.style.display = "none";
+    }
 }
 
 
