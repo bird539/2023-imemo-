@@ -42,6 +42,7 @@ function skill_apply_calcul(txt){
         const allCheckSpan = document.createElement("span");
         const allCheckInput = document.createElement("input");
         allCheckInput.type = "checkbox";
+        allCheckInput.addEventListener("click", checkboxAllCheckedEvent);
         allCheckSpan.innerText = "all  ";
         allCheckSpan.prepend(allCheckInput);
         sumSpan.appendChild(allCheckSpan);
@@ -51,6 +52,8 @@ function skill_apply_calcul(txt){
         selectSumSpan.innerText = "selected sum";
         selectSumSpan.prepend(sumSpan);
         const selectSumInput = document.createElement("input");
+        let sum = saveCalcul(div_calculName,false,0,4);
+        selectSumInput.value = sum.toLocaleString('ko-kr');
         selectSumSpan.appendChild(selectSumInput);
 
         //-------------
@@ -131,6 +134,14 @@ function saveCalcul(divName,text, num,newOrDel){
         change = text;
         calculArray[num] = change;
         localStorage.setItem(divName, JSON.stringify(calculArray));
+    }else if(newOrDel == 4){
+        let sum=0;
+        for(i=0;i<calculArray.length;i++){
+            if(calculArray[i][0] == true && calculArray[i][2] != null){
+                sum+=calculArray[i][2];
+            }
+        }
+        return sum;
     }
 }
 
@@ -158,7 +169,7 @@ function makeTrTd(index,checkedvalue,text,num,tableCalcul){
             tdTxtSpan.innerText = `${text}`;
             tdTxtSpan.className = "text";
             if(j==2){
-                tdTxtSpan.innerText = `${num}`;
+                tdTxtSpan.innerText = `${num.toLocaleString('ko-kr')}`;
                 tdTxtSpan.className = "value";
             }
             trCal.addEventListener("dblclick",editTextOrValue);
@@ -207,7 +218,21 @@ function checkBoxEvent(event){
     const index = event.target.value;
     const check = event.target.checked;
     saveCalcul(divName,check,index,1);
+    let sum = saveCalcul(divName,check,index,4);
+    const sumInput = event.target.parentElement.parentElement.parentElement.parentElement.childNodes[2].childNodes[2];
+    
+    sumInput.value = sum.toLocaleString('ko-kr');
 }
+function checkboxAllCheckedEvent(event){
+    
+}
+/*
+해시총공많은참여바랍니다
+#프로젝트문_부당해고_진상규명
+프로젝트문은부당해고해명하고사과하라
+#PM_unfairdismissal
+앑맘팔로워10명필수15분화력집중!!
+*/
 
 function newInputCalcul(event){
     event.preventDefault();
@@ -344,7 +369,7 @@ function editFormSubmit(event){
         const text = event.target.parentElement.parentElement.childNodes[1].childNodes[0];
         let final = seperateCalculUi(text.innerText,targetFormValue,1);
         editArray = [targetCheck.checked, final[0], final[1]];
-        targetText.innerText = final[1];
+        targetText.innerText = final[1].toLocaleString('ko-kr');
         text.innerText = `${final[0]}`;
     }else if(targetText.className == "text"){
         const value = event.target.parentElement.parentElement.childNodes[2].childNodes[0];
@@ -352,15 +377,13 @@ function editFormSubmit(event){
         editArray = [targetCheck.checked, final[0], final[1]];
         targetText.innerText = final[0];
         if(final[1]!=null){
-            value.innerText = `${final[1]}`;
+            value.innerText = `${final[1].toLocaleString('ko-kr')}`;
         }
     }
     
     saveCalcul(divName,editArray, targetCheck.value,3);
-
     targetForm.style.display = "none";
     targetText.style.display = "inline-block";
-    
 }
 
 
