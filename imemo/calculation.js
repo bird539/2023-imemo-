@@ -26,10 +26,14 @@ function skill_apply_calcul(txt){
         const getSaveCalcul = localStorage.getItem(div_calculName);
         const getSaveCalculPar = JSON.parse(getSaveCalcul);
         let calculArray;
+        let sum = 0;
         if(getSaveCalculPar!=null && getSaveCalculPar.length !=0){
             calculArray = getSaveCalculPar;
             for(i=0;i<calculArray.length;i++){
                 let array  =calculArray[i];
+                if(array[0] == true && array[2] != null){
+                    sum += array[2];
+                }
                 makeTrTd(i,array[0],array[1],array[2],tableCalcul);
             }
         }
@@ -42,6 +46,9 @@ function skill_apply_calcul(txt){
         const allCheckSpan = document.createElement("span");
         const allCheckInput = document.createElement("input");
         allCheckInput.type = "checkbox";
+        if(calculArray != null && calculArray[0][3] != null && calculArray[0][3] != 0){
+            allCheckInput.checked = true;
+        }
         allCheckInput.addEventListener("click", checkboxAllCheckedEvent);
         allCheckSpan.innerText = "all  ";
         allCheckSpan.prepend(allCheckInput);
@@ -52,7 +59,7 @@ function skill_apply_calcul(txt){
         selectSumSpan.innerText = "selected sum";
         selectSumSpan.prepend(sumSpan);
         const selectSumInput = document.createElement("input");
-        let sum = saveCalcul(div_calculName,false,0,4);
+        //let sum = saveCalcul(div_calculName,false,0,4);
         selectSumInput.value = sum.toLocaleString('ko-kr');
         selectSumSpan.appendChild(selectSumInput);
 
@@ -65,14 +72,16 @@ function skill_apply_calcul(txt){
 
         const selectCopyBth = document.createElement("button");
         selectCopyBth.innerText = "select copy";
+        selectCopyBth.addEventListener("click",copySelect);
         otherBtnSpan.appendChild(selectCopyBth);
     
         const pluseTableBtn = document.createElement("button");
         pluseTableBtn.innerText = "insert table sum";
+        pluseTableBtn.addEventListener("click",newSumInputTable);
         otherBtnSpan.appendChild(pluseTableBtn);
 
         const selectOption = document.createElement("select");
-        let option = ["only text", "text + value","only value"];
+        let option = ["text + value","only text","only value"];
         for(i=0;i<option.length;i++){
             const optionType = document.createElement("option");
             optionType.innerText = option[i];
@@ -142,6 +151,66 @@ function saveCalcul(divName,text, num,newOrDel){
             }
         }
         return sum;
+    }else if(newOrDel == 5){
+        let sum=0;
+        if(calculArray.length != 0){
+            for(i=0;i<calculArray.length;i++){
+                calculArray[i][0] = text;
+                if(text != false && calculArray[i][2] != null){
+                    sum+=calculArray[i][2];
+                }else{
+                    sum = 0;
+                }
+            }
+                calculArray[0] = [calculArray[0][0],calculArray[0][1], calculArray[0][2],sum];
+                localStorage.setItem(divName, JSON.stringify(calculArray));
+            return calculArray;
+        }else{
+            return
+        }
+    }else if(newOrDel == 6){
+        let newText = "";
+        for(i=0;i<calculArray.length;i++){
+            if(calculArray[i][0] != false &&calculArray[i][1]!=null){
+                let tem = `${calculArray[i][1]}`;
+                tem += '+';
+                newText+=tem;
+            }
+        }
+        let text2 = devideTextAndNumAndCalcul(newText);
+        if(text == 0){
+            newText = `${text2[0]}\n${text2[1]}`;
+        }else if(text == 1){
+            newText = `${text2[0]}`;
+        }else if(text == 2){
+            newText = `${text2[1]}`;
+        }
+        let num2 = Number(num.replace(/[^0-9]/g,''));
+        let pls = [false,newText, num2];
+        calculArray.push(pls);
+        localStorage.setItem(divName, JSON.stringify(calculArray));
+        pls = [false,newText, num2, calculArray.length-1];
+        return pls;
+    }else if(newOrDel == 7){
+        let newText = "";
+        for(i=0;i<calculArray.length;i++){
+            if(calculArray[i][0] != false &&calculArray[i][1]!=null){
+                let tem = ``;
+                if(text == 0){
+                    tem = `${calculArray[i][1]}\t${calculArray[i][2]}\n`;
+                    newText+=tem;
+                }else if(text ==1){
+                    let text2 = devideTextAndNumAndCalcul(calculArray[i][1]);
+                    tem = `${text2[0]}\t${calculArray[i][2]}\n`;
+                    newText+=tem;
+                }else if(text ==2){
+                    let text2 = devideTextAndNumAndCalcul(calculArray[i][1]);
+                    tem = `${text2[1]}\t${calculArray[i][2]}\n`;
+                    newText+=tem;
+                }
+            }
+        }
+        return newText;
     }
 }
 
@@ -169,7 +238,12 @@ function makeTrTd(index,checkedvalue,text,num,tableCalcul){
             tdTxtSpan.innerText = `${text}`;
             tdTxtSpan.className = "text";
             if(j==2){
-                tdTxtSpan.innerText = `${num.toLocaleString('ko-kr')}`;
+                if(num !=null){
+                    tdTxtSpan.innerText = `${num.toLocaleString('ko-kr')}`;
+                }else{
+                    num = 0;
+                    tdTxtSpan.innerText = `${num.toLocaleString('ko-kr')}`;
+                }
                 tdTxtSpan.className = "value";
             }
             trCal.addEventListener("dblclick",editTextOrValue);
@@ -207,7 +281,7 @@ function delCheckCalcul(event){
 
     if(calculArray!=null && calculArray.length !=0){
         for(i=0;i<calculArray.length;i++){
-            let array  =calculArray[i];
+            let array = calculArray[i];
             makeTrTd(i,array[0],array[1],array[2],tableCalcul);
         }
     }
@@ -224,6 +298,21 @@ function checkBoxEvent(event){
     sumInput.value = sum.toLocaleString('ko-kr');
 }
 function checkboxAllCheckedEvent(event){
+    const check = event.target.checked;
+    const divName = event.target.parentElement.parentElement.parentElement.parentElement.className;
+    const tableCalcul = event.target.parentElement.parentElement.parentElement.parentElement.childNodes[1];
+    const sumInput = event.target.parentElement.parentElement.parentElement.childNodes[2];
+    let calculArray = saveCalcul(divName,check,0,5);
+    if(calculArray!=null && calculArray.length !=0){
+        tableCalcul.replaceChildren();
+        for(i=0;i<calculArray.length;i++){
+            let array = calculArray[i];
+            makeTrTd(i,array[0],array[1],array[2],tableCalcul);
+        }
+    }
+    if(calculArray != null){
+        sumInput.value = calculArray[0][3].toLocaleString('ko-kr');
+    }
     
 }
 /*
@@ -248,6 +337,18 @@ function newInputCalcul(event){
     textInput.value = null;
     numInput.value = null;
 }
+
+function newSumInputTable(event){
+    const divName = event.target.parentElement.parentElement.className;
+    const tableCalcul = event.target.parentElement.previousSibling.previousSibling;
+    const option = event.target.nextSibling.value;
+    const numInput = event.target.parentElement.previousSibling.childNodes[2];
+
+    let indexAndSave = saveCalcul(divName,option, numInput.value, 6);
+
+    makeTrTd(indexAndSave[3],indexAndSave[0],indexAndSave[1],indexAndSave[2],tableCalcul);
+}
+
 function seperateCalculUi(textInput, numInput,edit){
     let textCheck = devideTextAndNumAndCalcul(textInput);
     let valueCheck = devideTextAndNumAndCalcul(numInput);
@@ -314,20 +415,22 @@ function seperateCalculUi(textInput, numInput,edit){
 }
 
 function devideTextAndNumAndCalcul(text){
+    //let result  = text.split(/[\n]/g);
     let result  = text.split(/[^0-9\/\*\**\%\^\+\-\(\)\.]/g);
     let ss = "";
     result = ss.concat(result);
     result = result.split(/[\ ]/g);
     result = ss.concat(result);
     result = result.replace(/[,]/g,"");
+    result = result.replace(/[^0-9]$/,'');
     let sum = new Function(`return ${result}`)();
-
-    let textTitle  = text.split(/[0-9\/\*\**\%\^\+\-\(\)\.\t\n]/g);
+    
+    textTitle  = text.split(/[0-9\/\*\**\%\^\+\-\(\)\.\t\n]/g);
     let s2 = "";
     textTitle = s2.concat(textTitle);
     textTitle = textTitle.replace(/[,]/g,"");
-
     let retrunValue = [textTitle,result,sum];
+    
     return retrunValue;
 }
 
@@ -384,6 +487,12 @@ function editFormSubmit(event){
     saveCalcul(divName,editArray, targetCheck.value,3);
     targetForm.style.display = "none";
     targetText.style.display = "inline-block";
+}
+function copySelect(event){
+    const divName = event.target.parentElement.parentElement.className;
+    const option = event.target.nextSibling.nextSibling.value;
+    let copyTargetText = saveCalcul(divName,option, 0, 7);
+    window.navigator.clipboard.writeText(copyTargetText);
 }
 
 
