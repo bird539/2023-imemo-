@@ -306,7 +306,7 @@ function plusTapBTN_canChange(num){
             const label = document.createElement("label");
 
             let numTxt = `${thisWinTap_array[i].charAt(thisWinTap_array[i].length-1)}`;
-            let NameSkil = ["메모", "링크", "tap","tap","tap","tap","tap","tap","tap","tap"];
+            let NameSkil = ["메모", "링크", "계산","암기","tap","tap","tap","tap","tap","tap"];
             let bName = `${NameSkil[numTxt]}${numTxt}`;
 
             label.innerHTML = `${bName}`; 
@@ -526,7 +526,7 @@ function make_tap_pluse(num){
     newUl.style.listStyle = "none";
 
     //li안 선택 스킬 버튼
-    let skill_array = ["메모0","링크1",2,3,4,5,6,7,8,9];
+    let skill_array = ["메모0","링크1","계산2","암기3",4,5,6,7,8,9];
     skill_array.forEach(function(n) {
         const newLi = document.createElement("li");
         const newLiBtn = document.createElement("button");
