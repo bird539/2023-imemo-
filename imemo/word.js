@@ -62,6 +62,8 @@ function skill_apply_word(txt){
         let lastPage = 0;
         let limitPage = 1;
         let limitPage2 = [1,1];
+        let sortIndex = 0;
+        let randomArray = [];
         if(getSaveWordPar!= null && getSaveWordPar.length != null && getSaveWordPar.length != 0){
             limitPage = getSaveWordPar.length;
             if(getSaveWordPar[0][0] != null){
@@ -69,6 +71,13 @@ function skill_apply_word(txt){
             }
             if(getSaveWordPar[0][1] != null){
                 lastPage = getSaveWordPar[0][1];
+            }
+            if(getSaveWordPar[0][2] != null){
+                sortIndex = getSaveWordPar[0][2];
+            }
+            if(getSaveWordPar[0][6]!=null){
+                randomArray=getSaveWordPar[0][6];
+                randomArray.unshift(null);
             }
         }
         for(i=1;i<limitPage;i++){
@@ -96,6 +105,8 @@ function skill_apply_word(txt){
             lineOption.innerText =lineSetOtion[i];
             lineSelect.appendChild(lineOption);
         }
+        lineSelect.addEventListener("change",sortSelectEvent);
+        lineSelect.selectedIndex = sortIndex;
         const newRandomText = document.createElement("span");
         newRandomText.innerText = "Create a new sort? (Existing sort disappears)";
         const newRandom = document.createElement("button");
@@ -103,6 +114,7 @@ function skill_apply_word(txt){
         newRandom.addEventListener("click",newRandomEvent);
         const newRandom2 = document.createElement("button");
         newRandom2.innerText = "no";
+        newRandom2.addEventListener("click",newRandomEvent);
         newRandomText.appendChild(newRandom);
         newRandomText.appendChild(newRandom2);
         newRandomText.style.display = "none";
@@ -176,9 +188,19 @@ function skill_apply_word(txt){
                     optionPage.push(0);
                 }
             }
+            if(sortIndex == 0){
+                
+            }else if(sortIndex == 1){
+                optionPage.reverse()
+            }
         }
         for(j=1;j<wordsArray.length;j++){
-            makeTrTdWord(tableWord,j,wordsArray[j][0],wordsArray[j][1],wordsArray[j][2],wordsArray[j][3],wordsArray[j][4],wordsArray[j][5],optionPage[optionPage.length-j]);
+            if(sortIndex == 2){
+                console.log(j,randomArray[j]);
+                makeTrTdWord(tableWord, randomArray[j], wordsArray[randomArray[j]][0], wordsArray[randomArray[j]][1], wordsArray[randomArray[j]][2], wordsArray[randomArray[j]][3], wordsArray[randomArray[j]][4], wordsArray[randomArray[j]][5], optionPage[optionPage.length-j], sortIndex);
+            }else{
+                makeTrTdWord(tableWord,j,wordsArray[j][0],wordsArray[j][1],wordsArray[j][2],wordsArray[j][3],wordsArray[j][4],wordsArray[j][5],optionPage[optionPage.length-j],sortIndex);
+            }
         }
         secondSpan.appendChild(tableWord);
 
@@ -296,7 +318,7 @@ function skill_apply_word(txt){
 }
     //1 : [문제, 답, 마지막으로 입력한 답(입력, 미입력), 틀린 횟수, 맞춘 횟수, 안 푼 횟수]
     //체크박스(삭제시에만 표시),문제(답, 횟수), 답입력칸, OX
-function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,notSolveC,option){
+function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,notSolveC,option,sortIndex){
     const trW = document.createElement("tr");
     for(i=0;i<4;i++){
         if(i==0){
@@ -394,11 +416,16 @@ function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,not
     }else if(option==0){
         trW.style.display = "none";
     }
-    table.prepend(trW);
+    if(sortIndex==0 || sortIndex==2){
+        table.prepend(trW);
+    }else if(sortIndex==1){
+        table.appendChild(trW);
+    }
+    
 }
 //function=======================================================
 /*
-0 : [view 상태 정보(페이지당 문제 수), 마지막 연 페이지, 정렬 정보(새로운 랜덤, 기존 랜덤, 틀린순, 맞춘순, 안푼순), 
+0 : [view 상태 정보(페이지당 문제 수), 마지막 연 페이지, 정렬 정보(새롭게,올드, 기존 랜덤, 틀린순, 맞춘순, 안푼순새로운 랜덤), 
     답보기 상태 정보(맞춘여부,맞춘여부+정답보기,전체 정답보기),맞춘/틀린/안푼 횟수보기,
     테이블 칸 크기 조절, 랜덤 배열 index숫자 array]
 1 : [문제, 답, 마지막으로 입력한 답(입력, 미입력), 틀린 횟수, 맞춘 횟수, 안 푼 횟수]
@@ -436,12 +463,16 @@ function saveWord(divName,option,question,answer,lastAnswer,wrongC,correctC,notS
                 randomArray.push(i);
             }
             shuffle(randomArray);
-            console.log(wordsArray.length);
+            wordsArray[0][6] = randomArray;
+            localStorage.setItem(divName, JSON.stringify(wordsArray));
+        }else if(question == 3){
+            wordsArray[0][2] = answer;
+            localStorage.setItem(divName, JSON.stringify(wordsArray));
         }
     }
 }
 function shuffle(array){
-    array.sort(()=>Math.random() - 5);
+    array.sort(()=>Math.random() - 0.5);
 }
 //---SAVE
 function newQAndA(event){
@@ -529,10 +560,23 @@ function pageShowSelectEvent(event){
     }
 }
 
+function sortSelectEvent(event){
+    const divName = event.target.parentElement.parentElement.parentElement.className;
+    const selectValue = Number(event.target.value);
+    saveWord(divName, 1, 3, selectValue);
+}
+
 function newRandomEvent(event){
     const divName = event.target.parentElement.parentElement.parentElement.parentElement.className;
-    saveWord(divName, 1, 2);
-    console.log(divName);
+    const targetOption = event.target.innerText;
+    const optionSpan = event.target.parentElement;
+    if("yes"==targetOption){
+        saveWord(divName, 1, 2);
+        saveWord(divName, 1, 3, 2);
+        optionSpan.style.display = "none"
+    }else{
+        optionSpan.style.display = "none"
+    }
 }
 
 //window==========================================================
