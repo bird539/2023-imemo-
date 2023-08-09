@@ -59,7 +59,7 @@ function skill_apply_word(txt){
         const viewQuestionSelect = document.createElement("select");
         viewQuestionSelect.addEventListener("change",pageSelectEvent)
         
-        let lastPage = 0;
+        let lastPage = 1;
         let limitPage = 1;
         let limitPage2 = [1,1];
         let sortIndex = 0;
@@ -71,14 +71,17 @@ function skill_apply_word(txt){
             }
             if(getSaveWordPar[0][1] != null){
                 lastPage = getSaveWordPar[0][1];
+                if(limitPage2[0] >= lastPage){
+                    lastPage = 1;
+                }
             }
             if(getSaveWordPar[0][2] != null){
                 sortIndex = getSaveWordPar[0][2];
             }
             if(getSaveWordPar[0][6]!=null){
                 randomArray=getSaveWordPar[0][6];
-                randomArray.unshift(null);
             }
+
         }
         for(i=1;i<limitPage;i++){
             const viewQuestionOption = document.createElement("option");
@@ -171,7 +174,7 @@ function skill_apply_word(txt){
         }
         
         const tableWord = document.createElement("table");
-        
+        /*
         let optionPage = [];
         let optionPage1 = [];
         if(getSaveWordPar != null){
@@ -188,20 +191,18 @@ function skill_apply_word(txt){
                     optionPage.push(0);
                 }
             }
-            if(sortIndex == 0){
-                
-            }else if(sortIndex == 1){
+            if(sortIndex == 1){
                 optionPage.reverse()
             }
         }
         for(j=1;j<wordsArray.length;j++){
             if(sortIndex == 2){
-                console.log(j,randomArray[j]);
                 makeTrTdWord(tableWord, randomArray[j], wordsArray[randomArray[j]][0], wordsArray[randomArray[j]][1], wordsArray[randomArray[j]][2], wordsArray[randomArray[j]][3], wordsArray[randomArray[j]][4], wordsArray[randomArray[j]][5], optionPage[optionPage.length-j], sortIndex);
             }else{
                 makeTrTdWord(tableWord,j,wordsArray[j][0],wordsArray[j][1],wordsArray[j][2],wordsArray[j][3],wordsArray[j][4],wordsArray[j][5],optionPage[optionPage.length-j],sortIndex);
             }
-        }
+        }*/
+        newTableInner(tableWord,wordsArray,randomArray,limitPage2,lastPage,sortIndex);
         secondSpan.appendChild(tableWord);
 
         w_divWord.appendChild(secondSpan);
@@ -236,8 +237,12 @@ function skill_apply_word(txt){
             nowPageBtn.appendChild(pageNum);
         }
         nowPageBtn.addEventListener("change",pageShowSelectEvent);
-        if(lastPage!=null){
+        
+        if(lastPage!=null && limitPage2[1] >= lastPage){
+
             nowPageBtn.selectedIndex = lastPage-1;
+        }else{
+            nowPageBtn.selectedIndex = 0;
         }
         const nextPageBtn = document.createElement("button");
         nextPageBtn.innerText = ">";
@@ -391,7 +396,6 @@ function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,not
             trW.appendChild(tdW);
         }else if(i==3){
             const tdW = document.createElement("td");
-
             const OXspan = document.createElement("span");
             if(lastAnswer != null){
                 if(answer == lastAnswer){
@@ -421,7 +425,6 @@ function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,not
     }else if(sortIndex==1){
         table.appendChild(trW);
     }
-    
 }
 //function=======================================================
 /*
@@ -452,6 +455,7 @@ function saveWord(divName,option,question,answer,lastAnswer,wrongC,correctC,notS
             let an = answer;
             let pageLimit = Math.ceil(Math.ceil(len/an));
             wordsArray[0][0] = [answer,pageLimit];
+            wordsArray[0][1] = 1;////new
             localStorage.setItem(divName, JSON.stringify(wordsArray));
             return pageLimit;
         }else if(question == 1){
@@ -468,6 +472,7 @@ function saveWord(divName,option,question,answer,lastAnswer,wrongC,correctC,notS
         }else if(question == 3){
             wordsArray[0][2] = answer;
             localStorage.setItem(divName, JSON.stringify(wordsArray));
+            return wordsArray;
         }
     }
 }
@@ -559,11 +564,65 @@ function pageShowSelectEvent(event){
         }
     }
 }
-
+//tableWord,wordsArray,randomArray,limitPage2,lastPage,sortIndex
 function sortSelectEvent(event){
     const divName = event.target.parentElement.parentElement.parentElement.className;
     const selectValue = Number(event.target.value);
-    saveWord(divName, 1, 3, selectValue);
+    const tableWord = event.target.parentElement.parentElement.nextSibling.firstChild;
+    tableWord.replaceChildren();
+    //tableWord,wordsArray,randomArray,limitPage2,lastPage,sortIndex
+    let wordArray = saveWord(divName, 1, 3, selectValue);
+    let lastPage = 1;
+    let limitPage2 = [1,1];
+    if(wordArray[0][1]!=null){
+        lastPage = wordArray[0][1];
+    }
+    if(wordArray[0][0] != null){
+        limitPage2=wordArray[0][0];
+    }
+    newTableInner(tableWord,wordArray,wordArray[0][6],limitPage2,lastPage,selectValue);
+}
+
+function newTableInner(tableWord,wordsArray,randomArray,limitPage2,lastPage,sortIndex){
+    let optionPage = [];
+    let optionPage1 = [];
+    if(wordsArray != null){
+/**
+        console.log("la",lastPage);
+        console.log("li[0]",limitPage2);
+        console.log(lastPage*limitPage2[0]);
+        console.log(lastPage*limitPage2[0]-limitPage2[0]);
+ */
+//2(마지막페이)*3(페이속 갯수) = 6 ; 6 > 2(마지막페이지)*3(페이지속개수)-3(페이짓속개수) = 3 ; 6--
+        for(jp=lastPage*limitPage2[0];jp>lastPage*limitPage2[0]-limitPage2[0];jp--){//
+            optionPage1.push(jp);
+        }
+        optionPage1.reverse();
+        np = 0;
+        for(ip=0;ip<wordsArray.length-1;ip++){
+            if(ip==optionPage1[np]-1 && wordsArray[ip]!= null){
+                optionPage.push(1);
+                np++;
+            }else if(wordsArray[ip]!= null){
+                optionPage.push(0);
+            }
+        }
+        if(sortIndex == 1){
+            optionPage.reverse();
+        }
+        console.log(optionPage);
+    }
+    if(sortIndex == 2){
+        for(j=0;j<wordsArray.length-1;j++){
+        //              (table,             index,   question,                     answer,                        lastAnswer                     ,wrongC,                       correctC,                      notSolveC,                    option,                          sortIndex)
+            makeTrTdWord(tableWord, randomArray[j], wordsArray[randomArray[j]][0], wordsArray[randomArray[j]][1], wordsArray[randomArray[j]][2], wordsArray[randomArray[j]][3], wordsArray[randomArray[j]][4], wordsArray[randomArray[j]][5], optionPage[optionPage.length-j], sortIndex);
+        }    
+    }else{
+        for(j=1;j<wordsArray.length;j++){
+            
+            makeTrTdWord(tableWord,j,wordsArray[j][0],wordsArray[j][1],wordsArray[j][2],wordsArray[j][3],wordsArray[j][4],wordsArray[j][5],optionPage[optionPage.length-j],sortIndex);
+        }
+    }
 }
 
 function newRandomEvent(event){
