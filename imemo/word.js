@@ -64,6 +64,8 @@ function skill_apply_word(txt){
         let limitPage2 = [1,1];
         let sortIndex = 0;
         let randomArray = [];
+        let OXandAnswer = 0;
+        let countCheckArray = [null,null,null];
         if(getSaveWordPar!= null && getSaveWordPar.length != null && getSaveWordPar.length != 0){
             limitPage = getSaveWordPar.length;
             if(getSaveWordPar[0][0] != null){
@@ -80,6 +82,12 @@ function skill_apply_word(txt){
             }
             if(getSaveWordPar[0][6]!=null){
                 randomArray=getSaveWordPar[0][6];
+            }
+            if(getSaveWordPar[0][3]!=null){
+                OXandAnswer=getSaveWordPar[0][3];
+            }
+            if(getSaveWordPar[0][4]!=null){
+                countCheckArray=getSaveWordPar[0][4];
             }
 
         }
@@ -136,6 +144,7 @@ function skill_apply_word(txt){
             seeCoreectOption.innerText =seeCorrect[i];
             seeCorrectSelect.appendChild(seeCoreectOption);
         }
+        seeCorrectSelect.selectedIndex = OXandAnswer;
         seeCorrectSelect.addEventListener("change",showOXandOthers);
         firstSpan.appendChild(seeCorrectSelect);
     //2
@@ -153,6 +162,10 @@ function skill_apply_word(txt){
             countCheckBox.type = "checkbox";
             countCheckBox.value = i;
             countCheckBox.innerText = countOptin[i];
+            if(countCheckArray[i] !=  null){
+                countCheckBox.checked = countCheckArray[i];
+            }
+            countCheckBox.addEventListener("click",checkboxCount);
             countSpanInner.appendChild(countText);
             countSpanInner.appendChild(countCheckBox);
         }
@@ -203,7 +216,7 @@ function skill_apply_word(txt){
                 makeTrTdWord(tableWord,j,wordsArray[j][0],wordsArray[j][1],wordsArray[j][2],wordsArray[j][3],wordsArray[j][4],wordsArray[j][5],optionPage[optionPage.length-j],sortIndex);
             }
         }*/
-        newTableInner(tableWord,wordsArray,randomArray,limitPage2,lastPage,sortIndex);
+        newTableInner(tableWord,wordsArray,randomArray,limitPage2,lastPage,sortIndex,countCheckArray);
         secondSpan.appendChild(tableWord);
 
         w_divWord.appendChild(secondSpan);
@@ -253,6 +266,7 @@ function skill_apply_word(txt){
         thirdSpan.appendChild(pageBtnSpan);
 
         const allCountText = document.createElement("span");
+        
         allCountText.innerText = `\nall:${3} / coreect:${2}(${Math.floor(2/3*100)}%)wrong:${1}(${Math.floor(1/3*100)}%) / not solve:${0}(${Math.floor(0/3*100)}%)\n`;
         thirdSpan.appendChild(allCountText);
 
@@ -325,7 +339,7 @@ function skill_apply_word(txt){
     //1 : [문제, 답, 마지막으로 입력한 답(입력, 미입력), 틀린 횟수, 맞춘 횟수, 안 푼 횟수]
     //체크박스(삭제시에만 표시),문제(답, 횟수), 답입력칸, OX
     //(테이블, 인덱스, 질문, 답, 마지막답, wC,cC,nC, 옵션, 정렬인덱스)
-function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,notSolveC,option,sortIndex){
+function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,notSolveC,option,sortIndex,countCheckArray){
     const trW = document.createElement("tr");
     for(i=0;i<4;i++){
         if(i==0){
@@ -363,7 +377,34 @@ function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,not
             answerSpan.style.display = "none";
 
             const countSpan = document.createElement("span");
-            countSpan.innerText = `wrong:${wrongC},correct:${correctC},notSolve:${notSolveC}`;
+            let t = null;
+            let w = `wrong:${wrongC}`;
+            let c = `correct:${correctC}`;
+            let n = `notSolve:${notSolveC}`;
+            if(countCheckArray != null){
+                t=``;
+                if(countCheckArray[0]==true){
+                    t += w;
+                }
+                if(countCheckArray[1]==true){
+                    if(t != null && t != ''){
+                        t += `,`;
+                    }
+                    t += c;
+                }
+                if(countCheckArray[2]==true){
+                    if(t != null&& t != ''){
+                        t += `,`;
+                    }
+                    t += n;
+                }
+            }
+            if(t == null){
+                countSpan.style.display = "none";
+            }else{
+                countSpan.innerText = `${t}`;
+            }
+            //countSpan.innerText = `,correct:${correctC},notSolve:${notSolveC}`;
             //countSpan.style.display = "none";
 
             tdW.appendChild(questionSpan);
@@ -478,6 +519,19 @@ function saveWord(divName,option,question,answer,lastAnswer,wrongC,correctC,notS
             return wordsArray;
         }else if(question == 4){
             wordsArray[0][3] = answer;
+            localStorage.setItem(divName, JSON.stringify(wordsArray));
+        }else if(question == 5){
+            let boxArray = [null,null,null];
+            if(wordsArray[0][4] != null){
+                boxArray = wordsArray[0][4];
+            }
+            console.log(answer,lastAnswer);
+            if(lastAnswer != false){
+                boxArray[answer] = true;
+            }else{
+                boxArray[answer] = false;
+            }
+            wordsArray[0][4] = boxArray;
             localStorage.setItem(divName, JSON.stringify(wordsArray));
         }
     }
@@ -596,10 +650,10 @@ function sortSelectEvent(event){
     if(wordArray[0][0] != null){
         limitPage2=wordArray[0][0];
     }
-    newTableInner(tableWord,wordArray,wordArray[0][6],limitPage2,lastPage,selectValue);
+    newTableInner(tableWord,wordArray,wordArray[0][6],limitPage2,lastPage,selectValue,wordArray[0][4]);
 }
 
-function newTableInner(tableWord,wordsArray,randomArray,limitPage2,lastPage,sortIndex){
+function newTableInner(tableWord,wordsArray,randomArray,limitPage2,lastPage,sortIndex,countCheckArray){
     let optionPage = [];
     let optionPage1 = [];
     if(wordsArray != null){
@@ -630,12 +684,12 @@ function newTableInner(tableWord,wordsArray,randomArray,limitPage2,lastPage,sort
     if(sortIndex == 2){
         for(j=0;j<wordsArray.length-1;j++){
         //              (table,             index,   question,                     answer,                        lastAnswer                     ,wrongC,                       correctC,                      notSolveC,                    option,                          sortIndex)
-            makeTrTdWord(tableWord, randomArray[j], wordsArray[randomArray[j]][0], wordsArray[randomArray[j]][1], wordsArray[randomArray[j]][2], wordsArray[randomArray[j]][3], wordsArray[randomArray[j]][4], wordsArray[randomArray[j]][5], optionPage[optionPage.length-j], sortIndex);
+            makeTrTdWord(tableWord, randomArray[j], wordsArray[randomArray[j]][0], wordsArray[randomArray[j]][1], wordsArray[randomArray[j]][2], wordsArray[randomArray[j]][3], wordsArray[randomArray[j]][4], wordsArray[randomArray[j]][5], optionPage[optionPage.length-j], sortIndex,countCheckArray);
         }    
     }else{
         for(j=1;j<wordsArray.length;j++){
             
-            makeTrTdWord(tableWord,j,wordsArray[j][0],wordsArray[j][1],wordsArray[j][2],wordsArray[j][3],wordsArray[j][4],wordsArray[j][5],optionPage[optionPage.length-j],sortIndex);
+            makeTrTdWord(tableWord,j,wordsArray[j][0],wordsArray[j][1],wordsArray[j][2],wordsArray[j][3],wordsArray[j][4],wordsArray[j][5],optionPage[optionPage.length-j],sortIndex,countCheckArray);
         }
     }
 }
@@ -647,14 +701,28 @@ function newRandomEvent(event){
     if("yes"==targetOption){
         saveWord(divName, 1, 2);
         saveWord(divName, 1, 3, 2);
-        optionSpan.style.display = "none"
+        optionSpan.style.display = "none";
     }else{
-        optionSpan.style.display = "none"
+        optionSpan.style.display = "none";
     }
 }
 
 function showOXandOthers(event){
-    console.log(event.target.value);
+    const selectOption = event.target.value;
+    let selectOption1 = Number(selectOption);
+    const divName = event.target.parentElement.parentElement.className;
+    saveWord(divName, 1, 4, selectOption1);
+}
+
+function checkboxCount(event){
+    const checkboxValue = event.target.value;
+    const checkboxChecked = event.target.checked; 
+    const divName = event.target.parentElement.parentElement.parentElement.parentElement.className;
+    //console.log(divName);
+    saveWord(divName, 1, 5, checkboxValue,checkboxChecked);
+    const view = document.querySelector(`.${divName}`).firstChild.childNodes[2].childNodes[1];
+    console.log(view);
+    view.dispatchEvent(new Event('change'));//select의 chage이벤트 강제 실행
 }
 
 //window==========================================================
