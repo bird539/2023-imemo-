@@ -71,7 +71,7 @@ function skill_apply_word(txt){
             }
             if(getSaveWordPar[0][1] != null){
                 lastPage = getSaveWordPar[0][1];
-                if(limitPage2[0] >= lastPage){
+                if(limitPage2[1] < lastPage){
                     lastPage = 1;
                 }
             }
@@ -136,6 +136,7 @@ function skill_apply_word(txt){
             seeCoreectOption.innerText =seeCorrect[i];
             seeCorrectSelect.appendChild(seeCoreectOption);
         }
+        seeCorrectSelect.addEventListener("change",showOXandOthers);
         firstSpan.appendChild(seeCorrectSelect);
     //2
         //틀린횟수, 맞춘 횟수, 안 푼 횟수 표시하기(체크박스)
@@ -323,6 +324,7 @@ function skill_apply_word(txt){
 }
     //1 : [문제, 답, 마지막으로 입력한 답(입력, 미입력), 틀린 횟수, 맞춘 횟수, 안 푼 횟수]
     //체크박스(삭제시에만 표시),문제(답, 횟수), 답입력칸, OX
+    //(테이블, 인덱스, 질문, 답, 마지막답, wC,cC,nC, 옵션, 정렬인덱스)
 function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,notSolveC,option,sortIndex){
     const trW = document.createElement("tr");
     for(i=0;i<4;i++){
@@ -416,7 +418,7 @@ function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,not
         }
     }
     if(option==1){
-        trW.style.display = "inline-block";
+        trW.style.display = "block";
     }else if(option==0){
         trW.style.display = "none";
     }
@@ -458,9 +460,10 @@ function saveWord(divName,option,question,answer,lastAnswer,wrongC,correctC,notS
             wordsArray[0][1] = 1;////new
             localStorage.setItem(divName, JSON.stringify(wordsArray));
             return pageLimit;
-        }else if(question == 1){
+        }else if(question == 1){    
             wordsArray[0][1] = answer;
             localStorage.setItem(divName, JSON.stringify(wordsArray));
+            return wordsArray[0][0][1];
         }else if(question == 2){
             let randomArray = [];
             for(i=1;i<wordsArray.length;i++){
@@ -473,6 +476,9 @@ function saveWord(divName,option,question,answer,lastAnswer,wrongC,correctC,notS
             wordsArray[0][2] = answer;
             localStorage.setItem(divName, JSON.stringify(wordsArray));
             return wordsArray;
+        }else if(question == 4){
+            wordsArray[0][3] = answer;
+            localStorage.setItem(divName, JSON.stringify(wordsArray));
         }
     }
 }
@@ -487,9 +493,15 @@ function newQAndA(event){
     const question = document.querySelector(`.${divName}`).firstChild.firstChild.childNodes[0];
     const answer = document.querySelector(`.${divName}`).firstChild.firstChild.childNodes[1];
     let index = saveWord(divName,0,question.value,answer.value);
-    makeTrTdWord(table,index,question.value,answer.value,null,null,null,null);
+    //(테이블, 인덱스, 질문, 답, 마지막답, wC,cC,nC, 옵션(보일지 여부), 정렬인덱스)
+    const sortIndex = event.target.nextSibling.nextSibling.childNodes[1].value;
+    let sortIndex2 = Number(sortIndex);
+    makeTrTdWord(table,index,question.value,answer.value,null,null,null,null, 0, sortIndex2);
     question.value = null;
     answer.value=null;
+    const view = document.querySelector(`.${divName}`).firstChild.childNodes[1].childNodes[1];
+    view.dispatchEvent(new Event('change'));//select의 chage이벤트 강제 실행
+    
 }
 
 function nextTargetDisplayShow(event){
@@ -538,6 +550,8 @@ function pageSelectEvent(event){
         option.innerText = `page${j}`
         pageNumSelect.appendChild(option);
     }
+    const pageNumberShowSelect = event.target.parentElement.parentElement.parentElement.childNodes[2].firstChild;
+    pageNumberShowSelect.innerText = `${pageLimit}/1`;
 }
 function pageShowSelectEvent(event){
     const divName = event.target.parentElement.parentElement.parentElement.className;
@@ -545,7 +559,7 @@ function pageShowSelectEvent(event){
     const pageNum = Number(event.target.value);
     const count0 = event.target.parentElement.parentElement.previousSibling.previousSibling.childNodes[1].childNodes[1].value;
     const count = Number(count0);
-    saveWord(divName, 1, 1, pageNum);
+    const allPageCount = saveWord(divName, 1, 1, pageNum);
     let k = [];
     for(j=pageNum*count;j>pageNum*count-count;j--){
         k.push(j);
@@ -563,6 +577,8 @@ function pageShowSelectEvent(event){
             nn.push(0);
         }
     }
+    const pageNumberShowSelect = event.target.parentElement.parentElement.firstChild;
+    pageNumberShowSelect.innerText = `${allPageCount}/${pageNum}`;
 }
 //tableWord,wordsArray,randomArray,limitPage2,lastPage,sortIndex
 function sortSelectEvent(event){
@@ -610,7 +626,6 @@ function newTableInner(tableWord,wordsArray,randomArray,limitPage2,lastPage,sort
         if(sortIndex == 1){
             optionPage.reverse();
         }
-        console.log(optionPage);
     }
     if(sortIndex == 2){
         for(j=0;j<wordsArray.length-1;j++){
@@ -636,6 +651,10 @@ function newRandomEvent(event){
     }else{
         optionSpan.style.display = "none"
     }
+}
+
+function showOXandOthers(event){
+    console.log(event.target.value);
 }
 
 //window==========================================================
