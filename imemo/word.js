@@ -404,8 +404,6 @@ function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,not
             }else{
                 countSpan.innerText = `${t}`;
             }
-            //countSpan.innerText = `,correct:${correctC},notSolve:${notSolveC}`;
-            //countSpan.style.display = "none";
 
             tdW.appendChild(questionSpan);
             tdW.appendChild(answerSpan);
@@ -428,6 +426,7 @@ function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,not
             }else{
                 answerSpan.style.display = "none";
             }
+            answerForm.addEventListener("submit",AnswerInputEvent);
             answerForm.appendChild(answerInput);
 
             tdW.appendChild(answerForm);
@@ -721,10 +720,41 @@ function checkboxCount(event){
     //console.log(divName);
     saveWord(divName, 1, 5, checkboxValue,checkboxChecked);
     const view = document.querySelector(`.${divName}`).firstChild.childNodes[2].childNodes[1];
-    console.log(view);
     view.dispatchEvent(new Event('change'));//select의 chage이벤트 강제 실행
 }
 
+function AnswerInputEvent(event){
+    event.preventDefault();
+    const divName = event.target.parentElement.parentElement.parentElement.parentElement.parentElement.className;
+    const input = event.target.childNodes[0];
+    input.style.display = "none";
+    const lastAnswer = event.target.nextSibling;
+    lastAnswer.innerText = input.value;
+    lastAnswer.style.display = "block";
+
+    const realAnswer = event.target.parentElement.previousSibling.childNodes[2];
+    realAnswer.style.display = "block";
+    const OXspan = event.target.parentElement.nextSibling.firstChild;
+    let textOutput = textEquel(realAnswer.innerText,input.value+'\n');
+    if(textOutput == true){
+        OXspan.innerText = "O";
+    }else if(textOutput == false){
+        OXspan.innerText = "X";
+    }else if(textOutput == null){
+        OXspan.innerText = "?";
+    }
+}
+function textEquel(realText, inputText){
+    if(inputText != null && inputText.trim().length !== 0){
+        if(realText == inputText){
+            return true;
+        }else{
+            return false;
+        }
+    }else{
+        return null;
+    }
+}
 //window==========================================================
 let divWord = [];
 const in_stor_tap_array_word = localStorage.getItem("tap_array");
