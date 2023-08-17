@@ -216,7 +216,7 @@ function skill_apply_word(txt){
                 makeTrTdWord(tableWord,j,wordsArray[j][0],wordsArray[j][1],wordsArray[j][2],wordsArray[j][3],wordsArray[j][4],wordsArray[j][5],optionPage[optionPage.length-j],sortIndex);
             }
         }*/
-        newTableInner(tableWord,wordsArray,randomArray,limitPage2,lastPage,sortIndex,countCheckArray);
+        newTableInner(tableWord,wordsArray,randomArray,limitPage2,lastPage,sortIndex,countCheckArray,OXandAnswer);
         secondSpan.appendChild(tableWord);
 
         w_divWord.appendChild(secondSpan);
@@ -339,7 +339,7 @@ function skill_apply_word(txt){
     //1 : [문제, 답, 마지막으로 입력한 답(입력, 미입력), 틀린 횟수, 맞춘 횟수, 안 푼 횟수]
     //체크박스(삭제시에만 표시),문제(답, 횟수), 답입력칸, OX
     //(테이블, 인덱스, 질문, 답, 마지막답, wC,cC,nC, 옵션, 정렬인덱스)
-function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,notSolveC,option,sortIndex,countCheckArray){
+function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,notSolveC,option,sortIndex,countCheckArray,OXandAnswer){
     const trW = document.createElement("tr");
     for(i=0;i<4;i++){
         if(i==0){
@@ -366,15 +366,22 @@ function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,not
             questionInput.value = question;
             const answerInput = document.createElement("input");
             answerInput.value = answer;
+            const submitBtn = document.createElement("button");
+            submitBtn.type = "submit";
+            submitBtn.style.display = "none";
             QnAFrom.appendChild(questionInput);
             QnAFrom.style.display = "none";
             QnAFrom.appendChild(answerInput);
-            QnAFrom.style.display
+            QnAFrom.appendChild(submitBtn);
+            QnAFrom.addEventListener("submit",editQandASumitEvent);
             tdW.appendChild(QnAFrom);
 
             const answerSpan = document.createElement("span");
-            answerSpan.innerText = `${answer}\n`;
+            answerSpan.innerText = `${answer}`;
             answerSpan.style.display = "none";
+            if(OXandAnswer == 2){
+                answerSpan.style.display = "block";
+            }
 
             const countSpan = document.createElement("span");
             let t = null;
@@ -412,6 +419,7 @@ function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,not
             tdW.style.borderBottom = "1px solid #ffffff";
             tdW.style.padding = "5px";
             tdW.style.width = "150px";
+            trW.addEventListener("dblclick",editEvent);
             trW.appendChild(tdW);
         }else if(i==2){
             const tdW = document.createElement("td");
@@ -420,12 +428,15 @@ function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,not
             const answerInput = document.createElement("input");
             const answerSpan = document.createElement("span");
             if(lastAnswer!=null){
-                answerInput.value = lastAnswer;
-                answerSpan.innerText = `${lastAnswer}`;
-                answerInput.style.display = "none";
+                answerInput.value = lastAnswer[0];
+                answerSpan.innerText = `${lastAnswer[0]}`;
+                answerForm.style.display = "none";
             }else{
                 answerSpan.style.display = "none";
+                answerForm.style.display = "block";
             }
+
+            //answerForm.style.display = "none";
             answerForm.addEventListener("submit",AnswerInputEvent);
             answerForm.appendChild(answerInput);
 
@@ -435,15 +446,18 @@ function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,not
             tdW.style.borderBottom = "1px solid #ffffff";
             tdW.style.padding = "5px";
             tdW.style.width = "150px";
+            trW.addEventListener("dblclick",editEvent);
             trW.appendChild(tdW);
         }else if(i==3){
             const tdW = document.createElement("td");
             const OXspan = document.createElement("span");
             if(lastAnswer != null){
-                if(answer == lastAnswer){
+                if(lastAnswer[1] == true){
                     OXspan.innerText = "O";
-                }else if(answer != lastAnswer){
+                }else if(lastAnswer[1] == false){
                     OXspan.innerText = "X";
+                }else if(lastAnswer[1] == null){
+                    OXspan.innerText = "?";
                 }
             }else{
                 OXspan.innerText = "";
@@ -454,6 +468,9 @@ function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,not
             tdW.style.borderBottom = "1px solid #ffffff";
             tdW.style.padding = "5px";
             tdW.style.width = "20px";
+            if(OXandAnswer == 3){
+                tdW.style.display = "none";
+            }
             trW.appendChild(tdW);
         }
     }
@@ -473,7 +490,7 @@ function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,not
 0 : [view 상태 정보(페이지당 문제 수), 마지막 연 페이지, 정렬 정보(새롭게,올드, 기존 랜덤, 틀린순, 맞춘순, 안푼순새로운 랜덤), 
     답보기 상태 정보(맞춘여부,맞춘여부+정답보기,전체 정답보기),맞춘/틀린/안푼 횟수보기,
     테이블 칸 크기 조절, 랜덤 배열 index숫자 array]
-1 : [문제, 답, 마지막으로 입력한 답(입력, 미입력), 틀린 횟수, 맞춘 횟수, 안 푼 횟수]
+1 : [문제, 답, 마지막으로 입력한 답(입력, (미입력,정답여부)), 틀린 횟수, 맞춘 횟수, 안 푼 횟수]
  */
 //SAVE
 function saveWord(divName,option,question,answer,lastAnswer,wrongC,correctC,notSolveC){
@@ -524,7 +541,6 @@ function saveWord(divName,option,question,answer,lastAnswer,wrongC,correctC,notS
             if(wordsArray[0][4] != null){
                 boxArray = wordsArray[0][4];
             }
-            console.log(answer,lastAnswer);
             if(lastAnswer != false){
                 boxArray[answer] = true;
             }else{
@@ -533,6 +549,16 @@ function saveWord(divName,option,question,answer,lastAnswer,wrongC,correctC,notS
             wordsArray[0][4] = boxArray;
             localStorage.setItem(divName, JSON.stringify(wordsArray));
         }
+    }else if(option == 2){
+        wordsArray[question][2] = [answer,lastAnswer];//입력답, 정답여부
+        localStorage.setItem(divName, JSON.stringify(wordsArray));
+    }else if(option == 3){
+        //console.log(question,answer,lastAnswer)
+        console.log(wordsArray[lastAnswer],lastAnswer);
+        wordsArray[lastAnswer][0] = question;
+        wordsArray[lastAnswer][1] = answer;
+        wordsArray[lastAnswer][2][1] = wrongC;
+        localStorage.setItem(divName, JSON.stringify(wordsArray));
     }
 }
 function shuffle(array){
@@ -652,18 +678,11 @@ function sortSelectEvent(event){
     newTableInner(tableWord,wordArray,wordArray[0][6],limitPage2,lastPage,selectValue,wordArray[0][4]);
 }
 
-function newTableInner(tableWord,wordsArray,randomArray,limitPage2,lastPage,sortIndex,countCheckArray){
+function newTableInner(tableWord,wordsArray,randomArray,limitPage2,lastPage,sortIndex,countCheckArray,OXandAnswer){
     let optionPage = [];
     let optionPage1 = [];
     if(wordsArray != null){
-/**
-        console.log("la",lastPage);
-        console.log("li[0]",limitPage2);
-        console.log(lastPage*limitPage2[0]);
-        console.log(lastPage*limitPage2[0]-limitPage2[0]);
- */
-//2(마지막페이)*3(페이속 갯수) = 6 ; 6 > 2(마지막페이지)*3(페이지속개수)-3(페이짓속개수) = 3 ; 6--
-        for(jp=lastPage*limitPage2[0];jp>lastPage*limitPage2[0]-limitPage2[0];jp--){//
+        for(jp=lastPage*limitPage2[0];jp>lastPage*limitPage2[0]-limitPage2[0];jp--){
             optionPage1.push(jp);
         }
         optionPage1.reverse();
@@ -683,12 +702,12 @@ function newTableInner(tableWord,wordsArray,randomArray,limitPage2,lastPage,sort
     if(sortIndex == 2){
         for(j=0;j<wordsArray.length-1;j++){
         //              (table,             index,   question,                     answer,                        lastAnswer                     ,wrongC,                       correctC,                      notSolveC,                    option,                          sortIndex)
-            makeTrTdWord(tableWord, randomArray[j], wordsArray[randomArray[j]][0], wordsArray[randomArray[j]][1], wordsArray[randomArray[j]][2], wordsArray[randomArray[j]][3], wordsArray[randomArray[j]][4], wordsArray[randomArray[j]][5], optionPage[optionPage.length-j], sortIndex,countCheckArray);
+            makeTrTdWord(tableWord, randomArray[j], wordsArray[randomArray[j]][0], wordsArray[randomArray[j]][1], wordsArray[randomArray[j]][2], wordsArray[randomArray[j]][3], wordsArray[randomArray[j]][4], wordsArray[randomArray[j]][5], optionPage[optionPage.length-j], sortIndex,countCheckArray,OXandAnswer);
         }    
     }else{
         for(j=1;j<wordsArray.length;j++){
             
-            makeTrTdWord(tableWord,j,wordsArray[j][0],wordsArray[j][1],wordsArray[j][2],wordsArray[j][3],wordsArray[j][4],wordsArray[j][5],optionPage[optionPage.length-j],sortIndex,countCheckArray);
+            makeTrTdWord(tableWord,j,wordsArray[j][0],wordsArray[j][1],wordsArray[j][2],wordsArray[j][3],wordsArray[j][4],wordsArray[j][5],optionPage[optionPage.length-j],sortIndex,countCheckArray,OXandAnswer);
         }
     }
 }
@@ -726,22 +745,56 @@ function checkboxCount(event){
 function AnswerInputEvent(event){
     event.preventDefault();
     const divName = event.target.parentElement.parentElement.parentElement.parentElement.parentElement.className;
+    const form = event.target;
     const input = event.target.childNodes[0];
-    input.style.display = "none";
+    form.style.display = "none";
     const lastAnswer = event.target.nextSibling;
     lastAnswer.innerText = input.value;
+
+    const OXandAnswer = event.target.parentElement.parentElement.parentElement.parentElement.previousSibling.childNodes[3].value;
     lastAnswer.style.display = "block";
 
+    
+
     const realAnswer = event.target.parentElement.previousSibling.childNodes[2];
-    realAnswer.style.display = "block";
+    if(OXandAnswer=="1"){
+        realAnswer.style.display = "block";        
+    }
     const OXspan = event.target.parentElement.nextSibling.firstChild;
-    let textOutput = textEquel(realAnswer.innerText,input.value+'\n');
+    let textOutput = textEquel(realAnswer.innerText,input.value);
     if(textOutput == true){
         OXspan.innerText = "O";
     }else if(textOutput == false){
         OXspan.innerText = "X";
     }else if(textOutput == null){
         OXspan.innerText = "?";
+    }
+    const checkboxIndex = event.target.parentElement.previousSibling.previousSibling.firstChild.value;
+    saveWord(divName,2,Number(checkboxIndex),input.value,textOutput);
+}
+function editEvent(event){
+    //"dblclick"
+    const target = event.target;
+    if(target.tagName == "SPAN"){
+        const form = event.target.previousSibling;
+        if(form.style.display != "block"){
+            form.style.display = "block";
+            target.style.display = "none";
+        }else{
+            form.style.display = "none";
+            target.style.display = "block";
+        }
+
+    }else if(target.tagName == "TD"){
+        const form = event.target.childNodes[0];
+        const span = event.target.childNodes[1];
+        if(form.style.display != "block"){
+            form.style.display = "block";
+            span.style.display = "none";
+        }else{
+            form.style.display = "none";
+            span.style.display = "block";
+        }
     }
 }
 function textEquel(realText, inputText){
@@ -755,6 +808,35 @@ function textEquel(realText, inputText){
         return null;
     }
 }
+
+function editQandASumitEvent(event){
+    event.preventDefault();
+    const questionInput = event.target.childNodes[0].value;
+    const answerInput = event.target.childNodes[1].value;
+    const checkboxIndex = event.target.parentElement.previousSibling.childNodes[0].value;
+    const divName = event.target.parentElement.parentElement.parentElement.parentElement.parentElement.className;
+    const lastAnswer = event.target.parentElement.nextSibling.childNodes[1].innerText;
+    const OXspan = event.target.parentElement.nextSibling.nextSibling.childNodes[0];
+    let OXandAnswer = textEquel(answerInput, lastAnswer);
+
+    if(OXandAnswer == true){
+        OXspan.innerText = "O";
+    }else if(OXandAnswer == false){
+        OXspan.innerText = "X";
+    }else if(OXandAnswer == null){
+        OXspan.innerText = "?";
+    }
+    const form = event.target;
+    const questionSpan = event.target.nextSibling;
+    const answerSpan = event.target.nextSibling.nextSibling;
+    form.style.display = "none";
+    questionSpan.innerText = questionInput;
+    answerSpan.innerText = answerInput;
+    questionSpan.style.display = "block";
+    saveWord(divName,3,questionInput,answerInput,Number(checkboxIndex),OXandAnswer);
+}
+
+
 //window==========================================================
 let divWord = [];
 const in_stor_tap_array_word = localStorage.getItem("tap_array");
