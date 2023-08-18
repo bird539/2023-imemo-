@@ -285,6 +285,14 @@ function skill_apply_word(txt) {
             copyDelOption.innerText = `${copyDellArray[j]}`;
             checkboxCopyDelBtn.appendChild(copyDelOption);
         }
+        const allCheckText = document.createElement("span");
+        allCheckText.innerText = "all checked";
+        const allCheckInput = document.createElement("input");
+        allCheckInput.type = "checkbox";
+        allCheckInput.addEventListener("click",copyAndDellBtnEvent);
+        checkboxCopyDelBtn.appendChild(allCheckText);
+        checkboxCopyDelBtn.appendChild(allCheckInput);
+
         checkboxCopyDelBtn.style.display = "none";
         checkboxOption.appendChild(checkboxCopyDelBtn);
         thirdSpan.appendChild(checkboxOption);
@@ -568,16 +576,35 @@ function saveWord(divName, option, question, answer, lastAnswer, wrongC, correct
         return wordsArray;
     }else if(option == 5 ){
         let newWordArray = [];
+        let checkArray = [];
         for(i=0; i<wordsArray.length; i++){
+            let target = null;
             for(j=0;j<question.length;j++){
-                if(i!=question[j]){
-                    newWordArray.push(wordsArray[i]);
-                }else{
-                    console.log(question[j]);
+                if(i==question[j]){
+                    target = i;
                 }
             }
+            if(i != target){
+                newWordArray.push(wordsArray[i]);
+            }else{
+                checkArray.push(wordsArray[i]);
+            }
         }
-        console.log(newWordArray);
+        if(answer == 0){
+            let text = "";
+            for(i=0;i<checkArray.length;i++){
+                console.log(checkArray[i][0]);
+                text +=`${checkArray[i][0]}\t${checkArray[i][1]}`;
+                if(checkArray[i][2]!=null){
+                    text+= `\t${checkArray[i][2][0]}\n`
+                }else{
+                    text+=`\n`
+                }
+            }
+            return text;
+        }else if(answer == 1){
+            localStorage.setItem(divName, JSON.stringify(newWordArray));
+        }
     }
 }
 function shuffle(array) {
@@ -916,8 +943,13 @@ function copyAndDellBtnEvent(event){
     const divName = event.target.parentElement.parentElement.parentElement.parentElement.className;
     const tableWord = event.target.parentElement.parentElement.parentElement.previousSibling.firstChild;
     const text = event.target.innerText;
-    
+    const view = event.target.parentElement.parentElement.parentElement.previousSibling.previousSibling.childNodes[2].childNodes[1];
     let checkedArray = [];
+    if(event.target.type == "checkbox"){
+        for(j=0;j<tableWord.childNodes.length;j++){
+            tableWord.childNodes[j].childNodes[0].childNodes[0].checked = event.target.checked;
+        }
+    }
     for(i=0;i<tableWord.childNodes.length;i++){
         let checkeds = tableWord.childNodes[i].childNodes[0].childNodes[0].checked;
         if(checkeds == true){
@@ -925,9 +957,12 @@ function copyAndDellBtnEvent(event){
             checkedArray.push(Number(index));
         }
     }
-
     if(text == "copy"){
-        saveWord(divName,5,checkedArray);
+        let copyText = saveWord(divName,5,checkedArray,0);
+        window.navigator.clipboard.writeText(copyText);
+    }else if(text == "del"){
+        saveWord(divName,5,checkedArray,1);
+        view.dispatchEvent(new Event('change'));
     }
 }
 
