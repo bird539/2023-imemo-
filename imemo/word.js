@@ -26,17 +26,17 @@
 
 let W_showTap_array = [];
 const W_tapShow_array = localStorage.getItem("tapShow_array");
-if(W_tapShow_array != null){
+if (W_tapShow_array != null) {
     const W_parsed_tapShow_array = JSON.parse(M_tapShow_array);
     W_showTap_array = W_parsed_tapShow_array;
 }
 
 
-function skill_apply_word(txt){
+function skill_apply_word(txt) {
     const div_wordName = `s${txt}`;
-    if(div_wordName.charAt(div_wordName.length-1) == `3`){
+    if (div_wordName.charAt(div_wordName.length - 1) == `3`) {
         const w_divWord = document.querySelector(`.${div_wordName}`);
-        
+
         const getSaveWord = localStorage.getItem(div_wordName);
         const getSaveWordPar = JSON.parse(getSaveWord);
 
@@ -47,7 +47,7 @@ function skill_apply_word(txt){
         const QandASubmitBtn = document.createElement("button");
         QandASubmitBtn.type = "submit";
         QandASubmitBtn.innerText = "sub";
-        QandAForm.addEventListener("submit",newQAndA);
+        QandAForm.addEventListener("submit", newQAndA);
         QandAForm.appendChild(questionInput);
         QandAForm.appendChild(answerInput);
         QandAForm.appendChild(QandASubmitBtn);
@@ -57,48 +57,48 @@ function skill_apply_word(txt){
         const viewText = document.createElement("span");
         viewText.innerText = "view";
         const viewQuestionSelect = document.createElement("select");
-        viewQuestionSelect.addEventListener("change",pageSelectEvent)
-        
+        viewQuestionSelect.addEventListener("change", pageSelectEvent)
+
         let lastPage = 1;
         let limitPage = 1;
-        let limitPage2 = [1,1];
+        let limitPage2 = [1, 1];
         let sortIndex = 0;
         let randomArray = [];
         let OXandAnswer = 0;
-        let countCheckArray = [null,null,null];
-        if(getSaveWordPar!= null && getSaveWordPar.length != null && getSaveWordPar.length != 0){
+        let countCheckArray = [null, null, null];
+        if (getSaveWordPar != null && getSaveWordPar.length != null && getSaveWordPar.length != 0) {
             limitPage = getSaveWordPar.length;
-            if(getSaveWordPar[0][0] != null){
+            if (getSaveWordPar[0][0] != null) {
                 limitPage2 = getSaveWordPar[0][0];
             }
-            if(getSaveWordPar[0][1] != null){
+            if (getSaveWordPar[0][1] != null) {
                 lastPage = getSaveWordPar[0][1];
-                if(limitPage2[1] < lastPage){
+                if (limitPage2[1] < lastPage) {
                     lastPage = 1;
                 }
             }
-            if(getSaveWordPar[0][2] != null){
+            if (getSaveWordPar[0][2] != null) {
                 sortIndex = getSaveWordPar[0][2];
             }
-            if(getSaveWordPar[0][6]!=null){
-                randomArray=getSaveWordPar[0][6];
+            if (getSaveWordPar[0][6] != null) {
+                randomArray = getSaveWordPar[0][6];
             }
-            if(getSaveWordPar[0][3]!=null){
-                OXandAnswer=getSaveWordPar[0][3];
+            if (getSaveWordPar[0][3] != null) {
+                OXandAnswer = getSaveWordPar[0][3];
             }
-            if(getSaveWordPar[0][4]!=null){
-                countCheckArray=getSaveWordPar[0][4];
+            if (getSaveWordPar[0][4] != null) {
+                countCheckArray = getSaveWordPar[0][4];
             }
 
         }
-        for(i=1;i<limitPage;i++){
+        for (i = 1; i < limitPage; i++) {
             const viewQuestionOption = document.createElement("option");
             viewQuestionOption.value = i;
             viewQuestionOption.innerText = i;
             viewQuestionSelect.appendChild(viewQuestionOption);
-            tableC = Math.ceil(getSaveWordPar.length-1/1);
+            tableC = Math.ceil(getSaveWordPar.length - 1 / 1);
         }
-        viewQuestionSelect.selectedIndex = limitPage2[0]-1;
+        viewQuestionSelect.selectedIndex = limitPage2[0] - 1;
 
         viewSpan.appendChild(viewText);
         viewSpan.appendChild(viewQuestionSelect);
@@ -108,24 +108,24 @@ function skill_apply_word(txt){
         const linetext = document.createElement("span");
         linetext.innerText = "line set";
         const lineSelect = document.createElement("select");
-        lineSelect.addEventListener("change",lineSetEvent);
-        let lineSetOtion = ["new","old","existing random","wrong","correct", "not solve","new random"];
-        for(i=0;i<lineSetOtion.length;i++){
+        lineSelect.addEventListener("change", lineSetEvent);
+        let lineSetOtion = ["new", "old", "existing random", "wrong", "correct", "not solve", "new random"];
+        for (i = 0; i < lineSetOtion.length; i++) {
             const lineOption = document.createElement("option");
             lineOption.value = i;
-            lineOption.innerText =lineSetOtion[i];
+            lineOption.innerText = lineSetOtion[i];
             lineSelect.appendChild(lineOption);
         }
-        lineSelect.addEventListener("change",sortSelectEvent);
+        lineSelect.addEventListener("change", sortSelectEvent);
         lineSelect.selectedIndex = sortIndex;
         const newRandomText = document.createElement("span");
         newRandomText.innerText = "Create a new sort? (Existing sort disappears)";
         const newRandom = document.createElement("button");
         newRandom.innerText = "yes";
-        newRandom.addEventListener("click",newRandomEvent);
+        newRandom.addEventListener("click", newRandomEvent);
         const newRandom2 = document.createElement("button");
         newRandom2.innerText = "no";
-        newRandom2.addEventListener("click",newRandomEvent);
+        newRandom2.addEventListener("click", newRandomEvent);
         newRandomText.appendChild(newRandom);
         newRandomText.appendChild(newRandom2);
         newRandomText.style.display = "none";
@@ -137,35 +137,35 @@ function skill_apply_word(txt){
 
         const seeCorrectSelect = document.createElement("select");
         //(맞춘여부,맞춘여부+정답보기,전체 정답보기)
-        let seeCorrect = ["OX","OX and answer", "OX&see all answer", "all hide"];
-        for(i=0;i<seeCorrect.length;i++){
+        let seeCorrect = ["OX", "OX and answer", "OX&see all answer", "all hide"];
+        for (i = 0; i < seeCorrect.length; i++) {
             const seeCoreectOption = document.createElement("option");
             seeCoreectOption.value = i;
-            seeCoreectOption.innerText =seeCorrect[i];
+            seeCoreectOption.innerText = seeCorrect[i];
             seeCorrectSelect.appendChild(seeCoreectOption);
         }
         seeCorrectSelect.selectedIndex = OXandAnswer;
-        seeCorrectSelect.addEventListener("change",showOXandOthers);
+        seeCorrectSelect.addEventListener("change", showOXandOthers);
         firstSpan.appendChild(seeCorrectSelect);
-    //2
+        //2
         //틀린횟수, 맞춘 횟수, 안 푼 횟수 표시하기(체크박스)
         const countSpan = document.createElement("span");
         const countBtn = document.createElement("button");
         countBtn.innerText = "count show option";
-        countBtn.addEventListener("click",nextTargetDisplayShow);
+        countBtn.addEventListener("click", nextTargetDisplayShow);
         const countSpanInner = document.createElement("span");
-        let countOptin = ["wrong count","right count", "not solve count"];
-        for(i=0;i<countOptin.length;i++){
+        let countOptin = ["wrong count", "right count", "not solve count"];
+        for (i = 0; i < countOptin.length; i++) {
             const countText = document.createElement("span");
             countText.innerText = countOptin[i];
             const countCheckBox = document.createElement("input");
             countCheckBox.type = "checkbox";
             countCheckBox.value = i;
             countCheckBox.innerText = countOptin[i];
-            if(countCheckArray[i] !=  null){
+            if (countCheckArray[i] != null) {
                 countCheckBox.checked = countCheckArray[i];
             }
-            countCheckBox.addEventListener("click",checkboxCount);
+            countCheckBox.addEventListener("click", checkboxCount);
             countSpanInner.appendChild(countText);
             countSpanInner.appendChild(countCheckBox);
         }
@@ -178,15 +178,15 @@ function skill_apply_word(txt){
         const secondSpan = document.createElement("span");
         let wordsArray = [
             [],
-            ["[  ]예시문제1", "답", "마지막", 3,2,1],
-            ["[  ]예시문제2", "답", "답", 3,2,1],
-            ["[  ]예시문제3", "답", null, 3,2,1]
+            ["[  ]예시문제1", "답", "마지막", 3, 2, 1],
+            ["[  ]예시문제2", "답", "답", 3, 2, 1],
+            ["[  ]예시문제3", "답", null, 3, 2, 1]
         ]
 
-        if(getSaveWordPar!=null){
+        if (getSaveWordPar != null) {
             wordsArray = getSaveWordPar;
         }
-        
+
         const tableWord = document.createElement("table");
         /*
         let optionPage = [];
@@ -216,26 +216,26 @@ function skill_apply_word(txt){
                 makeTrTdWord(tableWord,j,wordsArray[j][0],wordsArray[j][1],wordsArray[j][2],wordsArray[j][3],wordsArray[j][4],wordsArray[j][5],optionPage[optionPage.length-j],sortIndex);
             }
         }*/
-        newTableInner(tableWord,wordsArray,randomArray,limitPage2,lastPage,sortIndex,countCheckArray,OXandAnswer);
+        newTableInner(tableWord, wordsArray, randomArray, limitPage2, lastPage, sortIndex, countCheckArray, OXandAnswer);
         secondSpan.appendChild(tableWord);
 
         w_divWord.appendChild(secondSpan);
-/*
-맨 아래 표시정보
-    페이지 안 문제수/맞춘 문제수 | < 1page >
-    전체 문제수/맞춘문제수(퍼센트로 표시%)/틀린문제수(%)/안푼문제수(%)
-    | 복사/삭제하기 - 클릭시 체크박스 표시. 문제+답 복사, 해당 문제+답 삭제 가능
-    | 진행사항 제출 후 새로 시작-클릭시 이전까지 입력된 답을 기준으로 맞춘여부/틀린여부/안푼여부 정보를 갱신하고 입력되었던 제출답 없애기
-    | 테이블 칸 크기 조절 - 입력 또는 막대바
- */
+        /*
+        맨 아래 표시정보
+            페이지 안 문제수/맞춘 문제수 | < 1page >
+            전체 문제수/맞춘문제수(퍼센트로 표시%)/틀린문제수(%)/안푼문제수(%)
+            | 복사/삭제하기 - 클릭시 체크박스 표시. 문제+답 복사, 해당 문제+답 삭제 가능
+            | 진행사항 제출 후 새로 시작-클릭시 이전까지 입력된 답을 기준으로 맞춘여부/틀린여부/안푼여부 정보를 갱신하고 입력되었던 제출답 없애기
+            | 테이블 칸 크기 조절 - 입력 또는 막대바
+         */
         const thirdSpan = document.createElement("span");
         const spanCountPageQA = document.createElement("span");
-        
-        if(limitPage2 !=null && lastPage !=null){
+
+        if (limitPage2 != null && lastPage != null) {
             spanCountPageQA.innerText = `${limitPage2[1]}/${lastPage}`;
-        }else if(limitPage2 !=null && lastPage ==null){
+        } else if (limitPage2 != null && lastPage == null) {
             spanCountPageQA.innerText = `${limitPage2[1]}/${1}`;
-        }else{
+        } else {
             spanCountPageQA.innerText = `${1}/${1}`;
         }
         thirdSpan.appendChild(spanCountPageQA);
@@ -243,42 +243,45 @@ function skill_apply_word(txt){
         const pageBtnSpan = document.createElement("span");
         const beforePageBtn = document.createElement("button");
         beforePageBtn.innerText = "<";
+        beforePageBtn.addEventListener("click", pagePastNextBtn);
         const nowPageBtn = document.createElement("select");
-        for(h=1;h<=limitPage2[1];h++){
+        for (h = 1; h <= limitPage2[1]; h++) {
             const pageNum = document.createElement("option");
             pageNum.innerText = `page${h}`;
             pageNum.value = h;
             nowPageBtn.appendChild(pageNum);
         }
-        nowPageBtn.addEventListener("change",pageShowSelectEvent);
-        
-        if(lastPage!=null && limitPage2[1] >= lastPage){
+        nowPageBtn.addEventListener("change", pageShowSelectEvent);
 
-            nowPageBtn.selectedIndex = lastPage-1;
-        }else{
+        if (lastPage != null && limitPage2[1] >= lastPage) {
+
+            nowPageBtn.selectedIndex = lastPage - 1;
+        } else {
             nowPageBtn.selectedIndex = 0;
         }
         const nextPageBtn = document.createElement("button");
         nextPageBtn.innerText = ">";
+        nextPageBtn.addEventListener("click", pagePastNextBtn);
         pageBtnSpan.appendChild(beforePageBtn);
         pageBtnSpan.appendChild(nowPageBtn);
         pageBtnSpan.appendChild(nextPageBtn);
         thirdSpan.appendChild(pageBtnSpan);
 
         const allCountText = document.createElement("span");
-        
-        allCountText.innerText = `\nall:${3} / coreect:${2}(${Math.floor(2/3*100)}%)wrong:${1}(${Math.floor(1/3*100)}%) / not solve:${0}(${Math.floor(0/3*100)}%)\n`;
+
+        allCountText.innerText = `\nall:${3} / coreect:${2}(${Math.floor(2 / 3 * 100)}%)wrong:${1}(${Math.floor(1 / 3 * 100)}%) / not solve:${0}(${Math.floor(0 / 3 * 100)}%)\n`;
         thirdSpan.appendChild(allCountText);
 
         const checkboxOption = document.createElement("span");
         const checkboxCopyAndDelBtn = document.createElement("button");
         checkboxCopyAndDelBtn.innerText = "copy or dell";
-        checkboxCopyAndDelBtn.addEventListener("click",nextTargetDisplayShow);
+        checkboxCopyAndDelBtn.addEventListener("click", nextTargetDisplayShow2);
         checkboxOption.appendChild(checkboxCopyAndDelBtn);
         const checkboxCopyDelBtn = document.createElement("span");
         let copyDellArray = ["copy", "del"];
-        for(j=0;j<copyDellArray.length;j++){
+        for (j = 0; j < copyDellArray.length; j++) {
             const copyDelOption = document.createElement("button");
+            copyDelOption.addEventListener("click",copyAndDellBtnEvent);
             copyDelOption.innerText = `${copyDellArray[j]}`;
             checkboxCopyDelBtn.appendChild(copyDelOption);
         }
@@ -289,7 +292,7 @@ function skill_apply_word(txt){
         const sizeTdSpan = document.createElement("span");
         const sizeTdSpanBtn = document.createElement("button");
         sizeTdSpanBtn.innerText = "size box set";
-        sizeTdSpanBtn.addEventListener("click",nextTargetDisplayShow);
+        sizeTdSpanBtn.addEventListener("click", nextTargetDisplayShow);
         const boxSizeForm = document.createElement("form");
         const questionBoxSizeInput = document.createElement("input");
         questionBoxSizeInput.placeholder = "question box size(px)";
@@ -311,7 +314,7 @@ function skill_apply_word(txt){
         const submitAllSpan = document.createElement("span");
         const submitAll = document.createElement("button");
         submitAll.innerText = "submit all";
-        submitAll.addEventListener("click",nextTargetDisplayShow);
+        submitAll.addEventListener("click", nextTargetDisplayShow);
         const submiSpan = document.createElement("span");
         submiSpan.innerText = "all input text will reset(count only save).ok?";
         const submitYesBtn = document.createElement("button");
@@ -336,13 +339,13 @@ function skill_apply_word(txt){
         }
     }
 }
-    //1 : [문제, 답, 마지막으로 입력한 답(입력, 미입력), 틀린 횟수, 맞춘 횟수, 안 푼 횟수]
-    //체크박스(삭제시에만 표시),문제(답, 횟수), 답입력칸, OX
-    //(테이블, 인덱스, 질문, 답, 마지막답, wC,cC,nC, 옵션, 정렬인덱스)
-function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,notSolveC,option,sortIndex,countCheckArray,OXandAnswer){
+//1 : [문제, 답, 마지막으로 입력한 답(입력, 미입력), 틀린 횟수, 맞춘 횟수, 안 푼 횟수]
+//체크박스(삭제시에만 표시),문제(답, 횟수), 답입력칸, OX
+//(테이블, 인덱스, 질문, 답, 마지막답, wC,cC,nC, 옵션, 정렬인덱스)
+function makeTrTdWord(table, index, question, answer, lastAnswer, wrongC, correctC, notSolveC, option, sortIndex, countCheckArray, OXandAnswer, checkboxShow) {
     const trW = document.createElement("tr");
-    for(i=0;i<4;i++){
-        if(i==0){
+    for (i = 0; i < 4; i++) {
+        if (i == 0) {
             const tdW = document.createElement("td");
 
             const checkbox = document.createElement("input");
@@ -353,14 +356,16 @@ function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,not
             tdW.style.borderBottom = "1px solid #ffffff";
             tdW.style.padding = "5px";
             tdW.style.width = "20px";
-            tdW.style.display = "none";
+            if (checkboxShow != 1) {
+                tdW.style.display = "none";
+            }
             trW.appendChild(tdW);
-        }else if(i==1){
+        } else if (i == 1) {
             const tdW = document.createElement("td");
 
             const questionSpan = document.createElement("span");
             questionSpan.innerText = `${question}\n`;
-            
+
             const QnAFrom = document.createElement("form");
             const questionInput = document.createElement("input");
             questionInput.value = question;
@@ -373,13 +378,13 @@ function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,not
             QnAFrom.style.display = "none";
             QnAFrom.appendChild(answerInput);
             QnAFrom.appendChild(submitBtn);
-            QnAFrom.addEventListener("submit",editQandASumitEvent);
+            QnAFrom.addEventListener("submit", editQandASumitEvent);
             tdW.appendChild(QnAFrom);
 
             const answerSpan = document.createElement("span");
             answerSpan.innerText = `${answer}`;
             answerSpan.style.display = "none";
-            if(OXandAnswer == 2){
+            if (OXandAnswer == 2) {
                 answerSpan.style.display = "block";
             }
 
@@ -388,27 +393,27 @@ function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,not
             let w = `wrong:${wrongC}`;
             let c = `correct:${correctC}`;
             let n = `notSolve:${notSolveC}`;
-            if(countCheckArray != null){
-                t=``;
-                if(countCheckArray[0]==true){
+            if (countCheckArray != null) {
+                t = ``;
+                if (countCheckArray[0] == true) {
                     t += w;
                 }
-                if(countCheckArray[1]==true){
-                    if(t != null && t != ''){
+                if (countCheckArray[1] == true) {
+                    if (t != null && t != '') {
                         t += `,`;
                     }
                     t += c;
                 }
-                if(countCheckArray[2]==true){
-                    if(t != null&& t != ''){
+                if (countCheckArray[2] == true) {
+                    if (t != null && t != '') {
                         t += `,`;
                     }
                     t += n;
                 }
             }
-            if(t == null){
+            if (t == null) {
                 countSpan.style.display = "none";
-            }else{
+            } else {
                 countSpan.innerText = `${t}`;
             }
 
@@ -419,69 +424,69 @@ function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,not
             tdW.style.borderBottom = "1px solid #ffffff";
             tdW.style.padding = "5px";
             tdW.style.width = "150px";
-            trW.addEventListener("dblclick",editEvent);
+            trW.addEventListener("dblclick", editEvent);
             trW.appendChild(tdW);
-        }else if(i==2){
+        } else if (i == 2) {
             const tdW = document.createElement("td");
 
             const answerForm = document.createElement("form");
             const answerInput = document.createElement("input");
             const answerSpan = document.createElement("span");
-            if(lastAnswer!=null){
+            if (lastAnswer != null) {
                 answerInput.value = lastAnswer[0];
                 answerSpan.innerText = `${lastAnswer[0]}`;
                 answerForm.style.display = "none";
-            }else{
+            } else {
                 answerSpan.style.display = "none";
                 answerForm.style.display = "block";
             }
 
             //answerForm.style.display = "none";
-            answerForm.addEventListener("submit",AnswerInputEvent);
+            answerForm.addEventListener("submit", AnswerInputEvent);
             answerForm.appendChild(answerInput);
 
             tdW.appendChild(answerForm);
             tdW.appendChild(answerSpan);
-            
+
             tdW.style.borderBottom = "1px solid #ffffff";
             tdW.style.padding = "5px";
             tdW.style.width = "150px";
-            trW.addEventListener("dblclick",editEvent);
+            trW.addEventListener("dblclick", editEvent);
             trW.appendChild(tdW);
-        }else if(i==3){
+        } else if (i == 3) {
             const tdW = document.createElement("td");
             const OXspan = document.createElement("span");
-            if(lastAnswer != null){
-                if(lastAnswer[1] == true){
+            if (lastAnswer != null) {
+                if (lastAnswer[1] == true) {
                     OXspan.innerText = "O";
-                }else if(lastAnswer[1] == false){
+                } else if (lastAnswer[1] == false) {
                     OXspan.innerText = "X";
-                }else if(lastAnswer[1] == null){
+                } else if (lastAnswer[1] == null) {
                     OXspan.innerText = "?";
                 }
-            }else{
+            } else {
                 OXspan.innerText = "";
             }
 
             tdW.appendChild(OXspan);
-            
+
             tdW.style.borderBottom = "1px solid #ffffff";
             tdW.style.padding = "5px";
             tdW.style.width = "20px";
-            if(OXandAnswer == 3){
+            if (OXandAnswer == 3) {
                 tdW.style.display = "none";
             }
             trW.appendChild(tdW);
         }
     }
-    if(option==1){
+    if (option == 1) {
         trW.style.display = "block";
-    }else if(option==0){
+    } else if (option == 0) {
         trW.style.display = "none";
     }
-    if(sortIndex==0 || sortIndex==2){
+    if (sortIndex == 0 || sortIndex == 2) {
         table.prepend(trW);
-    }else if(sortIndex==1){
+    } else if (sortIndex == 1) {
         table.appendChild(trW);
     }
 }
@@ -493,119 +498,176 @@ function makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,not
 1 : [문제, 답, 마지막으로 입력한 답(입력, (미입력,정답여부)), 틀린 횟수, 맞춘 횟수, 안 푼 횟수]
  */
 //SAVE
-function saveWord(divName,option,question,answer,lastAnswer,wrongC,correctC,notSolveC){
+function saveWord(divName, option, question, answer, lastAnswer, wrongC, correctC, notSolveC) {
     const getSaveWord = localStorage.getItem(divName);
     const getSaveWordlPar = JSON.parse(getSaveWord);
     let wordsArray;
-    if(getSaveWordlPar!=null && getSaveWordlPar.length !=0){
+    if (getSaveWordlPar != null && getSaveWordlPar.length != 0) {
         wordsArray = getSaveWordlPar;
-    }else{
-        wordsArray = [[null,null,null,null,null,null,null]];
+    } else {
+        wordsArray = [[null, null, null, null, null, null, null]];
     }
-    if(option ==0){
-        let pls = [question,answer,null,null,null,null];
+    if (option == 0) {
+        let pls = [question, answer, null, null, null, null];
         wordsArray.push(pls);
         localStorage.setItem(divName, JSON.stringify(wordsArray));
-        return wordsArray.length-1;
+        return wordsArray.length - 1;
 
-    }else if(option == 1){
-        if(question == 0){
-            let len = wordsArray.length-1;
+    } else if (option == 1) {
+        if (question == 0) {
+            let len = wordsArray.length - 1;
             let an = answer;
-            let pageLimit = Math.ceil(Math.ceil(len/an));
-            wordsArray[0][0] = [answer,pageLimit];
+            let pageLimit = Math.ceil(Math.ceil(len / an));
+            wordsArray[0][0] = [answer, pageLimit];
             wordsArray[0][1] = 1;////new
             localStorage.setItem(divName, JSON.stringify(wordsArray));
             return pageLimit;
-        }else if(question == 1){    
+        } else if (question == 1) {
             wordsArray[0][1] = answer;
             localStorage.setItem(divName, JSON.stringify(wordsArray));
             return wordsArray[0][0][1];
-        }else if(question == 2){
+        } else if (question == 2) {
             let randomArray = [];
-            for(i=1;i<wordsArray.length;i++){
+            for (i = 1; i < wordsArray.length; i++) {
                 randomArray.push(i);
             }
             shuffle(randomArray);
             wordsArray[0][6] = randomArray;
             localStorage.setItem(divName, JSON.stringify(wordsArray));
-        }else if(question == 3){
+        } else if (question == 3) {
             wordsArray[0][2] = answer;
             localStorage.setItem(divName, JSON.stringify(wordsArray));
             return wordsArray;
-        }else if(question == 4){
+        } else if (question == 4) {
             wordsArray[0][3] = answer;
             localStorage.setItem(divName, JSON.stringify(wordsArray));
-        }else if(question == 5){
-            let boxArray = [null,null,null];
-            if(wordsArray[0][4] != null){
+        } else if (question == 5) {
+            let boxArray = [null, null, null];
+            if (wordsArray[0][4] != null) {
                 boxArray = wordsArray[0][4];
             }
-            if(lastAnswer != false){
+            if (lastAnswer != false) {
                 boxArray[answer] = true;
-            }else{
+            } else {
                 boxArray[answer] = false;
             }
             wordsArray[0][4] = boxArray;
             localStorage.setItem(divName, JSON.stringify(wordsArray));
         }
-    }else if(option == 2){
-        wordsArray[question][2] = [answer,lastAnswer];//입력답, 정답여부
+    } else if (option == 2) {
+        wordsArray[question][2] = [answer, lastAnswer];//입력답, 정답여부
         localStorage.setItem(divName, JSON.stringify(wordsArray));
-    }else if(option == 3){
+    } else if (option == 3) {
         //console.log(question,answer,lastAnswer)
-        console.log(wordsArray[lastAnswer],lastAnswer);
+        console.log(wordsArray[lastAnswer], lastAnswer);
         wordsArray[lastAnswer][0] = question;
         wordsArray[lastAnswer][1] = answer;
         wordsArray[lastAnswer][2][1] = wrongC;
         localStorage.setItem(divName, JSON.stringify(wordsArray));
+    } else if (option == 4) {
+        return wordsArray;
+    }else if(option == 5 ){
+        let newWordArray = [];
+        for(i=0; i<wordsArray.length; i++){
+            for(j=0;j<question.length;j++){
+                if(i!=question[j]){
+                    newWordArray.push(wordsArray[i]);
+                }else{
+                    console.log(question[j]);
+                }
+            }
+        }
+        console.log(newWordArray);
     }
 }
-function shuffle(array){
-    array.sort(()=>Math.random() - 0.5);
+function shuffle(array) {
+    array.sort(() => Math.random() - 0.5);
 }
 //---SAVE
-function newQAndA(event){
+function newQAndA(event) {
     event.preventDefault();
     const divName = event.target.parentElement.parentElement.className;
     const table = event.target.parentElement.parentElement.childNodes[1].childNodes[0];
     const question = document.querySelector(`.${divName}`).firstChild.firstChild.childNodes[0];
     const answer = document.querySelector(`.${divName}`).firstChild.firstChild.childNodes[1];
-    let index = saveWord(divName,0,question.value,answer.value);
+    let index = saveWord(divName, 0, question.value, answer.value);
     //(테이블, 인덱스, 질문, 답, 마지막답, wC,cC,nC, 옵션(보일지 여부), 정렬인덱스)
     const sortIndex = event.target.nextSibling.nextSibling.childNodes[1].value;
     let sortIndex2 = Number(sortIndex);
-    makeTrTdWord(table,index,question.value,answer.value,null,null,null,null, 0, sortIndex2);
+    makeTrTdWord(table, index, question.value, answer.value, null, null, null, null, 0, sortIndex2);
     question.value = null;
-    answer.value=null;
+    answer.value = null;
     const view = document.querySelector(`.${divName}`).firstChild.childNodes[1].childNodes[1];
     view.dispatchEvent(new Event('change'));//select의 chage이벤트 강제 실행
-    
 }
 
-function nextTargetDisplayShow(event){
+function nextTargetDisplayShow(event) {
     const target = event.target.nextSibling;
-    if(target.style.display == "none"){
+    if (target.style.display == "none") {
         target.style.display = "block";
-    }else{
+    } else {
         target.style.display = "none";
     }
 }
+function nextTargetDisplayShow2(event) {
+    const target = event.target.nextSibling;
+    if (target.style.display == "none") {
+        target.style.display = "block";
+    } else {
+        target.style.display = "none";
+    }
+    const divName = event.target.parentElement.parentElement.parentElement.className;
+    const selectValue = Number(event.target.parentElement.parentElement.previousSibling.previousSibling.childNodes[2].childNodes[1].selectedIndex);
+    const tableWord = event.target.parentElement.parentElement.previousSibling.firstChild;
+    let wordArray = saveWord(divName, 4);
+    let lastPage = 1;
+    let limitPage2 = [1, 1];
+    let OXoption = 0;
+    const targetState = event.target.nextSibling.style.display;
+    if (tableWord != null) {
+        if (targetState == "none") {
+            tableWord.replaceChildren();
+            if (wordArray[0][1] != null) {
+                lastPage = wordArray[0][1];
+            }
+            if (wordArray[0][0] != null) {
+                limitPage2 = wordArray[0][0];
+            }
+            if (wordArray[0][3] != null) {
+                OXoption = wordArray[0][3];
+            }
+            newTableInner(tableWord, wordArray, wordArray[0][6], limitPage2, lastPage, selectValue, wordArray[0][4], OXoption, 0);
+        } else if (targetState == "block") {
+            tableWord.replaceChildren();
+            if (wordArray[0][1] != null) {
+                lastPage = wordArray[0][1];
+            }
+            if (wordArray[0][0] != null) {
+                limitPage2 = wordArray[0][0];
+            }
+            if (wordArray[0][3] != null) {
+                OXoption = wordArray[0][3];
+            }
+            newTableInner(tableWord, wordArray, wordArray[0][6], limitPage2, lastPage, selectValue, wordArray[0][4], OXoption, 1);
+        }
+    }
+    //makeTrTdWord(table,index,question,answer,lastAnswer,wrongC,correctC,notSolveC,option,sortIndex,countCheckArray,OXandAnswer,checkboxShow)
+}
 
-function lineSetEvent(event){
+function lineSetEvent(event) {
     const selectOption = event.target.value;
-    if(selectOption == 6){
-        if(event.target.nextSibling.style.display == "none"){
+    if (selectOption == 6) {
+        if (event.target.nextSibling.style.display == "none") {
             event.target.nextSibling.style.display = "block";
-        }else{
+        } else {
             event.target.nextSibling.style.display = "none";
         }
-    }else{
+    } else {
         event.target.nextSibling.style.display = "none";
     }
 }
 
-function pageSelectEvent(event){
+function pageSelectEvent(event) {
     const divName = event.target.parentElement.parentElement.parentElement.className;
     const pageValue = event.target.value;
     let number = Number(pageValue);
@@ -613,17 +675,17 @@ function pageSelectEvent(event){
     const table = event.target.parentElement.parentElement.parentElement.childNodes[1].childNodes[0];
 
     let n = 1;
-    for(i=0;i<table.childNodes.length;i++){
-        if(n>number){
+    for (i = 0; i < table.childNodes.length; i++) {
+        if (n > number) {
             table.childNodes[i].style.display = "none";
-        }else{
+        } else {
             table.childNodes[i].style.display = "inline-block";
         }
         n++;
     }
     const pageNumSelect = event.target.parentElement.parentElement.parentElement.childNodes[2].childNodes[1].childNodes[1];
     pageNumSelect.replaceChildren();
-    for(j=1;j<=pageLimit;j++){
+    for (j = 1; j <= pageLimit; j++) {
         const option = document.createElement("option");
         option.value = j;
         option.innerText = `page${j}`
@@ -632,7 +694,7 @@ function pageSelectEvent(event){
     const pageNumberShowSelect = event.target.parentElement.parentElement.parentElement.childNodes[2].firstChild;
     pageNumberShowSelect.innerText = `${pageLimit}/1`;
 }
-function pageShowSelectEvent(event){
+function pageShowSelectEvent(event) {
     const divName = event.target.parentElement.parentElement.parentElement.className;
     const table = event.target.parentElement.parentElement.previousSibling.firstChild;
     const pageNum = Number(event.target.value);
@@ -640,18 +702,18 @@ function pageShowSelectEvent(event){
     const count = Number(count0);
     const allPageCount = saveWord(divName, 1, 1, pageNum);
     let k = [];
-    for(j=pageNum*count;j>pageNum*count-count;j--){
+    for (j = pageNum * count; j > pageNum * count - count; j--) {
         k.push(j);
     }
     k.reverse();
     let n = 0;
     let nn = [];
-    for(i=0;i<=table.childNodes.length;i++){
-        if(i==k[n]-1 && table.childNodes[i]!= null){
+    for (i = 0; i <= table.childNodes.length; i++) {
+        if (i == k[n] - 1 && table.childNodes[i] != null) {
             table.childNodes[i].style.display = "inline-block";
             n++;
             nn.push(1);
-        }else if(table.childNodes[i]!= null){
+        } else if (table.childNodes[i] != null) {
             table.childNodes[i].style.display = "none";
             nn.push(0);
         }
@@ -660,89 +722,92 @@ function pageShowSelectEvent(event){
     pageNumberShowSelect.innerText = `${allPageCount}/${pageNum}`;
 }
 //tableWord,wordsArray,randomArray,limitPage2,lastPage,sortIndex
-function sortSelectEvent(event){
+function sortSelectEvent(event) {
     const divName = event.target.parentElement.parentElement.parentElement.className;
     const selectValue = Number(event.target.value);
+    console.log(event.target);
     const tableWord = event.target.parentElement.parentElement.nextSibling.firstChild;
     tableWord.replaceChildren();
     //tableWord,wordsArray,randomArray,limitPage2,lastPage,sortIndex
     let wordArray = saveWord(divName, 1, 3, selectValue);
     let lastPage = 1;
-    let limitPage2 = [1,1];
-    if(wordArray[0][1]!=null){
+    let limitPage2 = [1, 1];
+    if (wordArray[0][1] != null) {
         lastPage = wordArray[0][1];
     }
-    if(wordArray[0][0] != null){
-        limitPage2=wordArray[0][0];
+    if (wordArray[0][0] != null) {
+        limitPage2 = wordArray[0][0];
     }
-    newTableInner(tableWord,wordArray,wordArray[0][6],limitPage2,lastPage,selectValue,wordArray[0][4]);
+    newTableInner(tableWord, wordArray, wordArray[0][6], limitPage2, lastPage, selectValue, wordArray[0][4], wordArray[0][3]);
 }
 
-function newTableInner(tableWord,wordsArray,randomArray,limitPage2,lastPage,sortIndex,countCheckArray,OXandAnswer){
+function newTableInner(tableWord, wordsArray, randomArray, limitPage2, lastPage, sortIndex, countCheckArray, OXandAnswer, checkboxShow) {
     let optionPage = [];
     let optionPage1 = [];
-    if(wordsArray != null){
-        for(jp=lastPage*limitPage2[0];jp>lastPage*limitPage2[0]-limitPage2[0];jp--){
+    if (wordsArray != null) {
+        for (jp = lastPage * limitPage2[0]; jp > lastPage * limitPage2[0] - limitPage2[0]; jp--) {
             optionPage1.push(jp);
         }
         optionPage1.reverse();
         np = 0;
-        for(ip=0;ip<wordsArray.length-1;ip++){
-            if(ip==optionPage1[np]-1 && wordsArray[ip]!= null){
+        for (ip = 0; ip < wordsArray.length - 1; ip++) {
+            if (ip == optionPage1[np] - 1 && wordsArray[ip] != null) {
                 optionPage.push(1);
                 np++;
-            }else if(wordsArray[ip]!= null){
+            } else if (wordsArray[ip] != null) {
                 optionPage.push(0);
             }
         }
-        if(sortIndex == 1){
+        if (sortIndex == 1) {
             optionPage.reverse();
         }
     }
-    if(sortIndex == 2){
-        for(j=0;j<wordsArray.length-1;j++){
-        //              (table,             index,   question,                     answer,                        lastAnswer                     ,wrongC,                       correctC,                      notSolveC,                    option,                          sortIndex)
-            makeTrTdWord(tableWord, randomArray[j], wordsArray[randomArray[j]][0], wordsArray[randomArray[j]][1], wordsArray[randomArray[j]][2], wordsArray[randomArray[j]][3], wordsArray[randomArray[j]][4], wordsArray[randomArray[j]][5], optionPage[optionPage.length-j], sortIndex,countCheckArray,OXandAnswer);
-        }    
-    }else{
-        for(j=1;j<wordsArray.length;j++){
-            
-            makeTrTdWord(tableWord,j,wordsArray[j][0],wordsArray[j][1],wordsArray[j][2],wordsArray[j][3],wordsArray[j][4],wordsArray[j][5],optionPage[optionPage.length-j],sortIndex,countCheckArray,OXandAnswer);
+    if (sortIndex == 2) {
+        for (j = 0; j < wordsArray.length - 1; j++) {
+            //              (table,             index,   question,                     answer,                        lastAnswer                     ,wrongC,                       correctC,                      notSolveC,                    option,                          sortIndex)
+            makeTrTdWord(tableWord, randomArray[j], wordsArray[randomArray[j]][0], wordsArray[randomArray[j]][1], wordsArray[randomArray[j]][2], wordsArray[randomArray[j]][3], wordsArray[randomArray[j]][4], wordsArray[randomArray[j]][5], optionPage[optionPage.length - j], sortIndex, countCheckArray, OXandAnswer, checkboxShow);
+        }
+    } else {
+        for (j = 1; j < wordsArray.length; j++) {
+
+            makeTrTdWord(tableWord, j, wordsArray[j][0], wordsArray[j][1], wordsArray[j][2], wordsArray[j][3], wordsArray[j][4], wordsArray[j][5], optionPage[optionPage.length - j], sortIndex, countCheckArray, OXandAnswer, checkboxShow);
         }
     }
 }
 
-function newRandomEvent(event){
+function newRandomEvent(event) {
     const divName = event.target.parentElement.parentElement.parentElement.parentElement.className;
     const targetOption = event.target.innerText;
     const optionSpan = event.target.parentElement;
-    if("yes"==targetOption){
+    if ("yes" == targetOption) {
         saveWord(divName, 1, 2);
         saveWord(divName, 1, 3, 2);
         optionSpan.style.display = "none";
-    }else{
+    } else {
         optionSpan.style.display = "none";
     }
 }
 
-function showOXandOthers(event){
+function showOXandOthers(event) {
     const selectOption = event.target.value;
     let selectOption1 = Number(selectOption);
     const divName = event.target.parentElement.parentElement.className;
     saveWord(divName, 1, 4, selectOption1);
-}
-
-function checkboxCount(event){
-    const checkboxValue = event.target.value;
-    const checkboxChecked = event.target.checked; 
-    const divName = event.target.parentElement.parentElement.parentElement.parentElement.className;
-    //console.log(divName);
-    saveWord(divName, 1, 5, checkboxValue,checkboxChecked);
     const view = document.querySelector(`.${divName}`).firstChild.childNodes[2].childNodes[1];
     view.dispatchEvent(new Event('change'));//select의 chage이벤트 강제 실행
 }
 
-function AnswerInputEvent(event){
+function checkboxCount(event) {
+    const checkboxValue = event.target.value;
+    const checkboxChecked = event.target.checked;
+    const divName = event.target.parentElement.parentElement.parentElement.parentElement.className;
+    //console.log(divName);
+    saveWord(divName, 1, 5, checkboxValue, checkboxChecked);
+    const view = document.querySelector(`.${divName}`).firstChild.childNodes[2].childNodes[1];
+    view.dispatchEvent(new Event('change'));//select의 chage이벤트 강제 실행
+}
+
+function AnswerInputEvent(event) {
     event.preventDefault();
     const divName = event.target.parentElement.parentElement.parentElement.parentElement.parentElement.className;
     const form = event.target;
@@ -754,62 +819,60 @@ function AnswerInputEvent(event){
     const OXandAnswer = event.target.parentElement.parentElement.parentElement.parentElement.previousSibling.childNodes[3].value;
     lastAnswer.style.display = "block";
 
-    
-
     const realAnswer = event.target.parentElement.previousSibling.childNodes[2];
-    if(OXandAnswer=="1"){
-        realAnswer.style.display = "block";        
+    if (OXandAnswer == "1") {
+        realAnswer.style.display = "block";
     }
     const OXspan = event.target.parentElement.nextSibling.firstChild;
-    let textOutput = textEquel(realAnswer.innerText,input.value);
-    if(textOutput == true){
+    let textOutput = textEquel(realAnswer.innerText, input.value);
+    if (textOutput == true) {
         OXspan.innerText = "O";
-    }else if(textOutput == false){
+    } else if (textOutput == false) {
         OXspan.innerText = "X";
-    }else if(textOutput == null){
+    } else if (textOutput == null) {
         OXspan.innerText = "?";
     }
     const checkboxIndex = event.target.parentElement.previousSibling.previousSibling.firstChild.value;
-    saveWord(divName,2,Number(checkboxIndex),input.value,textOutput);
+    saveWord(divName, 2, Number(checkboxIndex), input.value, textOutput);
+
 }
-function editEvent(event){
+function editEvent(event) {
     //"dblclick"
     const target = event.target;
-    if(target.tagName == "SPAN"){
+    if (target.tagName == "SPAN") {
         const form = event.target.previousSibling;
-        if(form.style.display != "block"){
+        if (form.style.display != "block") {
             form.style.display = "block";
             target.style.display = "none";
-        }else{
+        } else {
             form.style.display = "none";
             target.style.display = "block";
         }
-
-    }else if(target.tagName == "TD"){
+    } else if (target.tagName == "TD") {
         const form = event.target.childNodes[0];
         const span = event.target.childNodes[1];
-        if(form.style.display != "block"){
+        if (form.style.display != "block") {
             form.style.display = "block";
             span.style.display = "none";
-        }else{
+        } else {
             form.style.display = "none";
             span.style.display = "block";
         }
     }
 }
-function textEquel(realText, inputText){
-    if(inputText != null && inputText.trim().length !== 0){
-        if(realText == inputText){
+function textEquel(realText, inputText) {
+    if (inputText != null && inputText.trim().length !== 0) {
+        if (realText == inputText) {
             return true;
-        }else{
+        } else {
             return false;
         }
-    }else{
+    } else {
         return null;
     }
 }
 
-function editQandASumitEvent(event){
+function editQandASumitEvent(event) {
     event.preventDefault();
     const questionInput = event.target.childNodes[0].value;
     const answerInput = event.target.childNodes[1].value;
@@ -819,11 +882,11 @@ function editQandASumitEvent(event){
     const OXspan = event.target.parentElement.nextSibling.nextSibling.childNodes[0];
     let OXandAnswer = textEquel(answerInput, lastAnswer);
 
-    if(OXandAnswer == true){
+    if (OXandAnswer == true) {
         OXspan.innerText = "O";
-    }else if(OXandAnswer == false){
+    } else if (OXandAnswer == false) {
         OXspan.innerText = "X";
-    }else if(OXandAnswer == null){
+    } else if (OXandAnswer == null) {
         OXspan.innerText = "?";
     }
     const form = event.target;
@@ -833,14 +896,45 @@ function editQandASumitEvent(event){
     questionSpan.innerText = questionInput;
     answerSpan.innerText = answerInput;
     questionSpan.style.display = "block";
-    saveWord(divName,3,questionInput,answerInput,Number(checkboxIndex),OXandAnswer);
+    saveWord(divName, 3, questionInput, answerInput, Number(checkboxIndex), OXandAnswer);
 }
 
+function pagePastNextBtn(event) {
+    const btnInText = event.target.innerText;
+    const pageSelect = event.target.parentElement.childNodes[1];
+    if (pageSelect.length > 1) {
+        if (btnInText == '<' && pageSelect.selectedIndex > 0) {
+            pageSelect.selectedIndex -= 1;
+        } else if (btnInText == '>' && pageSelect.selectedIndex < pageSelect.length) {
+            pageSelect.selectedIndex += 1;
+        }
+    }
+    pageSelect.dispatchEvent(new Event('change'));
+}
+
+function copyAndDellBtnEvent(event){
+    const divName = event.target.parentElement.parentElement.parentElement.parentElement.className;
+    const tableWord = event.target.parentElement.parentElement.parentElement.previousSibling.firstChild;
+    const text = event.target.innerText;
+    
+    let checkedArray = [];
+    for(i=0;i<tableWord.childNodes.length;i++){
+        let checkeds = tableWord.childNodes[i].childNodes[0].childNodes[0].checked;
+        if(checkeds == true){
+            let index = tableWord.childNodes[i].childNodes[0].childNodes[0].value;
+            checkedArray.push(Number(index));
+        }
+    }
+
+    if(text == "copy"){
+        saveWord(divName,5,checkedArray);
+    }
+}
 
 //window==========================================================
 let divWord = [];
 const in_stor_tap_array_word = localStorage.getItem("tap_array");
-if(in_stor_tap_array_word != null){
+if (in_stor_tap_array_word != null) {
     const parsed_tap3 = JSON.parse(in_stor_tap_array_word);
     divWord = parsed_tap3;
     divWord.forEach(skill_apply_word);
