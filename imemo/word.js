@@ -286,6 +286,7 @@ function skill_apply_word(txt) {
         submitYesBtn.innerText = "yes";
         submitYesBtn.addEventListener("click", submitAllEvent);
         const submitNoBtn = document.createElement("button");
+        submitNoBtn.addEventListener("click",noEvent);
         submitNoBtn.innerText = "no";
         submiSpan.appendChild(submitYesBtn);
         submiSpan.appendChild(submitNoBtn);
@@ -562,6 +563,26 @@ function saveWord(divName, option, question, answer, lastAnswer, wrongC, correct
             }
             return text;
         }else if(answer == 1){
+            /*
+            let randomArray;
+            console.log(wordsArray[0][6])
+            if(wordsArray !=null && wordsArray[0][6] != null){
+                randomArray =wordsArray[0][6];
+                let newRandomArray = [];
+                for(i=0; i<randomArray.length; i++){
+                    let target = null;
+                    for(j=0;j<question.length;j++){
+                        if(randomArray[i]==question[j]){
+                            target = randomArray[i];
+                    }
+                }
+                    if(randomArray[i] != target){
+                        newRandomArray.push(randomArray[i]);
+                    }
+                }
+                console.log(newRandomArray);//삭제시 랜덤 숫자도 변경 
+            }*/
+
             wordsArray[0][5] =  saveCountAndPercent(newWordArray, divName);
             localStorage.setItem(divName, JSON.stringify(newWordArray));
         }
@@ -725,7 +746,7 @@ function lineSetEvent(event) {
     }
 }
 
-function pageSelectEvent(event) {
+function pageSelectEvent(event) { //view
     const divName = event.target.parentElement.parentElement.parentElement.className;
     const pageValue = event.target.value;
     let number = Number(pageValue);
@@ -737,7 +758,7 @@ function pageSelectEvent(event) {
         if (n > number) {
             table.childNodes[i].style.display = "none";
         } else {
-            table.childNodes[i].style.display = "inline-block";
+            table.childNodes[i].style.display = "block";
         }
         n++;
     }
@@ -768,7 +789,7 @@ function pageShowSelectEvent(event) {
     let nn = [];
     for (i = 0; i <= table.childNodes.length; i++) {
         if (i == k[n] - 1 && table.childNodes[i] != null) {
-            table.childNodes[i].style.display = "inline-block";
+            table.childNodes[i].style.display = "block";
             n++;
             nn.push(1);
         } else if (table.childNodes[i] != null) {
@@ -819,7 +840,6 @@ function newTableInner(tableWord, wordsArray, randomArray, limitPage2, lastPage,
         if (sortIndex == 1) {
             optionPage.reverse();
         }
-
         if (sortIndex == 2) {
             for (j = 0; j < wordsArray.length - 1; j++) {
                 //              (table,             index,   question,                     answer,                        lastAnswer                     ,wrongC,                       correctC,                      notSolveC,                    option,                          sortIndex)
@@ -827,10 +847,11 @@ function newTableInner(tableWord, wordsArray, randomArray, limitPage2, lastPage,
                 if(wordsArray[n] == null){
                     continue;
                 }
-                makeTrTdWord(tableWord, n, wordsArray[n][0], wordsArray[n][1], wordsArray[n][2], wordsArray[n][3], wordsArray[n][4], wordsArray[n][5], optionPage[optionPage.length - j], sortIndex, countCheckArray, OXandAnswer, checkboxShow);
+                makeTrTdWord(tableWord, n, wordsArray[n][0], wordsArray[n][1], wordsArray[n][2], wordsArray[n][3], wordsArray[n][4], wordsArray[n][5], optionPage[optionPage.length - n], sortIndex, countCheckArray, OXandAnswer, checkboxShow);
             }
         } else {
             for (j = 1; j < wordsArray.length; j++) {
+                console.log(j)
                 if(wordsArray[j][0] == null){
                     continue;
                 }
@@ -844,10 +865,12 @@ function newRandomEvent(event) {
     const divName = event.target.parentElement.parentElement.parentElement.parentElement.className;
     const targetOption = event.target.innerText;
     const optionSpan = event.target.parentElement;
+    const selectSet = event.target.parentElement.previousSibling;
     if ("yes" == targetOption) {
         saveWord(divName, 1, 2);
-        saveWord(divName, 1, 3, 2);
         optionSpan.style.display = "none";
+        selectSet.selectedIndex = 2;
+        selectSet.dispatchEvent(new Event('change'));
     } else {
         optionSpan.style.display = "none";
     }
@@ -1010,6 +1033,10 @@ function submitAllEvent(event){
     view.dispatchEvent(new Event('change'));
     const targetShow = event.target.parentElement;
     targetShow.style.display = "none";
+}
+function noEvent(event){
+    const span = event.target.parentElement;
+    span.style.display = "none";
 }
 
 //window==========================================================
