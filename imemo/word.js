@@ -1,29 +1,3 @@
-/*
-저장 공간 관리
-0 : [view 상태 정보(페이지당 문제 수), 마지막 연 페이지, 정렬 정보(새로운 랜덤, 기존 랜덤, 틀린순, 맞춘순, 안푼순), 
-    답보기 상태 정보(맞춘여부,맞춘여부+정답보기,전체 정답보기),맞춘/틀린/안푼 횟수보기,
-    테이블 칸 크기 조절, 랜덤 배열 index숫자 array]
-1 : [문제, 답, 마지막으로 입력한 답(입력, 미입력), 틀린 횟수, 맞춘 횟수, 안 푼 횟수]
-
-맨 위 표시
-    문제입력 input | 답 입력 input
-    view페이지당 문제 수(문제수~all) | 정렬셋팅(기존 랜덤, 새 랜덤, 틀린순, 맞춘순, 안푼순) | 
-    제출시 답 보기 상태(맞춘여부, 맟춘여부+정답보기, 맞춘여부 가리기,걍 전체답 확인하기) | 
-    틀린횟수, 맞춘 횟수, 안 푼 횟수 표시하기(체크박스)
-
-중간 표 테이블
-    문제표시 (클릭시 정답보기 가능-문제\n답\n틀린맞춘안푼 횟수)-두번클릭시 문제&답 수정 가능
-    | 답 입력란(input)-입력 후 제출시 텍스트만 남음. 두번 클릭시 입력 답 수정 가능 
-    | 정답여부 보는 칸(안보기 해둘 시 클릭해서 볼 수 있음)
-
-맨 아래 표시정보
-    페이지 안 문제수/맞춘 문제수 | < 1page >
-    전체 문제수/맞춘문제수(퍼센트로 표시%)/틀린문제수(%)/안푼문제수(%)
-    | 복사/삭제하기 - 클릭시 체크박스 표시. 문제+답 복사, 해당 문제+답 삭제 가능
-    | 진행사항 제출 후 새로 시작-클릭시 이전까지 입력된 답을 기준으로 맞춘여부/틀린여부/안푼여부 정보를 갱신하고 입력되었던 제출답 없애기
-    | 테이블 칸 크기 조절 - 입력 또는 막대바
-*/
-
 let W_showTap_array = [];
 const W_tapShow_array = localStorage.getItem("tapShow_array");
 if (W_tapShow_array != null) {
@@ -60,12 +34,13 @@ function skill_apply_word(txt) {
         viewQuestionSelect.addEventListener("change", pageSelectEvent)
 
         let lastPage = 1;
-        let limitPage = 1;
+        let limitPage = 2;
         let limitPage2 = [1, 1];
         let sortIndex = 0;
         let randomArray = [];
         let OXandAnswer = 0;
         let countCheckArray = [null, null, null];
+        let percentArray = [[0,0.0],[0,0.0],[0,0.0]];
         if (getSaveWordPar != null && getSaveWordPar.length != null && getSaveWordPar.length != 0) {
             limitPage = getSaveWordPar.length;
             if (getSaveWordPar[0][0] != null) {
@@ -89,16 +64,25 @@ function skill_apply_word(txt) {
             if (getSaveWordPar[0][4] != null) {
                 countCheckArray = getSaveWordPar[0][4];
             }
+            if(getSaveWordPar[0][5] != null ){
+                percentArray = getSaveWordPar[0][5] ;
+            }
 
+        }
+        if(limitPage < 2){
+            limitPage = 2;
         }
         for (i = 1; i < limitPage; i++) {
             const viewQuestionOption = document.createElement("option");
             viewQuestionOption.value = i;
             viewQuestionOption.innerText = i;
             viewQuestionSelect.appendChild(viewQuestionOption);
-            tableC = Math.ceil(getSaveWordPar.length - 1 / 1);
+            //tableC = Math.ceil(getSaveWordPar.length - 1 / 1);
         }
-        viewQuestionSelect.selectedIndex = limitPage2[0] - 1;
+        viewQuestionSelect.selectedIndex = 0;
+        if(limitPage2[0] >= 1){
+            viewQuestionSelect.selectedIndex = limitPage2[0] - 1;
+        }
 
         viewSpan.appendChild(viewText);
         viewSpan.appendChild(viewQuestionSelect);
@@ -188,34 +172,7 @@ function skill_apply_word(txt) {
         }
 
         const tableWord = document.createElement("table");
-        /*
-        let optionPage = [];
-        let optionPage1 = [];
-        if(getSaveWordPar != null){
-            for(jp=lastPage*limitPage2[0];jp>lastPage*limitPage2[0]-limitPage2[0];jp--){
-                optionPage1.push(jp);
-            }
-            optionPage1.reverse();
-            np = 0;
-            for(ip=0;ip<getSaveWordPar.length-1;ip++){
-                if(ip==optionPage1[np]-1 && getSaveWordPar[ip]!= null){
-                    optionPage.push(1);
-                    np++;
-                }else if(getSaveWordPar[ip]!= null){
-                    optionPage.push(0);
-                }
-            }
-            if(sortIndex == 1){
-                optionPage.reverse()
-            }
-        }
-        for(j=1;j<wordsArray.length;j++){
-            if(sortIndex == 2){
-                makeTrTdWord(tableWord, randomArray[j], wordsArray[randomArray[j]][0], wordsArray[randomArray[j]][1], wordsArray[randomArray[j]][2], wordsArray[randomArray[j]][3], wordsArray[randomArray[j]][4], wordsArray[randomArray[j]][5], optionPage[optionPage.length-j], sortIndex);
-            }else{
-                makeTrTdWord(tableWord,j,wordsArray[j][0],wordsArray[j][1],wordsArray[j][2],wordsArray[j][3],wordsArray[j][4],wordsArray[j][5],optionPage[optionPage.length-j],sortIndex);
-            }
-        }*/
+
         newTableInner(tableWord, wordsArray, randomArray, limitPage2, lastPage, sortIndex, countCheckArray, OXandAnswer);
         secondSpan.appendChild(tableWord);
 
@@ -269,7 +226,7 @@ function skill_apply_word(txt) {
 
         const allCountText = document.createElement("span");
 
-        allCountText.innerText = `\nall:${3} / coreect:${2}(${Math.floor(2 / 3 * 100)}%)wrong:${1}(${Math.floor(1 / 3 * 100)}%) / not solve:${0}(${Math.floor(0 / 3 * 100)}%)\n`;
+        allCountText.innerText = `\nall:${wordsArray.length-1} / coreect:${percentArray[0][0]}(${percentArray[0][1]}%)wrong:${percentArray[1][0]}(${percentArray[1][1]}%) / not solve:${percentArray[2][0]}(${percentArray[2][1]}%)\n`;
         thirdSpan.appendChild(allCountText);
 
         const checkboxOption = document.createElement("span");
@@ -327,6 +284,7 @@ function skill_apply_word(txt) {
         submiSpan.innerText = "all input text will reset(count only save).ok?";
         const submitYesBtn = document.createElement("button");
         submitYesBtn.innerText = "yes";
+        submitYesBtn.addEventListener("click", submitAllEvent);
         const submitNoBtn = document.createElement("button");
         submitNoBtn.innerText = "no";
         submiSpan.appendChild(submitYesBtn);
@@ -500,10 +458,10 @@ function makeTrTdWord(table, index, question, answer, lastAnswer, wrongC, correc
 }
 //function=======================================================
 /*
-0 : [view 상태 정보(페이지당 문제 수), 마지막 연 페이지, 정렬 정보(새롭게,올드, 기존 랜덤, 틀린순, 맞춘순, 안푼순새로운 랜덤), 
-    답보기 상태 정보(맞춘여부,맞춘여부+정답보기,전체 정답보기),맞춘/틀린/안푼 횟수보기,
-    테이블 칸 크기 조절, 랜덤 배열 index숫자 array]
-1 : [문제, 답, 마지막으로 입력한 답(입력, (미입력,정답여부)), 틀린 횟수, 맞춘 횟수, 안 푼 횟수]
+0 : [view 상태 정보(페이지당 문제 수)-0, 마지막 연 페이지-1, 정렬 정보(새롭게,올드, 기존 랜덤, 틀린순, 맞춘순, 안푼순새로운 랜덤)-2, 
+    OX and Other-3,답보기 상태 정보(맞춘여부,맞춘여부+정답보기,전체 정답보기)-4,
+    전체 맞춘/틀린/안푼 횟수와 퍼센트-5, 랜덤 배열 index숫자 array-6]
+1 : [문제-0, 답-1, 마지막으로 입력한 답(입력, (미입력,정답여부))-2, 틀린 횟수-3, 맞춘 횟수-4, 안 푼 횟수-5]
  */
 //SAVE
 function saveWord(divName, option, question, answer, lastAnswer, wrongC, correctC, notSolveC) {
@@ -518,7 +476,9 @@ function saveWord(divName, option, question, answer, lastAnswer, wrongC, correct
     if (option == 0) {
         let pls = [question, answer, null, null, null, null];
         wordsArray.push(pls);
+        wordsArray[0][5] =  saveCountAndPercent(wordsArray, divName);
         localStorage.setItem(divName, JSON.stringify(wordsArray));
+        newViewSelectMake(divName, wordsArray.length, wordsArray[0][0]);
         return wordsArray.length - 1;
 
     } else if (option == 1) {
@@ -564,13 +524,13 @@ function saveWord(divName, option, question, answer, lastAnswer, wrongC, correct
         }
     } else if (option == 2) {
         wordsArray[question][2] = [answer, lastAnswer];//입력답, 정답여부
+        wordsArray[0][5] =  saveCountAndPercent(wordsArray, divName);
         localStorage.setItem(divName, JSON.stringify(wordsArray));
     } else if (option == 3) {
-        //console.log(question,answer,lastAnswer)
-        console.log(wordsArray[lastAnswer], lastAnswer);
         wordsArray[lastAnswer][0] = question;
         wordsArray[lastAnswer][1] = answer;
         wordsArray[lastAnswer][2][1] = wrongC;
+        wordsArray[0][5] =  saveCountAndPercent(wordsArray, divName);
         localStorage.setItem(divName, JSON.stringify(wordsArray));
     } else if (option == 4) {
         return wordsArray;
@@ -593,7 +553,6 @@ function saveWord(divName, option, question, answer, lastAnswer, wrongC, correct
         if(answer == 0){
             let text = "";
             for(i=0;i<checkArray.length;i++){
-                console.log(checkArray[i][0]);
                 text +=`${checkArray[i][0]}\t${checkArray[i][1]}`;
                 if(checkArray[i][2]!=null){
                     text+= `\t${checkArray[i][2][0]}\n`
@@ -603,8 +562,80 @@ function saveWord(divName, option, question, answer, lastAnswer, wrongC, correct
             }
             return text;
         }else if(answer == 1){
+            wordsArray[0][5] =  saveCountAndPercent(newWordArray, divName);
             localStorage.setItem(divName, JSON.stringify(newWordArray));
         }
+    }else if(option == 6){
+        if(wordsArray != null && wordsArray.length > 1){
+            for(i=1;i<wordsArray.length;i++){
+                for(j=3;j<6;j++){
+                    if(wordsArray[i][j] == null){
+                        wordsArray[i][j] = 0;
+                    };
+                }
+                if(wordsArray[i][2] != null){
+                    if(wordsArray[i][2][1] == true){
+                        wordsArray[i][3] += 1
+                    }else if(wordsArray[i][2][1] == false){
+                        wordsArray[i][4] += 1
+                    }else{
+                        wordsArray[i][5] += 1
+                    }
+                }else{
+                    wordsArray[i][5] += 1
+                }
+                wordsArray[i][2] = null;
+            }
+            localStorage.setItem(divName, JSON.stringify(wordsArray));
+        }
+    }
+}
+
+function newViewSelectMake(divName,len, page){
+    let page2 = 0;
+    if(page != null){
+        page2 = page[0]-1;
+    }
+    const view = document.querySelector(`.${divName}`).firstChild.childNodes[1].childNodes[1];
+    view.replaceChildren();
+    for(i=1;i<len;i++){
+        const viewQuestionOption = document.createElement("option");
+        viewQuestionOption.value = i;
+        viewQuestionOption.innerText = i;
+        view.appendChild(viewQuestionOption);
+    }
+    view.selectedIndex = page2;
+}
+
+function saveCountAndPercent(wordsArray,divName){
+    let correct = 0;
+    let wrong = 0;
+    let notSolve = 0;
+    let len = wordsArray.length-1;
+    if(len > 0){
+        for(i=1;i<wordsArray.length; i++){
+            if(wordsArray[i][0]!=null){
+                if(wordsArray[i][2]!=null){
+                    if(wordsArray[i][2][1]==true){
+                        correct+=1;
+                    }else if(wordsArray[i][2][1]==false){
+                        wrong+=1;
+                    }else{
+                        notSolve+=1;
+                    }
+                }else{
+                    notSolve+=1;
+                }
+            }
+        }
+
+        let correctP = ((correct/len)*100).toFixed(1);
+        let wrongP = ((wrong/len)*100).toFixed(1);
+        let notSolveP = ((notSolve/len)*100).toFixed(1);
+
+        const pageText = document.querySelector(`.${divName}`).childNodes[2].childNodes[2];
+        pageText.innerText= `\nall:${len}/correct:${correct}(${correctP}%)/wrong:${wrong}(${wrongP}%)/not solve:${notSolve}(${notSolveP}%)\n`;
+        return [[correct, correctP], [wrong, wrongP], [notSolve, notSolveP]];
     }
 }
 function shuffle(array) {
@@ -752,7 +783,6 @@ function pageShowSelectEvent(event) {
 function sortSelectEvent(event) {
     const divName = event.target.parentElement.parentElement.parentElement.className;
     const selectValue = Number(event.target.value);
-    console.log(event.target);
     const tableWord = event.target.parentElement.parentElement.nextSibling.firstChild;
     tableWord.replaceChildren();
     //tableWord,wordsArray,randomArray,limitPage2,lastPage,sortIndex
@@ -765,13 +795,14 @@ function sortSelectEvent(event) {
     if (wordArray[0][0] != null) {
         limitPage2 = wordArray[0][0];
     }
+    
     newTableInner(tableWord, wordArray, wordArray[0][6], limitPage2, lastPage, selectValue, wordArray[0][4], wordArray[0][3]);
 }
 
 function newTableInner(tableWord, wordsArray, randomArray, limitPage2, lastPage, sortIndex, countCheckArray, OXandAnswer, checkboxShow) {
     let optionPage = [];
     let optionPage1 = [];
-    if (wordsArray != null) {
+    if (wordsArray != null && wordsArray.length != 0) {
         for (jp = lastPage * limitPage2[0]; jp > lastPage * limitPage2[0] - limitPage2[0]; jp--) {
             optionPage1.push(jp);
         }
@@ -788,16 +819,23 @@ function newTableInner(tableWord, wordsArray, randomArray, limitPage2, lastPage,
         if (sortIndex == 1) {
             optionPage.reverse();
         }
-    }
-    if (sortIndex == 2) {
-        for (j = 0; j < wordsArray.length - 1; j++) {
-            //              (table,             index,   question,                     answer,                        lastAnswer                     ,wrongC,                       correctC,                      notSolveC,                    option,                          sortIndex)
-            makeTrTdWord(tableWord, randomArray[j], wordsArray[randomArray[j]][0], wordsArray[randomArray[j]][1], wordsArray[randomArray[j]][2], wordsArray[randomArray[j]][3], wordsArray[randomArray[j]][4], wordsArray[randomArray[j]][5], optionPage[optionPage.length - j], sortIndex, countCheckArray, OXandAnswer, checkboxShow);
-        }
-    } else {
-        for (j = 1; j < wordsArray.length; j++) {
 
-            makeTrTdWord(tableWord, j, wordsArray[j][0], wordsArray[j][1], wordsArray[j][2], wordsArray[j][3], wordsArray[j][4], wordsArray[j][5], optionPage[optionPage.length - j], sortIndex, countCheckArray, OXandAnswer, checkboxShow);
+        if (sortIndex == 2) {
+            for (j = 0; j < wordsArray.length - 1; j++) {
+                //              (table,             index,   question,                     answer,                        lastAnswer                     ,wrongC,                       correctC,                      notSolveC,                    option,                          sortIndex)
+                let n = randomArray[j];
+                if(wordsArray[n] == null){
+                    continue;
+                }
+                makeTrTdWord(tableWord, n, wordsArray[n][0], wordsArray[n][1], wordsArray[n][2], wordsArray[n][3], wordsArray[n][4], wordsArray[n][5], optionPage[optionPage.length - j], sortIndex, countCheckArray, OXandAnswer, checkboxShow);
+            }
+        } else {
+            for (j = 1; j < wordsArray.length; j++) {
+                if(wordsArray[j][0] == null){
+                    continue;
+                }
+                makeTrTdWord(tableWord, j, wordsArray[j][0], wordsArray[j][1], wordsArray[j][2], wordsArray[j][3], wordsArray[j][4], wordsArray[j][5], optionPage[optionPage.length - j], sortIndex, countCheckArray, OXandAnswer, checkboxShow);
+            }
         }
     }
 }
@@ -828,7 +866,6 @@ function checkboxCount(event) {
     const checkboxValue = event.target.value;
     const checkboxChecked = event.target.checked;
     const divName = event.target.parentElement.parentElement.parentElement.parentElement.className;
-    //console.log(divName);
     saveWord(divName, 1, 5, checkboxValue, checkboxChecked);
     const view = document.querySelector(`.${divName}`).firstChild.childNodes[2].childNodes[1];
     view.dispatchEvent(new Event('change'));//select의 chage이벤트 강제 실행
@@ -964,6 +1001,15 @@ function copyAndDellBtnEvent(event){
         saveWord(divName,5,checkedArray,1);
         view.dispatchEvent(new Event('change'));
     }
+}
+
+function submitAllEvent(event){
+    const divName = event.target.parentElement.parentElement.parentElement.parentElement.className;
+    saveWord(divName, 6)
+    const view = event.target.parentElement.parentElement.parentElement.previousSibling.previousSibling.childNodes[2].childNodes[1];
+    view.dispatchEvent(new Event('change'));
+    const targetShow = event.target.parentElement;
+    targetShow.style.display = "none";
 }
 
 //window==========================================================
