@@ -100,7 +100,7 @@ function first_make_tap_btn_pluse(txt){
     const tap_name = document.createElement("label");
     tap_name.htmlFor = `${txt}`;
     let numTxt = `${txt.charAt(txt.length-1)}`;
-    let NameSkil = ["메모", "링크", "tap","tap","tap","tap","tap","tap","tap","tap"];
+    let NameSkil = ["메모", "링크", "계산","암기","달력","tap","tap","tap","tap","tap"];
     let bName = `${NameSkil[numTxt]}${numTxt}`;
     tap_name.innerText = bName;
     if(tapName_array[ii] != null){
