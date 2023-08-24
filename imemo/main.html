@@ -1,13 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" meta http-equiv="content-language" content="ko">
     <title>imemo</title>
     <link rel="stylesheet" href="/style.css">
 </head>
+
 <body>
     <div class="main">
     </div>
+
+    <script>/*
+        const getData = JSON.parse(localStorage.getItem(calender_text));
+
+        const bytes1 = window.CryptoJS.AES.decrypt(getData[0].calenderAPI, `${getData[0].calenderID}dexinnfigre167!`);
+        const decrypt1 = bytes1.toString(window.CryptoJS.enc.Utf8);
+
+        const bytes2 = window.CryptoJS.AES.decrypt(getData[1].calenderAPI, `${getData[1].calenderID}dexinnfigre167!`);
+        const decrypt2 = bytes2.toString(window.CryptoJS.enc.Utf8);
+
+        const bytes3 = window.CryptoJS.AES.decrypt(getData[2].calenderAPI, `${getData[2].calenderID}dexinnfigre167!`);
+        const decrypt3 = bytes3.toString(window.CryptoJS.enc.Utf8);
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                contentHeight: 500,
+                googleCalendarApiKey: 'AIzaSyBPomniaEFpdI98NVQIpyxJqtPzbN-bYoo',
+
+                eventSources: [{
+                    googleCalendarId: decrypt1,
+                    className: 'gcal-event', // an option!
+                    color: '#362222',
+                },
+                {
+                    googleCalendarId: decrypt2,
+                    className: 'gcal-event2', // an option!
+                    color: '#3b6978',
+                },
+                {
+                    googleCalendarId: decrypt3,
+                    className: 'gcal-event3', // an option!
+                    color: '#204051',
+                }],
+            });
+            calendar.render();
+        }); */
+    </script>
 
     <script src="/make_window.js"></script>
     <script src="/window_title_change.js"></script>
@@ -17,4 +58,5 @@
     <script src="/calculation.js"></script>
     <script src="/word.js"></script>
 </body>
+
 </html>
