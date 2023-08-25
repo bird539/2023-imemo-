@@ -2,29 +2,258 @@
 <html lang="en">
 
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8" meta http-equiv="content-language" content="ko">
     <title>imemo</title>
     <link rel="stylesheet" href="/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
 </head>
 
 <body>
     <div class="main">
     </div>
 
-    <script>/*
-        const getData = JSON.parse(localStorage.getItem(calender_text));
 
-        const bytes1 = window.CryptoJS.AES.decrypt(getData[0].calenderAPI, `${getData[0].calenderID}dexinnfigre167!`);
-        const decrypt1 = bytes1.toString(window.CryptoJS.enc.Utf8);
 
-        const bytes2 = window.CryptoJS.AES.decrypt(getData[1].calenderAPI, `${getData[1].calenderID}dexinnfigre167!`);
-        const decrypt2 = bytes2.toString(window.CryptoJS.enc.Utf8);
+    <script src="/make_window.js"></script>
+    <script src="/window_title_change.js"></script>
+    <script src="/tap.js"></script>
+    <script src="/workMemo.js"></script>
+    <script src="/link.js"></script>
+    <script src="/calculation.js"></script>
+    <script src="/word.js"></script>
+    <script src="/fullcalenderMain.js"></script>
 
-        const bytes3 = window.CryptoJS.AES.decrypt(getData[2].calenderAPI, `${getData[2].calenderID}dexinnfigre167!`);
-        const decrypt3 = bytes3.toString(window.CryptoJS.enc.Utf8);
+    <script>
+        //달력 사이즈 - whith, height
+        //달력 타이틀, 달력 링크1, 달력 링크1, 달력 표시 색깔
+        //0:['대표 달력 네임', with, height],
+        //  [true,false,false], - 스케줄 보일지 말지
+        //  ['타이틀1','타이틀2',null],
+        //  ['색깔1', '색깔2',null],
+        //  ['url1', 'url2', null]
+        //달력 저장-----
+        let Cal_showTap_array = [];
+        const Cal_tapShow_array = localStorage.getItem("tapShow_array");
+        if(Cal_tapShow_array != null){
+            const Cal_parsed_tapShow_array = JSON.parse(Cal_tapShow_array);
+            Cal_showTap_array = Cal_parsed_tapShow_array;
+        }
 
-        document.addEventListener('DOMContentLoaded', function () {
-            var calendarEl = document.getElementById('calendar');
+        let calendarMakeArray = [];
+
+        function skill_apply_calendar(txt){
+            const div_calendarName = `s${txt}`;
+            if(div_calendarName.charAt(div_calendarName.length-1) == `4`){
+                const w_divCalendar = document.querySelector(`.${div_calendarName}`);
+                
+                const calendarDivHead = document.createElement("div");
+
+                const calendarForm = document.createElement("form");
+                const calendarInputTitle = document.createElement("input");
+                const calendarSubBtn = document.createElement("button");
+                calendarSubBtn.innerText = "sub";
+                calendarSubBtn.type = "submit";
+                calendarInputTitle.placeholder = "calendar name";
+                calendarForm.style.display = "inline-block";
+                calendarForm.appendChild(calendarInputTitle);
+                calendarForm.appendChild(calendarSubBtn);
+
+                const calendarSchedulForm = document.createElement("form");
+                const calendarSchedulInputTitle = document.createElement("input");
+                const calendarSchedulInputUrl = document.createElement("input");
+                const calendarSchedulInputColor = document.createElement("input");
+                
+                let calenderNum = txt.split('_',2)[1];
+                //보여줄 달력 select + 일정 추가할 달력 대상
+                const calendarSelect = document.createElement("select");
+                let CalendarTitle = ["new calendar","달력1","달력2"];
+                for(i=0;i<CalendarTitle.length;i++){
+                    const CalendarOption = document.createElement("option");
+                    CalendarOption.value = `${calenderNum}_calendar_${i-1}`;
+                    CalendarOption.innerText = `${CalendarTitle[i]}`;
+                    if(i > 0){
+                        CalendarOption.innerText = `${CalendarTitle[i]}+schedule`;
+                    }
+                    calendarSelect.appendChild(CalendarOption);
+                }
+
+                //보여줄 달력 select
+                const calendarFoot =  document.createElement("div");
+                for(j=0;j<3;j++){
+                    const calendarScheduleDiv = document.createElement("div");
+                    let CalendarSchedule = ["일정1","일정2","일정3"];
+                    for(i=0;i<CalendarSchedule.length;i++){
+                        const schedulDiv = document.createElement("div"); 
+
+                        const editSheculForm = document.createElement("div");
+                        const editInputTitle = document.createElement("input");
+                        //editInputTitle.va
+                        editInputTitle.placeholder = "text";
+                        const editInputUrl = document.createElement("input");
+                        editInputUrl.placeholder = "calendar url";
+                        const editInputColor = document.createElement("input");
+                        editInputColor.placeholder = "color";
+                        const editSubBtn = document.createElement("button");
+                        editSubBtn.type = "submit";
+                        editSubBtn.innerText = "sub";
+                        const editInputHide = document.createElement("input");
+                        editInputHide.value =  `${calenderNum}_schedul_${j}_${i}`;
+                        editInputHide.type = "hide";
+                        editSheculForm.appendChild(editInputTitle);
+                        editSheculForm.appendChild(editInputUrl);
+                        editSheculForm.appendChild(editInputColor);
+                        editSheculForm.appendChild(editInputHide);
+                        editSheculForm.appendChild(editSubBtn);
+                        editSheculForm.style.display = "none";
+
+                        const schedulSpan = document.createElement("span");
+                        const ScheduleCheckbox = document.createElement("input");
+                        ScheduleCheckbox.type = "checkbox";
+                        ScheduleCheckbox.value = `${calenderNum}_calendar_${i}`;
+                        const SchedulText = document.createElement("span");
+                        SchedulText.innerText = `${CalendarSchedule[i]}`;
+                        const SchedulEditBtn = document.createElement("button");
+                        SchedulEditBtn.innerText = "edit";
+                        schedulSpan.appendChild(SchedulText);
+                        schedulSpan.appendChild(ScheduleCheckbox);
+                        schedulSpan.appendChild(SchedulEditBtn);
+                        //ScheduleCheckbox.innerText = `${CalendarSchedule[i]}`;
+                        schedulDiv.appendChild(schedulSpan);
+                        schedulDiv.appendChild(editSheculForm);
+
+                        schedulDiv.style.display = "inline-block";
+                        calendarScheduleDiv.appendChild(schedulDiv);
+                    }
+                    calendarScheduleDiv.className = `${calenderNum}_schedul_${j}`;
+                    if(j>0){
+                        calendarScheduleDiv.style.display = "none";
+                    }
+                    calendarFoot.appendChild(calendarScheduleDiv);
+                }
+
+                calendarDivHead.appendChild(calendarForm);
+                calendarDivHead.appendChild(calendarSelect);
+
+                const FullCalendarClassDiv = document.createElement("div");
+                FullCalendarClassDiv.className = "FullCalender";
+                FullCalendarClassDiv.style.width = "320px";
+                for(i=0;i<CalendarTitle.length;i++){
+                    const calendarDiv = document.createElement("div");
+                    calendarMakeArray.push(`${calenderNum}_calendar_${i}`);
+                    calendarDiv.className = `${calenderNum}_calendar_${i}`;
+                    //calendarDiv.style.width = "320px"
+                    if(calendarSelect.selectedIndex != i){
+                        calendarDiv.style.display = "none";
+                    }
+                    FullCalendarClassDiv.appendChild(calendarDiv);
+                }
+
+                w_divCalendar.appendChild(calendarDivHead);
+                w_divCalendar.appendChild(FullCalendarClassDiv);
+                w_divCalendar.appendChild(calendarFoot);
+
+                w_divCalendar.style.display = "none";
+                if (Cal_showTap_array != null) {
+                    for (i = 0; i < Cal_showTap_array.length; i++) {
+                        if (`${Cal_showTap_array[i]}` == txt) {
+                            w_divCalendar.style.display = "block";
+                        }
+                    }
+                }
+
+            }
+        }
+
+        //0:['대표 달력 네임', with, height],
+        //  [true,false,false], - 스케줄 보일지 말지
+        //  ['타이틀1','타이틀2',null],
+        //  ['색깔1', '색깔2',null],
+        //  ['url1', 'url2', null]
+        function calendarSave(divName,select,option,text,url,color,check,option2){
+            const getSaveCalendar = localStorage.getItem(divName);
+                const getSaveCalendarPar = JSON.parse(getSaveCalendar);
+                let calendarArray;
+                if(getSaveCalendarPar!=null && getSaveCalendarPar.length !=0){
+                    calendarArray = getSaveCalendarPar;
+                }else{
+                    calendarArray = [[
+                        ["달력1", 320, 473],
+                        [true,false,false],
+                        ['공휴일','shecul1','shecul2'],
+                        ['blue','yellow','green'],
+                        ['AIzaSyBPomniaEFpdI98NVQIpyxJqtPzbN-bYoo',null,null]
+                    ]];
+                }
+                if(select == 0){ //new
+                    if(option == 0){
+                        let newCalendar = [
+                            [`${text}`, 320, 473],
+                            [true,null,null],
+                            [`${text}`,null,null],
+                            ['blue',null,null],
+                            [`${url}`,null,null]
+                        ];
+                        calendarArray.push(newCalendar);
+                        localStorage.setItem(divName, JSON.stringify(calendarArray));
+                        return calendarArray.length;
+                    }
+                }else if(select == 1){ //edit 달력
+                    if(text == null || text.length == 0){
+                        text = `title`;
+                    };
+                    if(url == null || url.length == 0){
+                        url = 320;
+                    };
+                    if(color == null || color.length == 0){
+                        color = 473;
+                    };
+                    let index = Number(option);
+                    let editCalendar = calendarArray[index];
+                    editCalendar[0][0] = text;
+                    editCalendar[0][1] = url;
+                    editCalendar[0][2] = color;
+                    calendarArray[index] = editCalendar;
+                    localStorage.setItem(divName, JSON.stringify(calendarArray));
+                }else if(select == 2){
+                    if(text == null || text.length == 0){
+                        text = `schedule`;
+                    };
+                    if(url == null || url.length == 0){
+                        url = 'AIzaSyBPomniaEFpdI98NVQIpyxJqtPzbN-bYoo';
+                    };
+                    if(color == null || color.length == 0){
+                        color = 'blue';
+                    };
+                    let index = Number(option);
+                    let index2 = Number(option2);
+                    let editCalendar = calendarArray[index];
+                    editCalendar[1][index2] = text;
+                    editCalendar[2][index2] = check;
+                    editCalendar[3][index2] = color;
+                    editCalendar[4][index2] = url;
+
+                    calendarArray[index] = editCalendar;
+                    localStorage.setItem(divName, JSON.stringify(calendarArray));
+                }
+            }
+
+        //-------------start
+        let divCalendar = [];
+        const in_stor_tap_array_calendar = localStorage.getItem("tap_array");
+        if(in_stor_tap_array_calendar != null){
+            const parsed_tap3 = JSON.parse(in_stor_tap_array_calendar);
+            divCalendar = parsed_tap3;
+            divCalendar.forEach(skill_apply_calendar);
+        }
+        //-----달력저장
+
+        //풀캘린더 ---------------------------
+        //const bytes1 = window.CryptoJS.AES.decrypt(getData[0].calenderAPI, `${getData[0].calenderID}dexinnfigre167!`);
+        const decrypt1 = `ko.south_korea#holiday@group.v.calendar.google.com`;
+
+        for(i=0;i<calendarMakeArray.length;i++){
+            var calendarEl = document.querySelector(`.${calendarMakeArray[i]}`);
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 contentHeight: 500,
@@ -34,7 +263,8 @@
                     googleCalendarId: decrypt1,
                     className: 'gcal-event', // an option!
                     color: '#362222',
-                },
+                }
+                /*,
                 {
                     googleCalendarId: decrypt2,
                     className: 'gcal-event2', // an option!
@@ -44,19 +274,25 @@
                     googleCalendarId: decrypt3,
                     className: 'gcal-event3', // an option!
                     color: '#204051',
-                }],
+                }
+                */
+                ]
             });
             calendar.render();
-        }); */
+        }
+        
+
+        /*
+            <div style="float: center; width: 320px;" class="FullCalender">
+            <div class='calendar1'>
+            </div>
+            </div>
+         */
+
+        //------------풀캘린더
     </script>
 
-    <script src="/make_window.js"></script>
-    <script src="/window_title_change.js"></script>
-    <script src="/tap.js"></script>
-    <script src="/workMemo.js"></script>
-    <script src="/link.js"></script>
-    <script src="/calculation.js"></script>
-    <script src="/word.js"></script>
+
 </body>
 
 </html>
