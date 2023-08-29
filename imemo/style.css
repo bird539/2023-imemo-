@@ -1,5 +1,6 @@
-body {
+html, body {
     background-color: black;
+    height: 100%;
 }
 h3, h5, h4, span, label, a, div {
     color: bisque;
@@ -11,4 +12,49 @@ input, button, select{
     background-color: black;
     border-color: rgb(196, 162, 121);
     color: bisque;
+}
+button{
+    border: none;
+}
+button:hover{
+    background: gray;
+}
+input:hover{
+    background: rgb(48, 48, 48);
+}
+label{
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+li{
+    list-style: none;
+    border-bottom: 1px solid rgb(196, 162, 121);
+}
+input{
+    border: none;
+    border-bottom: 1px solid rgb(196, 162, 121);
+}
+select{
+    border: none;
+}
+select:hover{
+    background: gray;
+}
+
+ul a{
+    text-decoration-line : none;
+    padding: 5px;
+    border: 1px solid rgb(196, 162, 121);
+}
+ul{
+    padding: 0;
+}
+.main {
+    height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+    overflow : auto;
+    justify-content: center;
 }

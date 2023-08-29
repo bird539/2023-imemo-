@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8" meta http-equiv="content-language" content="ko">
     <title>imemo</title>
+    <link href='/fullcalenderMain.css' rel='stylesheet'>
     <link rel="stylesheet" href="/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
 </head>
@@ -167,7 +168,9 @@
                         const schedulSpan = document.createElement("span");
                         const ScheduleCheckbox = document.createElement("input");
                         ScheduleCheckbox.type = "checkbox";
+                        ScheduleCheckbox.addEventListener("click",schedulCheckBoxEvent);
                         ScheduleCheckbox.value = `${calenderNum}_calendar_${i}`;
+                        ScheduleCheckbox.checked = calendarArray[j][1][i];
                         const SchedulText = document.createElement("span");
                         SchedulText.innerText = calendarArray[j][2][i];
                         const SchedulEditBtn = document.createElement("button");
@@ -182,6 +185,7 @@
                         schedulDelBtn.innerText = "del";
                         scadulDelText.innerText = "del this schedul?";
                         scadulDelYes.innerText = "yes";
+                        scadulDelYes.addEventListener("click",delSchedulrYesBtnEvent);
                         scadulDelNo.innerText = "no";
                         scadulDelNo.addEventListener("click",delCalendarNoBtnEvent);
                         scadulDelText.style.display = "none";
@@ -219,6 +223,7 @@
                 calendarDelBtn.innerText = "del this calendar";
                 calendarDelBtn.addEventListener("click",delCalendarBtnEvent);
                 calendarDelYesBtn.innerText = "yes";
+                calendarDelYesBtn.addEventListener("click",delCalendarYesBtnEvent); 
                 calendarDelNoBtn.innerText = "no";
                 calendarDelNoBtn.addEventListener("click",delCalendarNoBtnEvent);
                 calendarDelTextSpan.innerText = "del this calendar?(scaduls also del)";
@@ -240,7 +245,7 @@
                 
                 const FullCalendarClassDiv = document.createElement("div");
                 FullCalendarClassDiv.className = "FullCalender";
-                FullCalendarClassDiv.style.width = "320px";
+                FullCalendarClassDiv.style.width = "300px";
                 for(i=0;i<calendarArray.length;i++){
                     const calendarDiv = document.createElement("div");
                     let plsMakeArray = [];
@@ -276,6 +281,7 @@
             const targetForm = event.target.previousSibling;
             const targetPlsScadulBtn = event.target.nextSibling;
             const targetCalendarEditBtn = event.target.nextSibling.nextSibling.nextSibling;
+            //const divName = event.target.parentElement.parentElement.className;
             if(targetSelect.selectedIndex == 0){
                 targetForm.style.display = "inline-block";
                 targetPlsScadulBtn.style.display = "none";
@@ -285,13 +291,18 @@
                 const targetCalendar = document.querySelector(`.${targetSelect.value}`);
                 const divName = event.target.parentElement.parentElement.className;
                 const targetCalendarOther = document.querySelector(`.${divName}`).childNodes[1];
+                const otherScheduleDiv = document.querySelector(`.${divName}`).childNodes[2];
                 for(i=0;i<targetCalendarOther.childNodes.length;i++){
                     targetCalendarOther.childNodes[i].style.display = "none";
+                    otherScheduleDiv.childNodes[i].style.display = "none";
                 }
-
+                
                 targetPlsScadulBtn.style.display = "inline-block";
                 targetCalendar.style.display = "block";
                 targetCalendarEditBtn.style.display = "inline-block";
+
+                const targetScheduleDiv = document.querySelector(`.${divName}_schedul_${targetSelect.selectedIndex-1}`);
+                targetScheduleDiv.style.display = "block";
             }
         }
 
@@ -327,11 +338,13 @@
             if(editBtn.style.display == "none"){
                 calendarSave(divName,0,0,name,Number(width), Number(height) );
             }else{
-                calendarSave(divName,1,index-1,name,width, height );
+                let calendarArray = calendarSave(divName,1,index-1,name,width, height );
+                //const calendarDivName = event.target.nextSibling.value;
+                //calendarEvent(calendarDivName, calendarArray[1], calendarArray[4], calendarArray[3], calendarArray[0][1])
             }
         }
         function schedulSubEvent(event){
-            event.preventDefault();
+            //event.preventDefault();
             const divName = event.target.parentElement.parentElement.className;
             const index = event.target.previousSibling.previousSibling.selectedIndex;
             const title = event.target.childNodes[0].value;
@@ -386,6 +399,32 @@
                 delText.style.display = "none";
             }
         }
+        function delCalendarYesBtnEvent(event){
+            const divName = event.target.parentElement.parentElement.parentElement.className;
+            const index = event.target.parentElement.previousSibling.previousSibling.previousSibling.previousSibling;
+            calendarSave(divName, 5, index.selectedIndex-1);
+            location.reload();
+        }
+        function delSchedulrYesBtnEvent(event){
+            const divName = event.target.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.className;
+            const index = event.target.parentElement.parentElement.parentElement.parentElement.parentElement.previousSibling.previousSibling.childNodes[1].selectedIndex;
+            const index2 = event.target.parentElement.parentElement.childNodes[1].value;
+            const index3 = index2.split("_")[4];
+            //console.log(index3);
+            calendarSave(divName, 6, index-1, Number(index3));
+            location.reload();
+        }
+        function schedulCheckBoxEvent(event){
+            const divName = event.target.parentElement.parentElement.parentElement.parentElement.parentElement.className;
+            const index = event.target.parentElement.parentElement.parentElement.parentElement.previousSibling.previousSibling.childNodes[1].selectedIndex;
+            const index2 = event.target.value;
+            const index3 = index2.split("_")[4];
+            const checkbox = event.target.checked;
+            calendarSave(divName, 7, index-1, Number(index3), checkbox);
+            //calendarEvent(divName_calendar_i, checkbox, url, color, height)
+            const calendarClassName = event.target.parentElement.parentElement.parentElement;
+            location.reload();
+        }
         //function delCalendarBtnShowEvent(event)
         //-----함수
 
@@ -403,7 +442,7 @@
                     calendarArray = getSaveCalendarPar;
                 }else{
                     calendarArray = [[
-                        ["calendar1", 320, 473],
+                        ["calendar1", 320, 400],
                         [true],
                         ['공휴일'],
                         ['blue'],
@@ -427,7 +466,7 @@
                         ];
                         calendarArray.push(newCalendar);
                         localStorage.setItem(divName, JSON.stringify(calendarArray));
-                        return calendarArray.length;
+                        //return calendarArray[calendarArray.length-1];
                     }
                 }else if(select == 1){ //edit 달력
                     if(text == null || text.length == 0){
@@ -446,6 +485,7 @@
                     editCalendar[0][2] = color;
                     calendarArray[index] = editCalendar;
                     localStorage.setItem(divName, JSON.stringify(calendarArray));
+                    return calendarArray[index];
                 }else if(select == 2){ //일정 생성
                     if(text == null || text.length == 0){
                         text = `schedule`;
@@ -493,6 +533,41 @@
 
                     calendarArray[index] = editCalendar;
                     localStorage.setItem(divName, JSON.stringify(calendarArray));
+                }else if(select == 5){//캘린더 삭제
+                    let newCalendarArray = [];
+                    for(i=0;i<calendarArray.length;i++){
+                        if(i != option){
+                            newCalendarArray.push(calendarArray[i]);
+                        }
+                    }
+                    localStorage.setItem(divName, JSON.stringify(newCalendarArray));
+                }else if(select == 6){//스케줄 삭제
+                    let targetCalendar = calendarArray[option];
+                    let newCalendar = [];
+                    newCalendar.push(calendarArray[option][0]);
+                    let newShcadulCheck = [];
+                    let newShcadulName = [];
+                    let newShcadulColor = [];
+                    let newShcadulUrl = [];
+                    for(i=0;i<targetCalendar[2].length;i++){
+                        if(text != i){
+                            newShcadulCheck.push(targetCalendar[1][i]);
+                            newShcadulName.push(targetCalendar[2][i]);
+                            newShcadulColor.push(targetCalendar[3][i]);
+                            newShcadulUrl.push(targetCalendar[4][i])
+                        }
+                    }
+                    newCalendar.push(newShcadulCheck);
+                    newCalendar.push(newShcadulName);
+                    newCalendar.push(newShcadulColor);
+                    newCalendar.push(newShcadulUrl);
+                    calendarArray[option] = newCalendar;
+                    localStorage.setItem(divName, JSON.stringify(calendarArray));
+                }else if(select == 7){
+                    let targetCalendar = calendarArray[option];
+                    targetCalendar[1][text] = url;
+                    calendarArray[option] = targetCalendar;
+                    localStorage.setItem(divName, JSON.stringify(calendarArray));
                 }
             }
 
@@ -520,43 +595,51 @@
         for(j=0;j<divNameArray.length;j++){
             let calendarArray2 = calendarSave(divNameArray[j], 3);
             let calenderNum = divNameArray[j];
-        for(i=0;i<calendarArray2.length;i++){
-            var calendarEl = document.querySelector(`.${calenderNum}_calendar_${i}`);
+            for(i=0;i<calendarArray2.length;i++){
+                calendarEvent(`${calenderNum}_calendar_${i}`, calendarArray2[i][1], calendarArray2[i][4], calendarArray2[i][3], calendarArray2[i][0][2])
+            }
+        }
+        function calendarEvent(divName_calendar_i, checkbox, url, color, height){
+            const basicUrl = `ko.south_korea#holiday@group.v.calendar.google.com`;
+            const fakeUrl = "";
+            const fakeColor = "blue"
+            const basicHeight = 500
+
+            var calendarEl = document.querySelector(`.${divName_calendar_i}`);
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
-                contentHeight: 500,
+                contentHeight: height == null ? basicHeight : height,
                 googleCalendarApiKey: 'AIzaSyBPomniaEFpdI98NVQIpyxJqtPzbN-bYoo',
 
                 eventSources: [{
-                    googleCalendarId: calendarArray2[i][4][0]==null ? fakeUrl : calendarArray2[i][4][0],
-                    className: 'gcal-event', // an option!
-                    color: calendarArray2[i][3][0]==null ? fakeUrl : calendarArray2[i][3][0],
+                    googleCalendarId: checkbox[0]==true ? url[0] : fakeUrl ,
+                    className: 'gcal-event0', // an option!
+                    color: checkbox[0]==true ? fakeUrl : color[0],
                 },
                 {
-                    googleCalendarId: calendarArray2[i][4][1]==null ? fakeUrl : calendarArray2[i][4][1],
+                    googleCalendarId: checkbox[1]==true ? url[1] : fakeUrl,
+                    className: 'gcal-event1', // an option!
+                    color: checkbox[1]==true ? fakeUrl : color[1],
+                },
+                {
+                    googleCalendarId: checkbox[2]==true ? url[2] : fakeUrl,
                     className: 'gcal-event2', // an option!
-                    color: calendarArray2[i][3][1]==null ? fakeUrl : calendarArray2[i][3][1],
+                    color: checkbox[2]==true ? fakeUrl : color[2],
                 },
                 {
-                    googleCalendarId: calendarArray2[i][4][2]==null ? fakeUrl : calendarArray2[i][4][2],
+                    googleCalendarId: checkbox[3]==true ? url[3] : fakeUrl,
                     className: 'gcal-event3', // an option!
-                    color: calendarArray2[i][3][2]==null ? fakeUrl : calendarArray2[i][3][2],
+                    color: checkbox[3]==true ? fakeUrl : color[3],
                 },
                 {
-                    googleCalendarId: calendarArray2[i][4][3]==null ? fakeUrl : calendarArray2[i][4][3],
-                    className: 'gcal-event2', // an option!
-                    color: calendarArray2[i][3][3]==null ? fakeUrl : calendarArray2[i][3][3],
-                },
-                {
-                    googleCalendarId: calendarArray2[i][4][4]==null ? fakeUrl : calendarArray2[i][4][0],
-                    className: 'gcal-event3', // an option!
-                    color: calendarArray2[i][3][4]==null ? fakeUrl : calendarArray2[i][3][4],
+                    googleCalendarId: checkbox[4]==true ? url[4] : fakeUrl,
+                    className: 'gcal-event4', // an option!
+                    color: checkbox[4]==true ? fakeUrl : color[4],
                 }
                 
                 ]
             });
             calendar.render();
-        }
         }
 
         
