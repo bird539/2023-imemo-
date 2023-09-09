@@ -5,10 +5,6 @@ function make_window(num){
     const newDiv = document.createElement("div");
     newDiv.className = `window_${num}`;
 
-    newDiv.style.width = "360px"
-    newDiv.style.display = "inline-block";
-    newDiv.style.padding = "5px";
-
     //윈도우 이름 추가
     const window_name = document.createElement("h3");
     window_name.innerText = `win${num}`;
@@ -27,14 +23,12 @@ function make_window(num){
 
     name_form.appendChild(name_input);
     name_form.appendChild(name_input_btn);
-    name_form.style.display = "inline-block";
 
     newDiv.appendChild(name_form);
 
     //윈도우 탭 클래스 생성
     const tap_class = document.createElement("div");
     tap_class.className = `win_tap_${num}`;
-    tap_class.style.display = "inline-block";
     newDiv.appendChild(tap_class);
 
     //윈도우를 메인에 생성
@@ -44,8 +38,8 @@ function make_window(num){
     make_tap_pluse(num);
 
     const memu_show_btn = document.createElement("button");
-    memu_show_btn.style.display = "inline-block";
     memu_show_btn.innerText = "menu";
+    memu_show_btn.style.display = "block";
     memu_show_btn.addEventListener("click",menu_show);
     newDiv.appendChild(memu_show_btn);
 
@@ -312,7 +306,7 @@ function plusTapBTN_canChange(num){
             const label = document.createElement("label");
 
             let numTxt = `${thisWinTap_array[i].charAt(thisWinTap_array[i].length-1)}`;
-            let NameSkil = ["메모", "링크", "계산","암기","달력","tap","tap","tap","tap","tap"];
+            let NameSkil = ["메모", "링크", "계산","암기","tap","tap","tap","tap","tap","tap"];
             let bName = `${NameSkil[numTxt]}${numTxt}`;
 
             label.innerHTML = `${bName}`; 
@@ -532,7 +526,7 @@ function make_tap_pluse(num){
     newUl.style.listStyle = "none";
 
     //li안 선택 스킬 버튼
-    let skill_array = ["메모0","링크1","계산2","암기3","달력4",5,6,7,8,9];
+    let skill_array = ["메모0","링크1","계산2","암기3",4,5,6,7,8,9];
     skill_array.forEach(function(n) {
         const newLi = document.createElement("li");
         const newLiBtn = document.createElement("button");
@@ -547,7 +541,6 @@ function make_tap_pluse(num){
 
     const tap_button = document.createElement("button");
     tap_button.innerText = `tap++`;
-    newDiv.style.display = "inline-block";
     newDiv.appendChild(tap_button);
     newDiv.appendChild(tapSelectDiv);//ul추가
     newDiv.addEventListener("click",hied_show_tapSelect);

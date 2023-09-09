@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8" meta http-equiv="content-language" content="ko">
     <title>imemo</title>
-    <link href='/fullcalenderMain.css' rel='stylesheet'>
     <link rel="stylesheet" href="/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
 </head>
@@ -42,15 +41,12 @@
         }
 
         let calendarMakeArray = [];
-        let divNameArray = [];
-        
 
         function skill_apply_calendar(txt){
             const div_calendarName = `s${txt}`;
             if(div_calendarName.charAt(div_calendarName.length-1) == `4`){
                 const w_divCalendar = document.querySelector(`.${div_calendarName}`);
-                divNameArray.push(div_calendarName);
-                let calendarArray = calendarSave(div_calendarName, 3);
+                
                 const calendarDivHead = document.createElement("div");
 
                 const calendarForm = document.createElement("form");
@@ -60,14 +56,13 @@
                 calendarSubBtn.type = "submit";
                 calendarInputTitle.placeholder = "calendar name";
                 calendarForm.style.display = "inline-block";
-                calendarForm.addEventListener("submit",calendarSubEvent);
 
                 const calendarInputHeight = document.createElement("input");
-                calendarInputHeight.placeholder = "basic Height : 473px";
+                calendarInputHeight.placeholder = "(emty fine)basic Height : 473px";
                 calendarInputHeight.style.display = "block";
                 const calendarInputWidth = document.createElement("input");
                 calendarInputWidth.style.display = "block";
-                calendarInputWidth.placeholder = "basic width : 300px";
+                calendarInputWidth.placeholder = "(emty fine)basic width : 300px";
 
 
                 
@@ -81,62 +76,44 @@
 
                 const calendarSchedulForm = document.createElement("form");
                 const calendarSchedulInputTitle = document.createElement("input");
-                calendarSchedulInputTitle.placeholder = "schedul title";
-                calendarSchedulInputTitle.style.display = "block";
                 const calendarSchedulInputUrl = document.createElement("input");
-                calendarSchedulInputUrl.placeholder = "google calendar url";
-                calendarSchedulInputUrl.style.display = "block";
                 const calendarSchedulInputColor = document.createElement("input");
-                calendarSchedulInputColor.placeholder = "schedul color";
-                calendarSchedulInputColor.style.display = "inline-block";
                 const calendarSchedulSubBtn = document.createElement("input");
                 calendarSchedulSubBtn.type = "submit";
-                calendarSchedulSubBtn.value = "sub";
+                calendarSchedulSubBtn.innerText = "sub";
 
                 const calendarSchedulShowBtn = document.createElement("button");
-                calendarSchedulShowBtn.innerText = "+ scadul";
-                calendarSchedulShowBtn.addEventListener("click",showNewScadulForm);
-
-                const calendarEditShowBtn = document.createElement("button");
-                calendarEditShowBtn.innerText = "calendar edit";
-                calendarEditShowBtn.addEventListener("click",showEditCalendarForm);
-                
+                calendarSchedulShowBtn.innerText = "+scadul";
+                calendarSchedulShowBtn.style.display = "none";
 
                 calendarSchedulForm.appendChild(calendarSchedulInputTitle);
                 calendarSchedulForm.appendChild(calendarSchedulInputUrl);
                 calendarSchedulForm.appendChild(calendarSchedulInputColor);
                 calendarSchedulForm.appendChild(calendarSchedulSubBtn);
-                calendarSchedulForm.addEventListener("submit",schedulSubEvent);
                 calendarSchedulForm.style.display = "none";
 
                 
-                let calenderNum = div_calendarName;
+                let calenderNum = txt.split('_',2)[1];
                 //보여줄 달력 select + 일정 추가할 달력 대상
                 const calendarSelect = document.createElement("select");
                 calendarSelect.addEventListener("change",showNewCalendarForm);
-                for(i=0;i<calendarArray.length+1;i++){
+                let CalendarTitle = ["new calendar","달력1","달력2"];
+                for(i=0;i<CalendarTitle.length;i++){
                     const CalendarOption = document.createElement("option");
                     CalendarOption.value = `${calenderNum}_calendar_${i-1}`;
-                    if(i < 1){
-                        CalendarOption.innerText = "new calendar";
-                    }else{
-                        CalendarOption.innerText = `${calendarArray[i-1][0][0]}`;
+                    CalendarOption.innerText = `${CalendarTitle[i]}`;
+                    if(i > 0){
+                        CalendarOption.innerText = `${CalendarTitle[i]}+schedule`;
                     }
                     calendarSelect.appendChild(CalendarOption);
                 }
-                calendarSelect.selectedIndex = 1;
                 
 
-                //0:0['대표 달력 네임', with, height],
-                //  1[true, null,null,null,null], - 스케줄 보일지 말지
-                //  2['타이틀1', null,null,null,null],
-                //  3['색깔1', null,null,null,null],
-                //  4['url1', null,null,null,null]
                 //보여줄 달력 select
                 const calendarFoot =  document.createElement("div");
-                for(j=0;j<calendarArray.length;j++){
+                for(j=0;j<3;j++){
                     const calendarScheduleDiv = document.createElement("div");
-                    let CalendarSchedule = calendarArray[j][2];
+                    let CalendarSchedule = ["일정1","일정2","일정3"];
                     for(i=0;i<CalendarSchedule.length;i++){
                         const schedulDiv = document.createElement("div"); 
 
@@ -144,65 +121,34 @@
                         const editInputTitle = document.createElement("input");
                         //editInputTitle.va
                         editInputTitle.placeholder = "text";
-                        editInputTitle.value = CalendarSchedule[i]
                         const editInputUrl = document.createElement("input");
                         editInputUrl.placeholder = "calendar url";
-                        editInputUrl.value = calendarArray[j][4][i];
                         const editInputColor = document.createElement("input");
                         editInputColor.placeholder = "color";
-                        editInputColor.type = "color";
-                        editInputColor.value = calendarArray[j][3][i];
                         const editSubBtn = document.createElement("button");
                         editSubBtn.type = "submit";
                         editSubBtn.innerText = "sub";
                         const editInputHide = document.createElement("input");
                         editInputHide.value =  `${calenderNum}_schedul_${j}_${i}`;
-                        editInputHide.type = "hidden";
+                        editInputHide.type = "hide";
                         editSheculForm.appendChild(editInputTitle);
                         editSheculForm.appendChild(editInputUrl);
                         editSheculForm.appendChild(editInputColor);
                         editSheculForm.appendChild(editInputHide);
                         editSheculForm.appendChild(editSubBtn);
                         editSheculForm.style.display = "none";
-                        
 
                         const schedulSpan = document.createElement("span");
                         const ScheduleCheckbox = document.createElement("input");
                         ScheduleCheckbox.type = "checkbox";
-                        ScheduleCheckbox.addEventListener("click",schedulCheckBoxEvent);
                         ScheduleCheckbox.value = `${calenderNum}_calendar_${i}`;
-                        ScheduleCheckbox.checked = calendarArray[j][1][i];
                         const SchedulText = document.createElement("span");
-                        SchedulText.innerText = calendarArray[j][2][i];
+                        SchedulText.innerText = `${CalendarSchedule[i]}`;
                         const SchedulEditBtn = document.createElement("button");
                         SchedulEditBtn.innerText = "edit";
-                        SchedulEditBtn.addEventListener("click",schedulEditBtnEvent);
-                        
-                        const schedulDelBtn = document.createElement("button");
-                        const scadulDelSpan = document.createElement("div");
-                        const scadulDelText = document.createElement("span");
-                        const scadulDelYes = document.createElement("button");
-                        const scadulDelNo = document.createElement("button");
-                        schedulDelBtn.innerText = "del";
-                        scadulDelText.innerText = "del this schedul?";
-                        scadulDelYes.innerText = "yes";
-                        scadulDelYes.addEventListener("click",delSchedulrYesBtnEvent);
-                        scadulDelNo.innerText = "no";
-                        scadulDelNo.addEventListener("click",delCalendarNoBtnEvent);
-                        scadulDelText.style.display = "none";
-                        scadulDelYes.style.display = "none";
-                        scadulDelNo.style.display = "none";
-                        scadulDelSpan.style.display = "none";//delCalendarBtnEvent
-                        schedulDelBtn.addEventListener("click",delCalendarBtnEvent);
-                        scadulDelSpan.appendChild(schedulDelBtn);
-                        scadulDelSpan.appendChild(scadulDelText);
-                        scadulDelSpan.appendChild(scadulDelYes);
-                        scadulDelSpan.appendChild(scadulDelNo);
-                        
                         schedulSpan.appendChild(SchedulText);
                         schedulSpan.appendChild(ScheduleCheckbox);
                         schedulSpan.appendChild(SchedulEditBtn);
-                        schedulSpan.appendChild(scadulDelSpan);
                         //ScheduleCheckbox.innerText = `${CalendarSchedule[i]}`;
                         schedulDiv.appendChild(schedulSpan);
                         schedulDiv.appendChild(editSheculForm);
@@ -216,46 +162,21 @@
                     }
                     calendarFoot.appendChild(calendarScheduleDiv);
                 }
-                const calendarDelSpan = document.createElement("span");
-                const calendarDelBtn = document.createElement("button");
-                const calendarDelYesBtn = document.createElement("button");
-                const calendarDelNoBtn = document.createElement("button");
-                const calendarDelTextSpan = document.createElement("span");
-                calendarDelBtn.innerText = "del this calendar";
-                calendarDelBtn.addEventListener("click",delCalendarBtnEvent);
-                calendarDelYesBtn.innerText = "yes";
-                calendarDelYesBtn.addEventListener("click",delCalendarYesBtnEvent); 
-                calendarDelNoBtn.innerText = "no";
-                calendarDelNoBtn.addEventListener("click",delCalendarNoBtnEvent);
-                calendarDelTextSpan.innerText = "del this calendar?(scaduls also del)";
-                calendarDelNoBtn.style.display = "none";
-                calendarDelYesBtn.style.display = "none";
-                calendarDelSpan.style.display = "none";
-                calendarDelTextSpan.style.display = "none";
-                calendarDelSpan.appendChild(calendarDelBtn);
-                calendarDelSpan.appendChild(calendarDelTextSpan);
-                calendarDelSpan.appendChild(calendarDelYesBtn);
-                calendarDelSpan.appendChild(calendarDelNoBtn);
 
                 calendarDivHead.appendChild(calendarForm);
                 calendarDivHead.appendChild(calendarSelect);
                 calendarDivHead.appendChild(calendarSchedulShowBtn);
                 calendarDivHead.appendChild(calendarSchedulForm);
-                calendarDivHead.appendChild(calendarEditShowBtn);
-                calendarDivHead.appendChild(calendarDelSpan);
                 
                 const FullCalendarClassDiv = document.createElement("div");
                 FullCalendarClassDiv.className = "FullCalender";
-                FullCalendarClassDiv.style.width = "300px";
-                for(i=0;i<calendarArray.length;i++){
+                FullCalendarClassDiv.style.width = "320px";
+                for(i=0;i<CalendarTitle.length;i++){
                     const calendarDiv = document.createElement("div");
-                    let plsMakeArray = [];
                     calendarMakeArray.push(`${calenderNum}_calendar_${i}`);
                     calendarDiv.className = `${calenderNum}_calendar_${i}`;
-                    calendarDiv.style.width = `${calendarArray[i][0][1]}`
-                    if(calendarSelect.selectedIndex-1 == i){
-                        calendarDiv.style.display = "block";
-                    }else{
+                    //calendarDiv.style.width = "320px"
+                    if(calendarSelect.selectedIndex != i){
                         calendarDiv.style.display = "none";
                     }
                     FullCalendarClassDiv.appendChild(calendarDiv);
@@ -281,160 +202,30 @@
             const targetSelect = event.target;
             const targetForm = event.target.previousSibling;
             const targetPlsScadulBtn = event.target.nextSibling;
-            const targetCalendarEditBtn = event.target.nextSibling.nextSibling.nextSibling;
-            //const divName = event.target.parentElement.parentElement.className;
             if(targetSelect.selectedIndex == 0){
                 targetForm.style.display = "inline-block";
                 targetPlsScadulBtn.style.display = "none";
-                targetCalendarEditBtn.style.display = "none";
             }else{
                 targetForm.style.display = "none";
                 const targetCalendar = document.querySelector(`.${targetSelect.value}`);
                 const divName = event.target.parentElement.parentElement.className;
                 const targetCalendarOther = document.querySelector(`.${divName}`).childNodes[1];
-                const otherScheduleDiv = document.querySelector(`.${divName}`).childNodes[2];
                 for(i=0;i<targetCalendarOther.childNodes.length;i++){
                     targetCalendarOther.childNodes[i].style.display = "none";
-                    otherScheduleDiv.childNodes[i].style.display = "none";
                 }
-                
+
                 targetPlsScadulBtn.style.display = "inline-block";
                 targetCalendar.style.display = "block";
-                targetCalendarEditBtn.style.display = "inline-block";
-
-                const targetScheduleDiv = document.querySelector(`.${divName}_schedul_${targetSelect.selectedIndex-1}`);
-                targetScheduleDiv.style.display = "block";
             }
         }
-
-        function showNewScadulForm(event){
-            const targetForm = event.target.nextSibling;
-            if(targetForm.style.display=="none"){
-                targetForm.style.display = "block";
-            }else{
-                targetForm.style.display = "none";
-            }
-        }
-        function showEditCalendarForm(event){
-            const targetSelect = event.target.previousSibling.previousSibling;
-            const targetForm = event.target.previousSibling.previousSibling.previousSibling.previousSibling;
-            const targetDelCalendarBtn = event.target.nextSibling;
-            
-            if(targetForm.style.display == "none"){
-                targetForm.style.display = "block";
-                targetDelCalendarBtn.style.display = "block";
-            }else{
-                targetForm.style.display = "none";
-                targetDelCalendarBtn.style.display ="none";
-            }
-        }
-
-        function calendarSubEvent(event){
-            const divName = event.target.parentElement.parentElement.className;
-            const editBtn = event.target.nextSibling.nextSibling.nextSibling.nextSibling;
-            const index = event.target.nextSibling.selectedIndex;
-            const height = event.target.childNodes[0].value;
-            const width = event.target.childNodes[1].value;
-            const name = event.target.childNodes[2].value;
-            if(editBtn.style.display == "none"){
-                calendarSave(divName,0,0,name,Number(width), Number(height) );
-            }else{
-                let calendarArray = calendarSave(divName,1,index-1,name,width, height );
-                //const calendarDivName = event.target.nextSibling.value;
-                //calendarEvent(calendarDivName, calendarArray[1], calendarArray[4], calendarArray[3], calendarArray[0][1])
-            }
-        }
-        function schedulSubEvent(event){
-            //event.preventDefault();
-            const divName = event.target.parentElement.parentElement.className;
-            const index = event.target.previousSibling.previousSibling.selectedIndex;
-            const title = event.target.childNodes[0].value;
-            const url = event.target.childNodes[1].value;
-            const color = event.target.childNodes[2].value;
-            calendarSave(divName,2,index-1,title, url,color);
-            //console.log( );
-        }
-        function schedulEditBtnEvent(event){
-            const editBtn = event.target;
-            const targetForm = event.target.parentElement.nextSibling;
-            const delDiv = event.target.nextSibling;
-            const span = event.target.parentElement.parentElement;
-            const delText = event.target.nextSibling.childNodes[1];
-            const delBtnYes = event.target.nextSibling.childNodes[2];
-            const delBtnNo = event.target.nextSibling.childNodes[3];
-
-            if(targetForm.style.display == "none"){
-                targetForm.style.display = "block";
-                delDiv.style.display = "inline-block";
-                span.style.display = "block";
-            }else{
-                targetForm.style.display ="none";
-                delDiv.style.display ="none";
-                span.style.display = "inline";
-                delText.style.display ="none";
-                delBtnYes.style.display ="none";
-                delBtnNo.style.display ="none";
-            }
-        }
-        function delCalendarBtnEvent(event){
-            const delText = event.target.nextSibling;
-            const YesBtn = event.target.nextSibling.nextSibling;
-            const NoBtn = event.target.nextSibling.nextSibling.nextSibling;
-            if(YesBtn.style.display == "none"){
-                delText.style.display = "block"
-                YesBtn.style.display = "inline-block"
-                NoBtn.style.display = "inline-block"
-            }else{
-                delText.style.display = "none";
-                YesBtn.style.display = "none";
-                NoBtn.style.display = "none";
-            }
-        }
-        function delCalendarNoBtnEvent(event){
-            const noBtn = event.target;
-            const YesBtn = event.target.previousSibling;
-            const delText = event.target.previousSibling.previousSibling;
-            if(noBtn.style.display != "none"){
-                noBtn.style.display =  "none";
-                YesBtn.style.display = "none";
-                delText.style.display = "none";
-            }
-        }
-        function delCalendarYesBtnEvent(event){
-            const divName = event.target.parentElement.parentElement.parentElement.className;
-            const index = event.target.parentElement.previousSibling.previousSibling.previousSibling.previousSibling;
-            calendarSave(divName, 5, index.selectedIndex-1);
-            location.reload();
-        }
-        function delSchedulrYesBtnEvent(event){
-            const divName = event.target.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.className;
-            const index = event.target.parentElement.parentElement.parentElement.parentElement.parentElement.previousSibling.previousSibling.childNodes[1].selectedIndex;
-            const index2 = event.target.parentElement.parentElement.childNodes[1].value;
-            const index3 = index2.split("_")[4];
-            //console.log(index3);
-            calendarSave(divName, 6, index-1, Number(index3));
-            location.reload();
-        }
-        function schedulCheckBoxEvent(event){
-            const divName = event.target.parentElement.parentElement.parentElement.parentElement.parentElement.className;
-            const index = event.target.parentElement.parentElement.parentElement.parentElement.previousSibling.previousSibling.childNodes[1].selectedIndex;
-            const index2 = event.target.value;
-            const index3 = index2.split("_")[4];
-            const checkbox = event.target.checked;
-            calendarSave(divName, 7, index-1, Number(index3), checkbox);
-            //calendarEvent(divName_calendar_i, checkbox, url, color, height)
-            const calendarClassName = event.target.parentElement.parentElement.parentElement;
-            location.reload();
-        }
-        //function delCalendarBtnShowEvent(event)
         //-----함수
 
         //달력 저장-----
-        //0:['대표 달력 네임', with, height, (선택된 달력일 시) true],
-        //  [true, null,null,null,null], - 스케줄 보일지 말지
-        //  ['타이틀1', null,null,null,null],
-        //  ['색깔1', null,null,null,null],
-        //  ['url1', null,null,null,null]
+        //0:['대표 달력 네임', with, height],
+        //  [true,false,false], - 스케줄 보일지 말지
+        //  ['타이틀1','타이틀2',null],
+        //  ['색깔1', '색깔2',null],
+        //  ['url1', 'url2', null]
         function calendarSave(divName,select,option,text,url,color,check,option2){
             const getSaveCalendar = localStorage.getItem(divName);
                 const getSaveCalendarPar = JSON.parse(getSaveCalendar);
@@ -443,31 +234,25 @@
                     calendarArray = getSaveCalendarPar;
                 }else{
                     calendarArray = [[
-                        ["calendar1", 320, 400],
-                        [true],
-                        ['공휴일'],
-                        ['blue'],
-                        ['AIzaSyBPomniaEFpdI98NVQIpyxJqtPzbN-bYoo']
+                        ["달력1", 320, 473],
+                        [true,false,false],
+                        ['공휴일','shecul1','shecul2'],
+                        ['blue','yellow','green'],
+                        ['AIzaSyBPomniaEFpdI98NVQIpyxJqtPzbN-bYoo',null,null]
                     ]];
                 }
-                if(select == 0){ //new 달력
+                if(select == 0){ //new
                     if(option == 0){
-                        if(url == null || url.length == 0){
-                            url = 320;
-                        };
-                        if(color == null || color.length == 0){
-                            color = 473;
-                        };
                         let newCalendar = [
-                            [`${text}`, url, color],
-                            [true],
-                            [`공휴일`],
-                            ['blue'],
-                            ['AIzaSyBPomniaEFpdI98NVQIpyxJqtPzbN-bYoo']
+                            [`${text}`, 320, 473],
+                            [true,null,null],
+                            [`${text}`,null,null],
+                            ['blue',null,null],
+                            [`${url}`,null,null]
                         ];
                         calendarArray.push(newCalendar);
                         localStorage.setItem(divName, JSON.stringify(calendarArray));
-                        //return calendarArray[calendarArray.length-1];
+                        return calendarArray.length;
                     }
                 }else if(select == 1){ //edit 달력
                     if(text == null || text.length == 0){
@@ -486,35 +271,7 @@
                     editCalendar[0][2] = color;
                     calendarArray[index] = editCalendar;
                     localStorage.setItem(divName, JSON.stringify(calendarArray));
-                    return calendarArray[index];
-                }else if(select == 2){ //일정 생성
-                    if(text == null || text.length == 0){
-                        text = `schedule`;
-                    };
-                    if(url == null || url.length == 0){
-                        url = 'AIzaSyBPomniaEFpdI98NVQIpyxJqtPzbN-bYoo';
-                    };
-                    if(color == null || color.length == 0){
-                        color = 'blue';
-                    };
-                    let index = Number(option);
-                    let editCalendar = calendarArray[index];
-                    let index2 = editCalendar[1].length;
-
-                    editCalendar[1].push(true);
-                    editCalendar[2].push(text);
-                    editCalendar[3].push(color);
-                    editCalendar[4].push(url);
-
-                    calendarArray[index] = editCalendar;
-                    localStorage.setItem(divName, JSON.stringify(calendarArray));
-                    //return calendarArray;
-
-                }else if(select == 3){//맨 처음 생성시 발생
-                    localStorage.setItem(divName, JSON.stringify(calendarArray));
-                    return calendarArray;
-                    
-                }else if(select == 4){ //일정 수정
+                }else if(select == 2){
                     if(text == null || text.length == 0){
                         text = `schedule`;
                     };
@@ -534,41 +291,6 @@
 
                     calendarArray[index] = editCalendar;
                     localStorage.setItem(divName, JSON.stringify(calendarArray));
-                }else if(select == 5){//캘린더 삭제
-                    let newCalendarArray = [];
-                    for(i=0;i<calendarArray.length;i++){
-                        if(i != option){
-                            newCalendarArray.push(calendarArray[i]);
-                        }
-                    }
-                    localStorage.setItem(divName, JSON.stringify(newCalendarArray));
-                }else if(select == 6){//스케줄 삭제
-                    let targetCalendar = calendarArray[option];
-                    let newCalendar = [];
-                    newCalendar.push(calendarArray[option][0]);
-                    let newShcadulCheck = [];
-                    let newShcadulName = [];
-                    let newShcadulColor = [];
-                    let newShcadulUrl = [];
-                    for(i=0;i<targetCalendar[2].length;i++){
-                        if(text != i){
-                            newShcadulCheck.push(targetCalendar[1][i]);
-                            newShcadulName.push(targetCalendar[2][i]);
-                            newShcadulColor.push(targetCalendar[3][i]);
-                            newShcadulUrl.push(targetCalendar[4][i])
-                        }
-                    }
-                    newCalendar.push(newShcadulCheck);
-                    newCalendar.push(newShcadulName);
-                    newCalendar.push(newShcadulColor);
-                    newCalendar.push(newShcadulUrl);
-                    calendarArray[option] = newCalendar;
-                    localStorage.setItem(divName, JSON.stringify(calendarArray));
-                }else if(select == 7){
-                    let targetCalendar = calendarArray[option];
-                    targetCalendar[1][text] = url;
-                    calendarArray[option] = targetCalendar;
-                    localStorage.setItem(divName, JSON.stringify(calendarArray));
                 }
             }
 
@@ -584,65 +306,36 @@
 
         //풀캘린더 ---------------------------
         //const bytes1 = window.CryptoJS.AES.decrypt(getData[0].calenderAPI, `${getData[0].calenderID}dexinnfigre167!`);
-        
-        //0:0['대표 달력 네임', with, height],
-        //  1[true, null,null,null,null], - 스케줄 보일지 말지
-        //  2['타이틀1', null,null,null,null],
-        //  3['색깔1', null,null,null,null],
-        //  4['url1', null,null,null,null]
-        const basicUrl = `ko.south_korea#holiday@group.v.calendar.google.com`;
-        const fakeUrl = "";
-        const fakeColor = "blue"
-        for(j=0;j<divNameArray.length;j++){
-            let calendarArray2 = calendarSave(divNameArray[j], 3);
-            let calenderNum = divNameArray[j];
-            for(i=0;i<calendarArray2.length;i++){
-                calendarEvent(`${calenderNum}_calendar_${i}`, calendarArray2[i][1], calendarArray2[i][4], calendarArray2[i][3], calendarArray2[i][0][2])
-            }
-        }
-        function calendarEvent(divName_calendar_i, checkbox, url, color, height){
-            const basicUrl = `ko.south_korea#holiday@group.v.calendar.google.com`;
-            const fakeUrl = "";
-            const fakeColor = "blue"
-            const basicHeight = 500
+        const decrypt1 = `ko.south_korea#holiday@group.v.calendar.google.com`;
 
-            var calendarEl = document.querySelector(`.${divName_calendar_i}`);
+        for(i=0;i<calendarMakeArray.length;i++){
+            var calendarEl = document.querySelector(`.${calendarMakeArray[i]}`);
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
-                contentHeight: height == null ? basicHeight : height,
+                contentHeight: 500,
                 googleCalendarApiKey: 'AIzaSyBPomniaEFpdI98NVQIpyxJqtPzbN-bYoo',
 
                 eventSources: [{
-                    googleCalendarId: checkbox[0]==true ? url[0] : fakeUrl ,
-                    className: 'gcal-event0', // an option!
-                    color: checkbox[0]==true ? fakeUrl : color[0],
-                },
-                {
-                    googleCalendarId: checkbox[1]==true ? url[1] : fakeUrl,
-                    className: 'gcal-event1', // an option!
-                    color: checkbox[1]==true ? fakeUrl : color[1],
-                },
-                {
-                    googleCalendarId: checkbox[2]==true ? url[2] : fakeUrl,
-                    className: 'gcal-event2', // an option!
-                    color: checkbox[2]==true ? fakeUrl : color[2],
-                },
-                {
-                    googleCalendarId: checkbox[3]==true ? url[3] : fakeUrl,
-                    className: 'gcal-event3', // an option!
-                    color: checkbox[3]==true ? fakeUrl : color[3],
-                },
-                {
-                    googleCalendarId: checkbox[4]==true ? url[4] : fakeUrl,
-                    className: 'gcal-event4', // an option!
-                    color: checkbox[4]==true ? fakeUrl : color[4],
+                    googleCalendarId: decrypt1,
+                    className: 'gcal-event', // an option!
+                    color: '#362222',
                 }
-                
+                /*,
+                {
+                    googleCalendarId: decrypt2,
+                    className: 'gcal-event2', // an option!
+                    color: '#3b6978',
+                },
+                {
+                    googleCalendarId: decrypt3,
+                    className: 'gcal-event3', // an option!
+                    color: '#204051',
+                }
+                */
                 ]
             });
             calendar.render();
         }
-
         
 
         /*
