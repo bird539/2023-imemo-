@@ -1973,13 +1973,14 @@ function make_menu(num){
     colorDiv.appendChild(basicColorDiv);
     //colorDiv.appendChild(colorTarget);
     //colorDiv.appendChild(colorSave);
+    /*
     const defailseColor = document.createElement("details");
     const defailseColorText = document.createElement("summary");
     defailseColorText.innerText = "컬러 옵션";
     defailseColor.appendChild(defailseColorText);
-    defailseColor.appendChild(colorDiv);
+    defailseColor.appendChild(colorDiv);*/
 
-    newDiv.appendChild(defailseColor);
+    newDiv.appendChild(colorDiv);
 
 
 
@@ -2041,7 +2042,6 @@ function make_menu(num){
     }
 
     function colorSubmitEvent(event){
-        event.preventDefault();
         const form = event.target;
         const backColor = form.childNodes[0].value;
         const textColor = form.childNodes[1].value;
