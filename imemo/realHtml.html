@@ -1742,7 +1742,7 @@ A VERTICAL event
     <!---<script src="/html/make_window.js"></script>--->
     <!---<script src="/html/window_title_change.js"></script>--->
     <!---<script src="/html/tap.js"></script>--->
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.10/clipboard.min.js"></script>
     <script>
         //111111
         const main = document.querySelector('.main');
@@ -1981,6 +1981,18 @@ function make_menu(num){
     defailseColor.appendChild(colorDiv);*/
 
     newDiv.appendChild(colorDiv);
+    
+
+    const copyDiv = document.createElement("div");
+    copyDiv.className =`div_copyTextInput_${num}`;
+    //copyDiv.style.display = "none";
+    /*
+    const copyTextInput = document.createElement("input");
+    copyTextInput.className = `copyTextInput_${num}`;
+    copyDiv.appendChild(copyTextInput);
+    */
+    
+    newDiv.appendChild(copyDiv);
 
 
 
@@ -3019,7 +3031,7 @@ function skill_apply(txt) {
                 select_option.selectedIndex = jjj;
             }
         }//https://hianna.tistory.com/420 - 빈 값 확인방법
-        selecOption_makeLi(memoText_array,jjj,get_stor_memoText_array_tapHendle,list_ul);
+        selecOption_makeLi(memoText_array,jjj,get_stor_memoText_array_tapHendle,list_ul, div_name);
 
         //전체복사 
         const copy_all_memo_btn = document.createElement("button");
@@ -3097,7 +3109,7 @@ function selectOption_select(event) {
         memoText_array[0].select = 3;
     }
     select_num = memoText_array[0].select;
-    selecOption_makeLi(memoText_array, select_num,get_stor_memoText_array_tapHendle,ul);
+    selecOption_makeLi(memoText_array, select_num,get_stor_memoText_array_tapHendle,ul,tap.className);
     memo_array_Stor(tap.className);
     memoText_array = [];
 }
@@ -3109,18 +3121,50 @@ function copyMemo(event) {
     window.navigator.clipboard.writeText(del_memo_target.innerText);
 }
 function copyMemo_All(event) {
-    const tap = event.target.parentElement.parentElement;
+    let tap = event.target.parentElement.parentElement;
+    if(event.target.parentElement.tagName ==  "BUTTON"){
+        tap = event.target.parentElement.parentElement.parentElement;
+    }
+    
     const select_memo = document.querySelectorAll(`.${tap.className} span`);
     const select_memo_li = document.querySelectorAll(`.${tap.className} li`);
     let allMemoCopy = "";
 
-    for (i = 0; i < select_memo.length; i++) {
+    for (i = 0; i < select_memo.length-1; i++) {
         if (select_memo_li[i].style.display != "none") {
             allMemoCopy = allMemoCopy.concat(select_memo[i].innerText, "\n");
         }
     }
-    window.navigator.clipboard.writeText(allMemoCopy);
+
+    const winNum = tap.className.split('_')[0];
+    const winNum2 = winNum.charAt(winNum.length-1);
+
+    const copyBtn = event.target;
+    const copyBtnParent = event.target.parentElement;
+    copyBtn.replaceChildren();
+    const copyDiv = document.querySelector(`.div_copyTextInput_${tap.className}`);
+
+    copyBtn.innerHTML = `<button class = "copyTextInput_${tap.className}" data-clipboard-text = "${allMemoCopy}">coppy all(rady)</button>`;
+
+    var clipboard = new ClipboardJS(`.copyTextInput_${tap.className}`);
+    clipboard.on('success', function(e) {
+        copyBtn.innerHTML = `copy all(done)`;
+        setTimeout(function(){
+            copyBtn.innerHTML = `copy all`;
+        }, 1000);
+        });
+    
+        clipboard.on('error', function(e) {
+            copyBtn.innerHTML = `<button class = "copyTextInput_${tap.className}" data-clipboard-text = "${allMemoCopy}">coppy all()</button>`;
+        });
+
+    //window.navigator.clipboard.writeText(allMemoCopy);
 }
+function copyMemoMake(Span,btnClassName, markName,copyText, btninnerText){
+    Span.innerHTML = `<button class = "copy${btnClassName}_${markName}" data-clipboard-text = "${copyText}">${btninnerText}</button>`;
+    var clipboard = new ClipboardJS(`.copy${btnClassName}_${markName}`);
+}
+
 
 function deleteMemo(event) {
     //삭제시 ""로 저장 및 none으로 숨기고, 후에 새로고침 시 ""는 없앤 배열을 저장하기
@@ -3215,7 +3259,7 @@ function workMemo_inputValu_inList(event) {
     if (parsed_memoText !== null) {
         memoText_array = parsed_memoText;
     }
-    const li = makeMemoUl_list(memoText_array.length,memoSaveValue.text,memoSaveValue.checked);
+    const li = makeMemoUl_list(memoText_array.length,memoSaveValue.text,memoSaveValue.checked,parent);
     ul.prepend(li);
     memoText_array.push(memoSaveValue);
     memo_array_Stor(parent);
@@ -3316,11 +3360,14 @@ function edit_memo_form(event) {
     const form = event.target;
     
     form.style.display = "none";
+
+    const copySpan = event.target.nextSibling.nextSibling;
+    copyMemoMake(copySpan, "memoText", `${html_text.className}_${parent}`, input_text.value, "copy");
 }
 
 //=====================================
 //윈도우에 li만드는 함수
-function makeMemoUl_list(index,text,checked) {
+function makeMemoUl_list(index,text,checked,divName) {
     const li = document.createElement("li");
     li.style.wordBreak = "break-all";
     const text_span = document.createElement("span");
@@ -3376,10 +3423,13 @@ function makeMemoUl_list(index,text,checked) {
     del_btn.addEventListener("click", deleteMemo);
 
     //복사버튼 구현
-    const copy_btn = document.createElement("button");
-    copy_btn.innerText = "copy";
+    const copy_btn = document.createElement("span");
+    copyMemoMake(copy_btn, "memoText", `${index}_${divName}`, text, "copy");
+    //copy_btn.innerText = "copy";
     copy_btn.style.display = "inline-block";
-    copy_btn.addEventListener("click", copyMemo);
+    
+    
+    //copy_btn.addEventListener("click", copyMemo);
 
     const div_combine = document.createElement("div");
     div_combine.appendChild(edit_form);
@@ -3393,7 +3443,9 @@ function makeMemoUl_list(index,text,checked) {
     return li;
 }
 
-function selecOption_makeLi(memoText_array, select_option,get_stor_memoText_array_tapHendle,ul){
+
+
+function selecOption_makeLi(memoText_array, select_option,get_stor_memoText_array_tapHendle,ul,divName){
     let first_write = [];
     let second_write = [];
     let newMemo_array = [];
@@ -3512,7 +3564,7 @@ function selecOption_makeLi(memoText_array, select_option,get_stor_memoText_arra
     if (get_stor_memoText_array_tapHendle !== null) {
         for (i = 0; i < newMemo_array.length; i++) {
             a = newMemo_array[i];
-            const li = makeMemoUl_list(a,memoText_array[a].text,memoText_array[a].checked);
+            const li = makeMemoUl_list(a,memoText_array[a].text,memoText_array[a].checked,divName);
             ul.appendChild(li);
         }
     }
@@ -3758,6 +3810,12 @@ function visitLink(event){
     localStorage.setItem(`${divNameLink}`, JSON.stringify(linkText_array));
 }
 
+
+function copyLinkMake(Span,btnClassName, markName,copyText, btninnerText){
+    Span.innerHTML = `<button class = "copy${btnClassName}_${markName}" data-clipboard-text = "${copyText}">${btninnerText}</button>`;
+    var clipboard = new ClipboardJS(`.copy${btnClassName}_${markName}`);
+}
+
 function makeLinkUl(linkText_array,link_ul,div_linkName,tag_array,check,index,selectOption){
     for(i=0;i<linkText_array.length;i++){
         if(linkText_array[i].obj != null){
@@ -3784,9 +3842,10 @@ function makeLinkUl(linkText_array,link_ul,div_linkName,tag_array,check,index,se
         link_tag_select1.selectedIndex = linkText_array[i].obj[3];
         link_tag_select1.addEventListener("change", tagSelectLink);
 
-        const copy_link = document.createElement("button");
-        copy_link.innerText = "copy";
-        copy_link.addEventListener("click",copyMemLink);
+        const copy_link = document.createElement("span");
+        copyLinkMake(copy_link,"Link", `${i}_${div_linkName}`,lint_url, "copy");
+        
+        //copy_link.addEventListener("click",copyMemLink);
         const edit_btn_link = document.createElement("button");
         edit_btn_link.innerText = "edit";
         edit_btn_link.addEventListener("click",hied_show_linkEdit);
@@ -3989,6 +4048,9 @@ function linkEdit(event){
     const divLinkName = event.target.parentElement.parentElement.className;
 
     const name_form = event.target;
+    const copyBtn = event.target.previousSibling.previousSibling.previousSibling.firstChild;
+    const copyClassName = copyBtn.className.substr(9);
+    console.log(copyBtn, copyBtn.className, copyClassName);
 
     const get_link_stor = localStorage.getItem(divLinkName);
     const parsed_linkStor = JSON.parse(get_link_stor);
@@ -4020,6 +4082,9 @@ function linkEdit(event){
         const targetName = event.target.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling;
         targetName.innerText = name_link;
         targetName.href = url_link;
+
+
+        copyLinkMake(copyBtn,"Link", `${copyClassName}`,url_link, "copy");
     }else{
         return;
     }
@@ -4458,9 +4523,12 @@ function skill_apply_calcul(txt){
         selectDelBth.addEventListener("click",delCheckCalcul);
         otherBtnSpan.appendChild(selectDelBth);
 
-        const selectCopyBth = document.createElement("button");
-        selectCopyBth.innerText = "select copy";
-        selectCopyBth.addEventListener("click",copySelect);
+        const selectCopyBth = document.createElement("span");
+        let copyText = saveCalcul(div_calculName,0, 0, 7);
+        copyCalculMake(selectCopyBth,"calculSelectAllCopy", `${div_calculName}`,copyText, "select copy");
+
+        //selectCopyBth.innerText = "select copy";
+        //selectCopyBth.addEventListener("click",copySelect);
         otherBtnSpan.appendChild(selectCopyBth);
     
         const pluseTableBtn = document.createElement("button");
@@ -4476,6 +4544,7 @@ function skill_apply_calcul(txt){
             optionType.value = i;
             selectOption.appendChild(optionType);
         }
+        selectOption.addEventListener("change", selectCopyCalculMake);
         otherBtnSpan.appendChild(selectOption);
         otherBtnSpan.style.display = "block";
 
@@ -4601,6 +4670,18 @@ function saveCalcul(divName,text, num,newOrDel){
         return newText;
     }
 }
+function selectCopyCalculMake(event){
+    const divName = event.target.parentElement.parentElement.className;
+    let copyText = saveCalcul(divName,event.target.selectedIndex, 0, 7);
+    const copySpan = event.target.previousSibling.previousSibling;
+    const copySpanClass = copySpan.firstChild.className;
+    copySpan.innerHTML = `<button class = "${copySpanClass}" data-clipboard-text = "${copyText}">select copy</button>`;
+    var clipboard = new ClipboardJS(`.${copySpanClass}`);
+}
+function copyCalculMake(Span,btnClassName, markName,copyText, btninnerText){
+    Span.innerHTML = `<button class = "copy${btnClassName}_${markName}" data-clipboard-text = "${copyText}">${btninnerText}</button>`;
+    var clipboard = new ClipboardJS(`.copy${btnClassName}_${markName}`);
+}
 
 function makeTrTd(index,checkedvalue,text,num,tableCalcul){
     const trCal = document.createElement("tr");
@@ -4684,6 +4765,12 @@ function checkBoxEvent(event){
     const sumInput = event.target.parentElement.parentElement.parentElement.parentElement.childNodes[2].childNodes[2];
     
     sumInput.value = sum.toLocaleString('ko-kr');
+
+    const selectCopyBth = event.target.parentElement.parentElement.parentElement.nextSibling.nextSibling.childNodes[1];
+    const copyClassName = selectCopyBth.firstChild.className;
+    const option = event.target.parentElement.parentElement.parentElement.nextSibling.nextSibling.childNodes[3].selectedIndex;
+    let copyText = saveCalcul(divName,option, 0, 7);
+    copyCalculMake(selectCopyBth,"calculSelectAllCopy", `${divName}`,copyText, "select copy");
 }
 function checkboxAllCheckedEvent(event){
     const check = event.target.checked;
@@ -4703,13 +4790,6 @@ function checkboxAllCheckedEvent(event){
     }
     
 }
-/*
-해시총공많은참여바랍니다
-#프로젝트문_부당해고_진상규명
-프로젝트문은부당해고해명하고사과하라
-#PM_unfairdismissal
-앑맘팔로워10명필수15분화력집중!!
-*/
 
 function newInputCalcul(event){
     event.preventDefault();
@@ -4892,7 +4972,7 @@ if(in_stor_tap_array_calcul != null){
     divCalcul = parsed_tap2;
     divCalcul.forEach(skill_apply_calcul);
 }
-    //111111- 링크1
+    //111111- 계산2
     </script>
 
         <script>
@@ -5151,13 +5231,23 @@ function skill_apply_word(txt) {
         checkboxCopyAndDelBtn.addEventListener("click", nextTargetDisplayShow2);
         checkboxOption.appendChild(checkboxCopyAndDelBtn);
         const checkboxCopyDelBtn = document.createElement("span");
-        let copyDellArray = ["copy", "del"];
+        
+        /*let copyDellArray = ["copy", "del"];
         for (j = 0; j < copyDellArray.length; j++) {
             const copyDelOption = document.createElement("button");
             copyDelOption.addEventListener("click",copyAndDellBtnEvent);
             copyDelOption.innerText = `${copyDellArray[j]}`;
             checkboxCopyDelBtn.appendChild(copyDelOption);
-        }
+        }//checkedEvent*/
+        const copyOption = document.createElement("span");
+        copyWordMake(copyOption, `copyCheckedWord_${div_wordName}`,"  ","copy")
+        checkboxCopyDelBtn.appendChild(copyOption);
+
+        const DelOption = document.createElement("button");
+        DelOption.addEventListener("click",copyAndDellBtnEvent);
+        DelOption.innerText = `del`;
+        checkboxCopyDelBtn.appendChild(DelOption);
+
         const allCheckText = document.createElement("span");
         allCheckText.innerText = "all checked";
         const allCheckInput = document.createElement("input");
@@ -5237,6 +5327,7 @@ function makeTrTdWord(table, index, question, answer, lastAnswer, wrongC, correc
             const checkbox = document.createElement("input");
             checkbox.type = "checkbox"
             checkbox.value = index;
+            checkbox.addEventListener("click",checkedEvent);
             tdW.appendChild(checkbox);
 
             tdW.style.borderBottom = "1px solid #ffffff";
@@ -5979,13 +6070,45 @@ function copyAndDellBtnEvent(event){
             checkedArray.push(Number(index));
         }
     }
-    if(text == "copy"){
+    let copyText = saveWord(divName,5,checkedArray,0);
+    const copySpan = event.target.previousSibling.previousSibling.previousSibling;
+    copyWordMake(copySpan,copySpan.firstChild.className,copyText, "copy");
+
+    if(text == "copyt"){
         let copyText = saveWord(divName,5,checkedArray,0);
         window.navigator.clipboard.writeText(copyText);
     }else if(text == "del"){
         saveWord(divName,5,checkedArray,1);
         view.dispatchEvent(new Event('change'));
     }
+}
+
+function checkedEvent(event){
+    const divName = event.target.parentElement.parentElement.parentElement.parentElement.parentElement.className;
+    const table = event.target.parentElement.parentElement.parentElement;
+    //console.log(table.childNodes[0].childNodes[0].childNodes[0]);
+    let checkedArray = [];
+    for(j=0;j<table.childNodes.length;j++){
+        let checkeds = table.childNodes[j].childNodes[0].childNodes[0].checked;
+        if(checkeds == true){
+            let index = table.childNodes[j].childNodes[0].childNodes[0].value;
+            checkedArray.push(Number(index));
+        }
+    }
+    const allCheck = event.target.parentElement.parentElement.parentElement.parentElement.nextSibling.childNodes[3].childNodes[1].childNodes[3];
+    if(checkedArray.length == table.childNodes.length){
+        allCheck.checked = true;
+    }else{
+        allCheck.checked = false;
+    }
+    let copyText = saveWord(divName,5,checkedArray,0);
+    const copySpan = event.target.parentElement.parentElement.parentElement.parentElement.nextSibling.childNodes[3].childNodes[1].childNodes[0];
+    copyWordMake(copySpan,copySpan.firstChild.className,copyText, "copy");
+    
+}
+function copyWordMake(Span,btnClassName,copyText, btninnerText){
+    Span.innerHTML = `<button class = "${btnClassName}" data-clipboard-text = "${copyText}">${btninnerText}</button>`;
+    var clipboard = new ClipboardJS(`.${btnClassName}`);
 }
 
 function submitAllEvent(event){
@@ -21160,7 +21283,6 @@ var FullCalendar = (function (exports) {
                     calendarSelect.appendChild(CalendarOption);
                 }
                 calendarSelect.selectedIndex = selectI;
-                console.log(calendarSelect.selectedIndex);
                 
 
                 //0:0['대표 달력 네임', with, height], 
