@@ -3,16 +3,38 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,maximum-scale=1,width=device-width" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <!--<link rel="manifest" href="/site.webmanifest">-->
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" sizes="16x16">
+
+    
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no,maximum-scale=1,width=device-width" />
     <meta charset="UTF-8" meta http-equiv="content-language" content="ko">
     <style>
 body {
     background-color: black;
     height: 100%;
-    overflow: scroll;
+    
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 13pt;
+    scrollbar-width: none; 
+    overflow-y: auto;
+    overflow-x: none;
 }
+.main {
+    height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+    overflow : auto;
+    justify-content: center;
+}
+
+
 input, textarea, button, select {
     appearance: none;
     -webkit-text-size-adjust : none;
@@ -108,14 +130,6 @@ ul{
     padding: 0;
     margin:0;
 }
-.main {
-    height: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    align-content: center;
-    overflow : auto;
-    justify-content: center;
-}
 
 
 /*라디오 버튼
@@ -146,18 +160,18 @@ input[type="radio"]{
 label{
     font-size: 15px;
     border:1px  #ccc;
-    padding: 2px 8px 1.7px;
+    padding: 2px 8px 2.6px;
     
 }
 label:hover{
     background-color: gray;
     border-radius:30px;
-    padding: 2px 8px 1.7px;
+    padding: 2px 8px 2.6px;
 }
 input[type="radio"]:checked+label{
     border:1px solid rgb(196, 162, 121);
     border-radius:30px;
-    padding: 2px 8px 1.7px;
+    padding: 2px 8px 2.6px;
     /*
     border-left: 1px solid gray;
     border-top: 1px solid gray;
@@ -205,7 +219,11 @@ input[type="checkbox"]:checked::before {
     border-radius: 2px;
     transform: scale(1) translate(-50%, -50%)
 }
-
+.calendarCheckbox{
+    margin-bottom: -3px;
+    margin-right: -2px !important;
+    margin-left: 2px !important;
+}
 /*todo 메모 */
     </style>
     <style>
@@ -1732,6 +1750,14 @@ A VERTICAL event
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
     <title>rainMemo</title>
 </head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FEHRSKJR3E"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-FEHRSKJR3E');
+</script>
 
 <body>
     <div class="main">
@@ -2005,7 +2031,7 @@ function make_menu(num){
             colorArray = JSON.parse(colorArray0);
         }else{
             colorArray = [
-                [['#000000', '#ffffff', '#000000'], [], [], [], [], [], [], [], [], [], [] ]
+                [['#000000', '#ffffff', '#1d9bf0'], [], [], [], [], [], [], [], [], [], [] ]
             ];
         }
         return colorArray;
@@ -2075,7 +2101,7 @@ function make_menu(num){
             colorArray = JSON.parse(colorArray0);
         }else{
             colorArray = [
-                [['#000000', '#ffffff', '#000000'], [], [], [], [], [], [], [], [], [], [] ]
+                [['#000000', '#ffffff', '#1d9bf0'], [], [], [], [], [], [], [], [], [], [] ]
             ];
             localStorage.setItem(`colorSaveLoclal`, JSON.stringify(colorArray));
         }
@@ -2382,7 +2408,8 @@ function tapNameChange(event){
         if(parsed_tap_array[i] == input_real){
             tapName_array[i] = name;
             const tapBtn = document.getElementById(input_real);
-            tapBtn.previousElementSibling.innerText = name;
+            console.log(tapBtn);
+            tapBtn.nextSibling.innerText = name;
         }
     }
     const div = event.target.parentElement.childNodes[5].childNodes;
@@ -2407,12 +2434,13 @@ function selectTapDel(event){
     const in_stor_tap_array = localStorage.getItem("tap_array");
     let tap_array = [];
     let tap_array_new = [];
+    let tapI;
     if(in_stor_tap_array !== null){
         const parsed_tap_array = JSON.parse(in_stor_tap_array);
         tap_array = parsed_tap_array;
         for(i=0;i<tap_array.length;i++){
             if(tap_array[i]==tapName){
-                console.log(tapName);
+                tapI = i;
                 window.localStorage.removeItem(`s${tapName}`);
             }else if(tap_array[i]!=tapName){
                 tap_array_new.push(tap_array[i]);
@@ -2420,6 +2448,28 @@ function selectTapDel(event){
         }
         localStorage.setItem(`tap_array`,JSON.stringify(tap_array_new));
     }
+
+    //제목 저장도 수정
+    const in_stor_tapName_array = localStorage.getItem("tap_name_array");
+    const in_stor_tapName_array_parse = JSON.parse(in_stor_tapName_array);
+    let tapName_array = [];
+    if(in_stor_tapName_array_parse.length > tap_array.length){
+        tapName_array = in_stor_tapName_array_parse.slice(0,tap_array.length);
+    }else if(in_stor_tapName_array_parse.length < tap_array.length){
+        tapName_array = Array(tap_array.length);
+    }else if(in_stor_tapName_array_parse.length == tap_array.length){
+        tapName_array = in_stor_tapName_array_parse;
+    }
+
+    let newTapName_array = [];
+
+    for(j=0;j<tapName_array.length;j++){
+        if(j != tapI){
+            newTapName_array.push(tapName_array[j]);
+        }
+    }
+    localStorage.setItem(`tap_name_array`,JSON.stringify(newTapName_array));
+
     location.reload();
 }
 
@@ -3130,9 +3180,9 @@ function copyMemo_All(event) {
     const select_memo_li = document.querySelectorAll(`.${tap.className} li`);
     let allMemoCopy = "";
 
-    for (i = 0; i < select_memo.length-1; i++) {
-        if (select_memo_li[i].style.display != "none") {
-            allMemoCopy = allMemoCopy.concat(select_memo[i].innerText, "\n");
+    for (il = 0; il < select_memo_li.length; il++) {
+        if (select_memo[il].style.display != "none") {
+            allMemoCopy = allMemoCopy.concat(select_memo_li[il].childNodes[1].innerText, "\n");
         }
     }
 
@@ -3835,7 +3885,7 @@ function makeLinkUl(linkText_array,link_ul,div_linkName,tag_array,check,index,se
             link_option1.value = j;
             link_option1.innerText = `#${tag_array[j]}`;
             if(tag_array[j] == "none"){
-                link_option1.innerText = `     `;
+                link_option1.innerText = `#     `;
             }
             link_tag_select1.appendChild(link_option1);
         }
@@ -21331,6 +21381,7 @@ var FullCalendar = (function (exports) {
                         ScheduleCheckbox.addEventListener("click",schedulCheckBoxEvent);
                         ScheduleCheckbox.value = `${calenderNum}_calendar_${i}`;
                         ScheduleCheckbox.checked = calendarArray[j][1][i];
+                        ScheduleCheckbox.className = "calendarCheckbox";
                         const SchedulText = document.createElement("span");
                         SchedulText.innerText = calendarArray[j][2][i];
                         const SchedulEditBtn = document.createElement("button");
@@ -21855,7 +21906,7 @@ var FullCalendar = (function (exports) {
             colorArray = JSON.parse(colorArray0);
         }else{
             colorArray = [
-                [['#000000', '#ffffff', '#000000'], [], [], [], [], [], [], [], [], [], [] ]
+                [['#000000', '#ffffff', '#1d9bf0'], [], [], [], [], [], [], [], [], [], [] ]
             ];
             //localStorage.setItem(`colorSaveLoclal`, JSON.stringify(colorArray));
         }
