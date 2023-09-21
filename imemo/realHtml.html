@@ -1770,7 +1770,7 @@ A VERTICAL event
     <!---<script src="/html/tap.js"></script>--->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.10/clipboard.min.js"></script>
     <script>
-        //111111
+        //111111 ============================================================================================
         const main = document.querySelector('.main');
         
 
@@ -2455,10 +2455,13 @@ function selectTapDel(event){
     let tapName_array = [];
     if(in_stor_tapName_array_parse.length > tap_array.length){
         tapName_array = in_stor_tapName_array_parse.slice(0,tap_array.length);
+
     }else if(in_stor_tapName_array_parse.length < tap_array.length){
         tapName_array = Array(tap_array.length);
+
     }else if(in_stor_tapName_array_parse.length == tap_array.length){
         tapName_array = in_stor_tapName_array_parse;
+
     }
 
     let newTapName_array = [];
@@ -2584,7 +2587,7 @@ function make_tap_pluse(num){
     newUl.style.listStyle = "none";
 
     //li안 선택 스킬 버튼
-    let skill_array = ["메모0","링크1","계산2","암기3","달력4",5,6,7,8,9];
+    let skill_array = ["메모0","링크1","계산2","암기3","달력4"]; //,5,6,7,8,9
     skill_array.forEach(function(n) {
         const newLi = document.createElement("li");
         const newLiBtn = document.createElement("button");
@@ -2688,7 +2691,7 @@ function hied_show_tapSelect(event){
         }
     }
 }
-        //111111
+        //111111 ============================================================================================
     </script>
     
 
