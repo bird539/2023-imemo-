@@ -1988,14 +1988,7 @@ function make_menu(num){
     colorSave.appendChild(applyColorBtn);
     colorInputPluse(colorSave);
 */
-
-
-
-
     //최종 
-
-
-
     colorDiv.appendChild(basicColorDiv);
     //colorDiv.appendChild(colorTarget);
     //colorDiv.appendChild(colorSave);
@@ -2008,7 +2001,6 @@ function make_menu(num){
 
     newDiv.appendChild(colorDiv);
     
-
     const copyDiv = document.createElement("div");
     copyDiv.className =`div_copyTextInput_${num}`;
     //copyDiv.style.display = "none";
@@ -2020,10 +2012,50 @@ function make_menu(num){
     
     newDiv.appendChild(copyDiv);
 
+    const copyWinOrTap = document.createElement("div");
 
+    const copyWinOrTap1 = document.createElement("div");
+    const copyTextWinOrTap =document.createElement("a");
+    copyTextWinOrTap.innerText = "copy window or tap";
+    const copyWinSelect = makeSelectInput_copyWinOrTap([0,1,2,3],[4,5,6,7]);
+    const copyTapSelect = makeSelectInput_copyWinOrTap([0,1,2,3],[4,5,6,7]);
+
+    copyWinOrTap1.appendChild(copyTextWinOrTap);
+    copyWinOrTap1.appendChild(copyWinSelect);
+    copyWinOrTap1.appendChild(copyTapSelect);
+    copyWinOrTap.appendChild(copyWinOrTap1);
+
+    const copyWinOrTap2 = document.createElement("div");
+    const copyMakeWinOrTap = document.createElement("a");
+    copyMakeWinOrTap.innerText = "make copy win or tap real";
+    const copyMakeRealForm = document.createElement("form");
+    const copyMakeRealInput = document.createElement("input");
+    const copyMakeRealSubmit = document.createElement("input");
+    copyMakeRealSubmit.type = "submit";
+    copyMakeRealSubmit.value = "sub";
+    copyMakeRealForm.appendChild(copyMakeRealInput);
+    copyMakeRealForm.appendChild(copyMakeRealSubmit);
+
+    copyWinOrTap2.appendChild(copyMakeWinOrTap);
+    copyWinOrTap2.appendChild(copyMakeRealForm);
+    copyWinOrTap.appendChild(copyWinOrTap2);
+    newDiv.appendChild(copyWinOrTap);
 
     return newDiv;
 }
+
+function makeSelectInput_copyWinOrTap(array1, array2){
+    const select = document.createElement("select");
+    for(i=0;i<array1.length;i++){
+        const option = document.createElement("option");
+        option.value = array1[i];
+        option.innerText = array2[i];
+        select.appendChild(option);
+    }
+    return select;
+}
+
+
     function getSaveColor(){
         const colorArray0 = localStorage.getItem("colorSaveLoclal");
         let colorArray = [];
