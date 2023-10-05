@@ -30,8 +30,18 @@ body {
     display: flex;
     flex-wrap: wrap;
     align-content: center;
-    overflow : auto;
     justify-content: center;
+
+    scrollbar-width: 1px; 
+    overflow-x: none;
+    overflow-y: auto;
+
+}
+.main::-webkit-scrollbar{
+    display:none;
+}
+.body::-webkit-scrollbar{
+    display:none;
 }
 
 
@@ -79,8 +89,8 @@ h3{
 }
 input, button, select{
     background-color: black;
-    border-color: rgb(196, 162, 121);
-    color: bisque;
+    border-color: rgb(29, 155, 240);
+    color: rgb(29, 155, 240);
 }
 button{
     border: none;
@@ -94,18 +104,18 @@ input:hover{
 li{
     padding-top: 10px;
     list-style: none;
-    border-bottom: 1px solid rgb(196, 162, 121);
+    border-bottom: 1px solid rgb(29, 155, 240);
 }
 input{
     text-size-adjust : none;
     height: 14px;
     font-size:12pt;
     border: none;
-    border-bottom: 1px solid rgb(196, 162, 121);
+    border-bottom: 1px solid rgb(29, 155, 240);
     margin-right:5px;
 }
 input[type="submit"]{
-    border-bottom: 0px solid rgb(196, 162, 121);
+    border-bottom: 0px solid rgb(29, 155, 240);
     height: 13px;
     font-size:10pt;
     padding-left: 5px;
@@ -124,7 +134,7 @@ select:hover{
 ul a{
     text-decoration-line : none;
     padding: 5px;
-    border: 1px solid rgb(196, 162, 121);
+    border: 1px solid rgb(29, 155, 240);
 }
 ul{
     padding: 0;
@@ -169,7 +179,7 @@ label:hover{
     padding: 2px 8px 2.6px;
 }
 input[type="radio"]:checked+label{
-    border:1px solid rgb(196, 162, 121);
+    border:1px solid rgb(29, 155, 240);
     border-radius:30px;
     padding: 2px 8px 2.6px;
     /*
@@ -187,7 +197,7 @@ input[type="checkbox"] {
     height: 20px;
     cursor: pointer;
     outline: none !important;
-    border: 1px solid rgb(196, 162, 121);
+    border: 1px solid rgb(29, 155, 240);
     border-radius: 30px;
     background: #11111100;
     margin-bottom: -3px;
@@ -2016,19 +2026,83 @@ function make_menu(num){
 
     const copyWinOrTap1 = document.createElement("div");
     const copyTextWinOrTap =document.createElement("a");
-    copyTextWinOrTap.innerText = "copy window or tap";
-    const copyWinSelect = makeSelectInput_copyWinOrTap([0,1,2,3],[4,5,6,7]);
-    const copyTapSelect = makeSelectInput_copyWinOrTap([0,1,2,3],[4,5,6,7]);
+    copyTextWinOrTap.innerText = "copy window / tap\n";
+    
+    const winNum = localStorage.getItem("win_array");
+    const winName = localStorage.getItem("window_title");
+    const tapNum = localStorage.getItem("tap_array");
+    const tapName = localStorage.getItem("tap_name_array");
 
-    copyWinOrTap1.appendChild(copyTextWinOrTap);
+    if(winNum !=null){
+        const winNumm = JSON.parse(winNum);
+        let winNamee;
+        if(winName != null){
+            winNamee = JSON.parse(winName);
+        }
+        let tapNumm;
+        if(tapNum != null){
+            tapNumm = JSON.parse(tapNum);
+        }
+        let tapNamee;
+        if(tapNamee != null){
+            tapNamee = JSON.parse(tapName);
+        }
+        copyWinOrTap1.appendChild(copyTextWinOrTap);
+    let winwin = [];
+    for(i=0;i<winNumm.length; i++){
+        let ww;
+        if(winNamee != null){
+            ww = winNamee[winNumm[i]];
+        }else{
+            ww = winNumm[i];
+        }
+        winwin.push(ww);
+    }
+    const copyWinSelect = makeSelectInput_copyWinOrTap(winNumm,winwin);
+    copyWinSelect.addEventListener("change",copyWinTapSelectShow);
     copyWinOrTap1.appendChild(copyWinSelect);
-    copyWinOrTap1.appendChild(copyTapSelect);
+
+    if(tapNumm != null){
+        let NameSkil = ["메모0", "링크1", "계산2","암기3","달력4","tap","tap","tap","tap","tap"];
+    const copytapSelectDiv = document.createElement("span");
+    for(w=0;w<winNumm.length; w++){
+        let taptap = ["_window all tap"];
+        let taptap2 = [null];
+        for(j=0;j<tapNumm.length; j++){
+            let target = tapNumm[j];
+            //console.log(target[1]==`${winNumm[i]}`, target[1],`${winNumm[i]}`);
+            if(target[1]==`${winNumm[w]}`){
+                taptap2.push(target);
+                if(tapNamee!=null && tapNamee[j] != null){
+                    taptap.push(tapNamee[j]);
+                }else{
+                    let num = Number(target[target.length-1]);
+                    taptap.push(NameSkil[num]);
+                }
+            }
+        }
+        const TapSelect = makeSelectInput_copyWinOrTap(taptap2,taptap);
+        if(w>0){
+            TapSelect.style.display = "none";
+        }
+        copytapSelectDiv.appendChild(TapSelect);
+    }
+    copyWinOrTap1.appendChild(copytapSelectDiv);
+    }
+
+
+    const copyWinTapBtn = document.createElement("button");
+    copyWinTapBtn.innerText = "copy";
+    copyWinTapBtn.addEventListener("click", copyWinTapBtnEvent);
+    copyWinOrTap1.appendChild(copyWinTapBtn);
+
     copyWinOrTap.appendChild(copyWinOrTap1);
 
     const copyWinOrTap2 = document.createElement("div");
     const copyMakeWinOrTap = document.createElement("a");
-    copyMakeWinOrTap.innerText = "make copy win or tap real";
+    copyMakeWinOrTap.innerText = "make copy win / tap real";
     const copyMakeRealForm = document.createElement("form");
+    copyMakeRealForm.addEventListener("submit",copyWinTapMakeReal);
     const copyMakeRealInput = document.createElement("input");
     const copyMakeRealSubmit = document.createElement("input");
     copyMakeRealSubmit.type = "submit";
@@ -2040,9 +2114,115 @@ function make_menu(num){
     copyWinOrTap2.appendChild(copyMakeRealForm);
     copyWinOrTap.appendChild(copyWinOrTap2);
     newDiv.appendChild(copyWinOrTap);
-
+}
     return newDiv;
 }
+//윈도우 탭 복사하고 다시 만들기
+function copyWinTapSelectShow(event){
+    const target = event.target.selectedIndex;
+    const nextTarget = event.target.nextSibling.childNodes;
+   // console.log(target, nextTarget);
+    for(i=0;i<nextTarget.length;i++){
+        if(i==target){
+            nextTarget[i].style.display = "inline-block";
+        }else{
+            nextTarget[i].style.display = "none";
+        }
+    }
+}
+function copyWinTapBtnEvent(event){
+    const target1 = event.target.previousSibling.previousSibling.selectedIndex;
+    const target2 = event.target.previousSibling.childNodes;
+    let indexTap = 0;
+    for(i=0;i<target2.length;i++){
+        if(target2[i].style.display != "none"){
+            let indexTap2 = target2[i].selectedIndex;
+            indexTap = target2[i].childNodes[indexTap2].value;
+        }
+    }
+    if(indexTap != "null"){
+        let copyTap = `${indexTap[indexTap.length-1]}${localStorage.getItem(`s${indexTap}`)}`;
+        window.navigator.clipboard.writeText(copyTap);
+    }else{
+        let copyWin = `win_`;
+
+        for(i=1;i<target2[target1].childNodes.length;i++){
+            let tapName = target2[target1].childNodes[i].value; 
+            let tap = localStorage.getItem(`s${tapName}`);
+            copyWin+=`${tapName[tapName.length-1]}${tap}_/*split*/_`;
+        }
+        window.navigator.clipboard.writeText(copyWin);
+    }
+}
+
+function copyWinTapMakeReal(event){
+    event.preventDefault();
+    const text = event.target.childNodes[0].value;
+
+    if(text.substr(0,4) == 'win_'){ //윈도우 자체 복사본을 구현
+        const text2 = text.substr(4);
+        const text3 = text2.split("_/*split*/_");
+        //copy윈도우 추가
+        const winNum = localStorage.getItem("win_array");
+        let window_array = JSON.parse(winNum);
+        let limit_num = [0,1,2,3,4,5,6,7,8,9];
+        let new_can_winNum = [];
+        for(i=0;i<window_array.length;i++){
+            for(j=0;j<limit_num.length;j++){
+                if(window_array[i]==limit_num[j]){
+                    limit_num[j] = -1;
+                }
+            }
+        }
+        for(i=0;i<limit_num.length;i++){
+            if(limit_num[i] != -1){
+                window_array.push(limit_num[i]);
+                break;
+            }
+        }
+        localStorage.setItem(`win_array`, JSON.stringify(window_array));
+
+        //copy탭 추가
+        //탭 array 저장
+        const tapNum = localStorage.getItem("tap_array");
+        let tapNumm = JSON.parse(tapNum);
+        const w = window_array[window_array.length-1];
+        let tleng = [];
+        for(j=0;j<text3.length;j++){
+            if(text3[j][0] != null){
+                tleng.push(tapNumm.length);
+                const tname = `w${w}_t${tapNumm.length}_s${text3[j][0]}`;
+                tapNumm.push(tname);
+            }
+        }
+        localStorage.setItem(`tap_array`, JSON.stringify(tapNumm));
+        //탭 정보들 각각 저장
+        for(j=0;j<text3.length;j++){
+            if(text3[j][0] != null){
+                const tname = `sw${w}_t${tleng[j]}_s${text3[j][0]}`;
+                let tapOb = JSON.parse(text3[j].substr(1));
+                if(tapOb != null){
+                    localStorage.setItem(`${tname}`, JSON.stringify(tapOb));
+                }
+            }
+        }
+        location.reload();
+    }else if(Number(text[0]) != null){
+        const winDiv = event.target.parentElement.parentElement.parentElement.parentElement.className;
+        
+        const tapNum = localStorage.getItem("tap_array");
+        let tapNumm = JSON.parse(tapNum);
+        const tname = `w${winDiv[winDiv.length-1]}_t${tapNumm.length}_s${text[0]}`;
+        tapNumm.push(tname);
+        localStorage.setItem(`tap_array`, JSON.stringify(tapNumm));
+        
+        let tapOb = JSON.parse(text.substr(1));
+        localStorage.setItem(`s${tname}`, JSON.stringify(tapOb));
+        location.reload();
+    }
+}
+
+//window.navigator.clipboard.writeText(ling_target);
 
 function makeSelectInput_copyWinOrTap(array1, array2){
     const select = document.createElement("select");
