@@ -2060,6 +2060,8 @@ function make_menu(num){
     }
     const copyWinSelect = makeSelectInput_copyWinOrTap(winNumm,winwin);
     copyWinSelect.addEventListener("change",copyWinTapSelectShow);
+    copyWinSelect.addEventListener("change",makeInnerHTMLcopyWinTapTargeting);
+    copyWinSelect.className = "copyWin";
     copyWinOrTap1.appendChild(copyWinSelect);
 
     if(tapNumm != null){
@@ -2085,18 +2087,31 @@ function make_menu(num){
         if(w>0){
             TapSelect.style.display = "none";
         }
+        TapSelect.className = "copyTap";
+        TapSelect.addEventListener("change",makeInnerHTMLcopyWinTapTargeting);
         copytapSelectDiv.appendChild(TapSelect);
     }
+
     copyWinOrTap1.appendChild(copytapSelectDiv);
     }
 
-
+    /*
     const copyWinTapBtn = document.createElement("button");
     copyWinTapBtn.innerText = "copy";
+    copyWinTapBtn.className = `copyWinTap_${num}`;
     copyWinTapBtn.addEventListener("click", copyWinTapBtnEvent);
     copyWinOrTap1.appendChild(copyWinTapBtn);
+    */
+
+    const copyTargetWinTapSpan = document.createElement("span");
+    copyTargetWinTapSpan.innerHTML = makeFirstInnerHTMLcopyWinTap(tapNumm,`window_${num}`);
+    copyTargetWinTapSpan.firstChild.addEventListener("click",copySpanClicEvent);
+    //copyTargetWinTapSpan.addEventListener("click",copySpanClicEvent);
+    copyWinOrTap1.appendChild(copyTargetWinTapSpan);
+    //copyTargetWinTapSpan.innerHTML = `<button class = "copyTextInput_${tap.className}" data-clipboard-text = "${allMemoCopy}">coppy all(rady)</button>`;
 
     copyWinOrTap.appendChild(copyWinOrTap1);
+
 
     const copyWinOrTap2 = document.createElement("div");
     const copyMakeWinOrTap = document.createElement("a");
@@ -2149,10 +2164,78 @@ function copyWinTapBtnEvent(event){
         for(i=1;i<target2[target1].childNodes.length;i++){
             let tapName = target2[target1].childNodes[i].value; 
             let tap = localStorage.getItem(`s${tapName}`);
-            copyWin+=`${tapName[tapName.length-1]}${tap}_/*split*/_`;
+            copyWin+=`${tapName[tapName.length-1]}${tap}_*split*_`;
         }
         window.navigator.clipboard.writeText(copyWin);
     }
+}
+
+function copyWinTapBtnEvent2(event){
+    
+}
+function makeInnerHTMLcopyWinTapTargeting(event){
+    let target1;
+    let target2;
+    let innerHTMLspan;
+    let winName;
+    if(event.target.className == "copyWin"){
+        target1 = event.target.selectedIndex;
+        target2 = event.target.nextSibling.childNodes;
+        innerHTMLspan = event.target.nextSibling.nextSibling;
+        winName = event.target.parentElement.parentElement.parentElement.parentElement.className;
+    }else if(event.target.className == "copyTap"){
+        target1 = event.target.parentElement.previousSibling.selectedIndex;
+        target2 = event.target.parentElement.childNodes;
+        innerHTMLspan = event.target.parentElement.nextSibling;
+        winName = event.target.parentElement.parentElement.parentElement.parentElement.parentElement.className;
+    }
+    makeInnerHTMLcopyWinTap(target1,target2,innerHTMLspan,winName);
+}
+
+
+function makeInnerHTMLcopyWinTap(target1,target2,innerHTMLspan,winName){
+    let indexTap = 0;
+    for(i=0;i<target2.length;i++){
+        if(target2[i].style.display != "none"){
+            let indexTap2 = target2[i].selectedIndex;
+            indexTap = target2[i].childNodes[indexTap2].value;
+        }
+    }
+    if(indexTap != "null"){
+        let copyTap = `${indexTap[indexTap.length-1]}${localStorage.getItem(`s${indexTap}`)}`;
+        innerHTMLspan.innerHTML = `<button class = "copyWinTap_${winName}" data-clipboard-text = '${copyTap}'>coppy</button>`;
+
+    }else{
+        let copyWin = `win_`;
+
+        for(i=1;i<target2[target1].childNodes.length;i++){
+            let tapName = target2[target1].childNodes[i].value; 
+            let tap = localStorage.getItem(`s${tapName}`);
+            copyWin+=`${tapName[tapName.length-1]}${tap}_*split*_`;
+        }
+        innerHTMLspan.innerHTML = `<button class = "copyWinTap_${winName}" data-clipboard-text = '${copyWin}'>coppy</button>`;
+    }
+}
+function makeFirstInnerHTMLcopyWinTap(tapNameArray,winName){
+        let copyWin = `win_`;
+        if(tapNameArray != null){
+            for(i=1;i<tapNameArray.length;i++){
+                let tapName = tapNameArray[i]; 
+                let tap = localStorage.getItem(`s${tapName}`);
+                copyWin+=`${tapName[tapName.length-1]}${tap}_*split*_`;
+            }
+        }
+        return `<button class = "copyWinTap_${winName}" data-clipboard-text = '${copyWin}'>copy</button>`;
+}
+
+/*
+    copyBtn.innerHTML = `<button class = "copyTextInput_${tap.className}" data-clipboard-text = "${allMemoCopy}">coppy all(rady)</button>`;
+
+    var clipboard = new ClipboardJS(`.copyTextInput_${tap.className}`);
+*/
+function copySpanClicEvent(event){
+    const buttonName = `${event.target.className}`;
+    var clipboard = new ClipboardJS(`.${buttonName}`);
 }
 
 function copyWinTapMakeReal(event){
@@ -2161,7 +2244,7 @@ function copyWinTapMakeReal(event){
 
     if(text.substr(0,4) == 'win_'){ //윈도우 자체 복사본을 구현
         const text2 = text.substr(4);
-        const text3 = text2.split("_/*split*/_");
+        const text3 = text2.split("_*split*_");
         //copy윈도우 추가
         const winNum = localStorage.getItem("win_array");
         let window_array = JSON.parse(winNum);
