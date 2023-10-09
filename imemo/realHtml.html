@@ -2233,9 +2233,11 @@ function makeFirstInnerHTMLcopyWinTap(tapNameArray,winName,nn){
         let copyWin = `win_`;
         if(tapNameArray != null){
             for(i=0;i<tapNameArray.length;i++){
-                let tapName = tapNameArray[i]; 
-                let tap = localStorage.getItem(`s${tapName}`);
-                copyWin+=`${tapName[tapName.length-1]}${tap}_*split*_`;
+                if(winName[winName.length-1] == tapNameArray[i][1]){
+                    let tapName = tapNameArray[i]; 
+                    let tap = localStorage.getItem(`s${tapName}`);
+                    copyWin+=`${tapName[tapName.length-1]}${tap}_*split*_`;
+                }
             }
         }
         if(nn == 1){
@@ -2688,7 +2690,7 @@ function radioTapSelect(event){
     const input_real = event.target.parentElement.parentElement.parentElement.childNodes[3];
     const value = event.target.value;
     input_real.value = `${value}`;
-
+    menueShow_tap(value);
     const div = event.target.parentElement.parentElement.childNodes;
     for(i=0;i<div.length;i++){
         if(div[i].childNodes[1].value == value){
@@ -2697,6 +2699,27 @@ function radioTapSelect(event){
             div[i].childNodes[1].checked = false;
         }
     }
+}
+
+function menueShow_tap(select_value){
+    const select_tap = document.querySelector(`.s${select_value}`);
+    const tapBtn = document.querySelectorAll(`.w${select_value.charAt(1)} input`);
+    for(i=0;i< tapBtn.length; i++){
+        const select_tap2 = document.querySelector(`.s${tapBtn[i].value}`);
+        //console.log(select_tap2);
+        if(select_tap2!=null){
+            select_tap2.style.display = "none";
+        }
+    }
+    select_tap.style.display = "block";
+
+    //해당 윈도우[i]에 이 탭 번호를 집어 넣어야 함
+    let lastTapOpen = `${select_value}`;
+
+    let showTap_array = localStorage.getItem("tapShow_array");
+    showTap_array = JSON.parse(showTap_array);
+    showTap_array[Number(select_value.charAt(1))] = lastTapOpen;
+    localStorage.setItem(`tapShow_array`,JSON.stringify(showTap_array));
 }
 
 function tapNameChange(event){
@@ -2739,6 +2762,8 @@ function tapNameChange(event){
     }
     localStorage.setItem(`tap_name_array`,JSON.stringify(tapName_array));
 }
+
+
 
 function selectTapDel(event){
     //event.preventDefault();
